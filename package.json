@@ -1,0 +1,40 @@
+{
+  "name": "hyped",
+  "version": "0.0.1",
+  "description": "Hypermedia response generation engine",
+  "main": "src/index.js",
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "parseurl": "^1.2.0",
+    "plural": "^0.1.6",
+    "qs": "^1.0.0",
+    "request": "^2.47.0",
+    "when": "^3.4.2"
+  },
+  "devDependencies": {
+    "autohost": "~0.3.0",
+    "gulp": "^3.8.6",
+    "gulp-mocha": "^0.5.2",
+    "request": "^2.47.0",
+    "should": "^4.0.4",
+    "when": "^3.5.0"
+  },
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/LeanKit-Labs/hyped"
+  },
+  "keywords": [
+    "hypermedia",
+    "autohost",
+    "express"
+  ],
+  "author": "Alex Robson",
+  "license": "MIT License - http://opensource.org/licenses/MIT",
+  "bugs": {
+    "url": "https://github.com/LeanKit-Labs/hyped/issues"
+  },
+  "homepage": "https://github.com/LeanKit-Labs/hyped"
+}
