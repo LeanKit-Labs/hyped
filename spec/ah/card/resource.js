@@ -12,7 +12,7 @@ module.exports = function( host ) {
 				handle: function( envelope ) {
 					var cards = _.reduce( model.board1.lanes, function( acc, x ) { return acc.concat( x.cards ); } );
 					var card = _.where( cards, { id: envelope.data.cardId } )[ 0 ];
-					envelope.hyper( card ).render();
+					envelope.hyped( card ).render();
 				}
 			},
 			move: {

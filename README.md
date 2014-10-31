@@ -102,13 +102,13 @@ This example will add an express middleware to `autohost` that extends the envel
 __index.js__
 ```javascript
 var autohost = require( "autohost" );
-var hyper = require( "hyped" )();
+var hyped = require( "hyped" )();
 autohost
 	.init( {
 		noOptions: true // turn off autohost's OPTIONS middleware
 	} )
-	.then( hyper.addResources );
-hyper.setupMiddleware( autohost );
+	.then( hyped.addResources );
+hyped.setupMiddleware( autohost );
 ```
 
 __resource.js__
@@ -123,7 +123,7 @@ module.exports = {
 			exclude: [],
 			handle: function( envelope ) {
 				var model = databass.getSomethingById( id );
-				envelope.hyper( model ).status( 200 ).render();
+				envelope.hyped( model ).status( 200 ).render();
 			}
 		}
 	},
@@ -139,13 +139,13 @@ module.exports = {
 __express__
 ```javascript
 // assumes you have a hash containing all your resource definitions and express set up
-var hyper = require( "hyped" )( resources );
-hyper.setupMiddleware( app );
+var hyped = require( "hyped" )( resources );
+hyped.setupMiddleware( app );
 
 app.get( "something/:id", function( req, res ) {
 	var id = req.param( "id" );
 	var model = databass.getSomethingById( id );
-	req.hyper( model ).resource( "something" ).action( "self" ).status( 200 ).render();
+	req.hyped( model ).resource( "something" ).action( "self" ).status( 200 ).render();
 } );
 ```
 
@@ -163,7 +163,7 @@ app.get( "something/:id", function( req, res ) {
 			url: the URL for this action
 			include: property names array to include in the rendered response
 			exclude: property names array to exclude from rendered response
-			filter: predicate to determine if a property"s key/value should be included
+			filter: predicate to determine if a property's key/value should be included
 			condition: returns true if the action is valid for the given model
 			embed: defines which model properties are embedded resources and how to render them
 		}
@@ -278,17 +278,17 @@ hyped.versionWith( req ) {
 ## Rendering API
 The hypermedia middleware extends autohost's envelope and the underlying request object with a set of fluent calls to help with the construction of a hypermedia response.
 
-Keep in mind that normally, you will only use the `hyper`, `status` and `render` calls. The middleware should correctly detect the version, mediatype, resource and action to be rendered.
+Keep in mind that normally, you will only use the `hyped`, `status` and `render` calls. The middleware should correctly detect the version, mediatype, resource and action to be rendered.
 
 ```javascript
 	// within an autohost handler
-	envelope.hyper( myData ).status( 200 ).render();
+	envelope.hyped( myData ).status( 200 ).render();
 	
 	// within an express route
-	req.hyper( myData ).status( 200 ).render();
+	req.hyped( myData ).status( 200 ).render();
 ```
 
-### .hyper( model )
+### .hyped( model )
 You provide the data model that the resource will render a response based on. The resources are designed to work with models that may have a great deal more information than should ever be exposed to the client.
 
 ### .resource( resourceName )

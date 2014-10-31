@@ -16,7 +16,7 @@ module.exports = function( host ) {
 					}
 				},
 				handle: function( envelope ) {
-					envelope.hyper( model.board1 ).render();
+					envelope.hyped( model.board1 ).render();
 				}
 			}
 		},

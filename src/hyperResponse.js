@@ -8,7 +8,7 @@ var HyperResponse = function( req, res, engine, hyperModel, contentType ) {
 	this._contentType = contentType;
 		
 	var self = this;
-	req.extendHttp.hyper = req.hyper = function( model ) {
+	req.extendHttp.hyped = req.hyped = function( model ) {
 		self._model = model;
 		return self;
 	};
@@ -19,7 +19,7 @@ HyperResponse.prototype.action = function( action ) {
 	return this;
 };
 
-HyperResponse.prototype.code = function( code ) {
+HyperResponse.prototype.status = function( code ) {
 	this._code = code;
 	return this;
 };
