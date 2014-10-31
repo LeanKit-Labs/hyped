@@ -10,13 +10,13 @@ var deepCompare = model.deepCompare;
 
 describe( "with oldest version as default", function() {
 	var autohost = require( "autohost" );
-	var hyperhelper;
+	var hyped;
 	before( function( done ) {
-		hyperhelper = require( "../src/index.js" )();
+		hyped = require( "../src/index.js" )();
 		autohost.init( { resources: "./spec/ah", noOptions: true } ) // just roll with the defaults...
-			.then( hyperhelper.addResources )
+			.then( hyped.addResources )
 			.then( done );
-		hyperhelper.setupMiddleware( autohost );
+		hyped.setupMiddleware( autohost );
 	} );
 
 	describe( "when requesting board with no media type", function() {
@@ -214,13 +214,13 @@ describe( "with oldest version as default", function() {
 
 describe( "with newest version as default", function() {
 	var autohost = require( "autohost" );
-	var hyperhelper;
+	var hyped;
 	before( function( done ) {
-		hyperhelper = require( "../src/index.js" )( true );
+		hyped = require( "../src/index.js" )( true );
 		autohost.init( { resources: "./spec/ah", noOptions: true } ) // just roll with the defaults...
-			.then( hyperhelper.addResources )
+			.then( hyped.addResources )
 			.then( done );
-		hyperhelper.setupMiddleware( autohost );
+		hyped.setupMiddleware( autohost );
 	} );
 
 	describe( "when requesting board with no media type", function() {
