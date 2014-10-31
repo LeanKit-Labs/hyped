@@ -19,7 +19,7 @@ HyperResponse.prototype.action = function( action ) {
 	return this;
 };
 
-HyperResponse.prototype.code = function( code ) {
+HyperResponse.prototype.status = function( code ) {
 	this._code = code;
 	return this;
 };
