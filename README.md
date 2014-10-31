@@ -153,7 +153,7 @@ app.get( "something/:id", function( req, res ) {
 
 	Note: include and exclude are mutually exclusive
 
-```javascript
+```
 {
 	name: the resource name (must be unique)
 	[inherit]: indicate if this resource should inherit a parent url
