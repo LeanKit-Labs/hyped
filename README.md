@@ -163,7 +163,7 @@ app.get( "something/:id", function( req, res ) {
 			url: the URL for this action
 			include: property names array to include in the rendered response
 			exclude: property names array to exclude from rendered response
-			filter: predicate to determine if a property"s key/value should be included
+			filter: predicate to determine if a property's key/value should be included
 			condition: returns true if the action is valid for the given model
 			embed: defines which model properties are embedded resources and how to render them
 		}
