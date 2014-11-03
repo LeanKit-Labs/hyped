@@ -1,6 +1,6 @@
 {
   "name": "hyped",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Hypermedia response generation engine",
   "main": "src/index.js",
   "dependencies": {
@@ -12,7 +12,7 @@
     "when": "^3.4.2"
   },
   "devDependencies": {
-    "autohost": "~0.3.0",
+    "autohost": "~0.3.0-3",
     "gulp": "^3.8.6",
     "gulp-mocha": "^0.5.2",
     "request": "^2.47.0",

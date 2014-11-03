@@ -19,7 +19,7 @@ module.exports = function( host ) {
 				},
 				handle: function( envelope ) {
 					envelope
-						.hyped( _.where( model.board1.lanes, { id: envelope.data.laneId } )[ 0 ] )
+						.hyped( _.where( model.board1.lanes, { id: parseInt( envelope.data.laneId ) } )[ 0 ] )
 						.render();
 				}
 			},
@@ -28,7 +28,7 @@ module.exports = function( host ) {
 				url: "/lane/:lane.id/card",
 				handle: function( envelope ) {
 					envelope
-						.hyped( _.where( model.board1.lanes, { id: envelope.data.laneId } )[ 0 ].cards )
+						.hyped( _.where( model.board1.lanes, { id: parseInt( envelope.data.laneId ) } )[ 0 ].cards )
 						.resource( "card" )
 						.action( "self" )
 						.render();

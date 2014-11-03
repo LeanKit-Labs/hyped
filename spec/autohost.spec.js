@@ -13,7 +13,7 @@ describe( "with oldest version as default", function() {
 	var hyped;
 	before( function( done ) {
 		hyped = require( "../src/index.js" )();
-		autohost.init( { resources: "./spec/ah", noOptions: true } ) // just roll with the defaults...
+		autohost.init( { resources: "./spec/ah", noOptions: true, urlStrategy: hyped.urlStrategy } ) // just roll with the defaults...
 			.then( hyped.addResources )
 			.then( done );
 		hyped.setupMiddleware( autohost );
@@ -35,7 +35,6 @@ describe( "with oldest version as default", function() {
 			contentType.should.equal( "application/json" );
 			body.should.equal( '{"id":100,"title":"Test Board","lanes":[{"id":200,"title":"To Do","wip":0,"cards":[{"id":301,"title":"Card 1","description":"This is card 1"},{"id":302,"title":"Card 2","description":"This is card 2"},{"id":303,"title":"Card 3","description":"This is card 3"}]},{"id":201,"title":"Doing","wip":0,"cards":[{"id":304,"title":"Card 4","description":"This is card 4"}]},{"id":202,"title":"Done","wip":0,"cards":[{"id":305,"title":"Card 5","description":"This is card 5"},{"id":306,"title":"Card 6","description":"This is card 6"}]}]}' );
 		} );
-
 	} );
 
 	describe( "when requesting board hal version 2", function() {
@@ -62,7 +61,6 @@ describe( "with oldest version as default", function() {
 		it( "should be 'quick'", function() {
 			elapsedMs.should.be.below( 10 );
 		} );
-
 	} );
 
 	describe( "when requesting board json version 2", function() {
@@ -87,7 +85,6 @@ describe( "with oldest version as default", function() {
 		it( "should be 'quick'", function() {
 			elapsedMs.should.be.below( 10 );
 		} );
-
 	} );
 
 	describe( "when requesting board json with no version specifier", function() {
@@ -114,7 +111,6 @@ describe( "with oldest version as default", function() {
 		it( "should be 'quick'", function() {
 			elapsedMs.should.be.below( 10 );
 		} );
-
 	} );
 
 	describe( "when requesting an unsupported media type", function() {
@@ -142,44 +138,68 @@ describe( "with oldest version as default", function() {
 		} );
 	} );
 
+	describe( "when requesting lane self action", function() {
+		var body, contentType, elapsedMs, status;
+
+		before( function( done ) {
+			var start = Date.now();
+			elapsedMs = ( Date.now() - start );
+			request.get( "http://localhost:8800/api/board/100/lane/200", { headers: { accept: "application/json" } }, function( err, res ) {
+				body = res.body;
+				status = res.statusCode;
+				contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+				done();
+			} );
+		} );
+
+		it( "should be correct media type", function() {
+			contentType.should.equal( "application/json" );
+		} );
+
+		it( "should get lane back", function() {
+			var json = JSON.parse( body );
+			json.should.eql( board1.lanes[ 0 ] );
+		} );
+	} );
+
 	describe( "when hitting root with options verb", function() {
 		var body, contentType, elapsedMs;
 
 		var expectedOptions = {
 			_autohost: 
-			 { api: { href: "/api", method: "GET" },
-				 resources: { href: "/api/resource", method: "GET" },
-				 actions: { href: "/api/action", method: "GET" },
-				 "connected-sockets": { href: "/api/sockets", method: "GET" },
-				 "list-users": { href: "/api/user", method: "GET" },
-				 "list-roles": { href: "/api/role", method: "GET" },
-				 "list-user-roles": { href: "/api/user/:user/role", method: "GET", templated: true },
-				 "list-action-roles": { href: "/api/action/:action/role", method: "GET", templated: true },
-				 "add-action-roles":  { href: "/api/action/:action/role", method: "PATCH", templated: true },
-				 "remove-action-roles": { href: "/api/action/:action/role", method: "DELETE", templated: true },
-				 "add-user-roles": { href: "/api/user/:user/role", method: "PATCH", templated: true },
-				 "remove-user-roles":  { href: "/api/user/:user/role", method: "DELETE", templated: true },
-				 "add-role": { href: "/api/role/:role", method: "POST", templated: true },
-				 "remove-role": { href: "/api/role/:role", method: "DELETE", templated: true },
-				 "create-user": { href: "/api/user/:userName", method: "POST", templated: true },
-				 "change-password": { href: "/api/user/:userName", method: "PATCH", templated: true },
-				 "create-token": { href: "/api/token", method: "POST" },
-				 "destroy-token": { href: "/api/token/:token", method: "DELETE", templated: true },
-				 "list-tokens": { href: "/api/token/", method: "GET" },
-				 "enable-user": { href: "/api/user/:userName", method: "PUT", templated: true },
-				 "disable-user": { href: "/api/user/:userName", method: "DELETE", templated: true },
-				 metrics: { href: "/api/metrics", method: "GET" } },
+			 { api: { href: "/api/_autohost", method: "GET" },
+				 resources: { href: "/api/_autohost/resource", method: "GET" },
+				 actions: { href: "/api/_autohost/action", method: "GET" },
+				 "connected-sockets": { href: "/api/_autohost/sockets", method: "GET" },
+				 "list-users": { href: "/api/_autohost/user", method: "GET" },
+				 "list-roles": { href: "/api/_autohost/role", method: "GET" },
+				 "list-user-roles": { href: "/api/_autohost/user/:user/role", method: "GET", templated: true },
+				 "list-action-roles": { href: "/api/_autohost/action/:action/role", method: "GET", templated: true },
+				 "add-action-roles":  { href: "/api/_autohost/action/:action/role", method: "PATCH", templated: true },
+				 "remove-action-roles": { href: "/api/_autohost/action/:action/role", method: "DELETE", templated: true },
+				 "add-user-roles": { href: "/api/_autohost/user/:user/role", method: "PATCH", templated: true },
+				 "remove-user-roles":  { href: "/api/_autohost/user/:user/role", method: "DELETE", templated: true },
+				 "add-role": { href: "/api/_autohost/role/:role", method: "POST", templated: true },
+				 "remove-role": { href: "/api/_autohost/role/:role", method: "DELETE", templated: true },
+				 "create-user": { href: "/api/_autohost/user/:userName", method: "POST", templated: true },
+				 "change-password": { href: "/api/_autohost/user/:userName", method: "PATCH", templated: true },
+				 "create-token": { href: "/api/_autohost/token", method: "POST" },
+				 "destroy-token": { href: "/api/_autohost/token/:token", method: "DELETE", templated: true },
+				 "list-tokens": { href: "/api/_autohost/token/", method: "GET" },
+				 "enable-user": { href: "/api/_autohost/user/:userName", method: "PUT", templated: true },
+				 "disable-user": { href: "/api/_autohost/user/:userName", method: "DELETE", templated: true },
+				 metrics: { href: "/api/_autohost/metrics", method: "GET" } },
 			board: { 
 				self: { href: "/api/board/:id", method: "GET", templated: true } 
 			},
 			card: { 
-				self: { href: "/api/card/:card.id", method: "GET", templated: true },
-				move: { href: "/api/card/:card.id/board/:boardId/lane/:laneId", method: "PUT", templated: true },
-				 block: { href: "/api/card/:card.id/block", method: "PUT", templated: true }
+				self: { href: "/api/card/:id", method: "GET", templated: true },
+				move: { href: "/api/card/:id/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+				 block: { href: "/api/card/:id/block", method: "PUT", templated: true }
 			},
 			lane: { 
-				self: { href: "/api/board/:id/lane/:lane.id", method: "GET", templated: true },
-				cards: { href: "/api/board/:id/lane/:lane.id/card", method: "GET", templated: true }
+				self: { href: "/api/board/:id/lane/:laneId", method: "GET", templated: true },
+				cards: { href: "/api/board/:id/lane/:laneId/card", method: "GET", templated: true }
 			},
 			_mediaTypes: [ "application/json", "application/hal+json" ],
 			_versions: [ "1", "2" ]
@@ -198,7 +218,6 @@ describe( "with oldest version as default", function() {
 		it( "should get options", function() {
 			contentType.should.equal( "application/json" );
 			var json = JSON.parse( body );
-			console.log( body );
 			json.should.eql( expectedOptions );
 		} );
 
@@ -217,7 +236,7 @@ describe( "with newest version as default", function() {
 	var hyped;
 	before( function( done ) {
 		hyped = require( "../src/index.js" )( true );
-		autohost.init( { resources: "./spec/ah", noOptions: true } ) // just roll with the defaults...
+		autohost.init( { resources: "./spec/ah", noOptions: true, urlStrategy: hyped.urlStrategy } ) // just roll with the defaults...
 			.then( hyped.addResources )
 			.then( done );
 		hyped.setupMiddleware( autohost );

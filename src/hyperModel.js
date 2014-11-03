@@ -50,7 +50,7 @@ function buildParentUrl( resources, parent, model ) { // jshint ignore:line
 	var tokens = url.getTokens( self );
 	if( tokens.length > 0 ) {
 		var values = {};
-		if( model[ parent ] ) {
+		if( model && model[ parent ] ) {
 			_.each( tokens, function( token ) {
 				values[ token.property ] = model[ parent ][ token.property ];
 			} );
@@ -58,7 +58,7 @@ function buildParentUrl( resources, parent, model ) { // jshint ignore:line
 			_.each( tokens, function( token ) {
 				token.resource = parent;
 				var property = url.toCamel( token );
-				if( model[ property ] ) {
+				if( model && model[ property ] ) {
 					token.resource = undefined;
 					values[ token.property ] = model[ property ];
 				}
@@ -107,7 +107,7 @@ function getEmbedded( auth, resources, version, prefix, action, model, parentPat
 	var embed = action.embed;
 	var embedded;
 
-	if( embed ) {
+	if( embed && model ) {
 		embedded = {};
 		_.each( embed, function( opts, property ) {
 			var child = model[ property ];
@@ -187,14 +187,14 @@ function generateOptions( resources, version, prefix, engines, auth ) { // jshin
 		options = _.reduce( resources, function( options, resource, resourceName ) {
 			var parentUrl = resource.parent ? resources[ resource.parent ].actions.self.url : undefined;
 			options[ resourceName ] = _.reduce( resource.actions, function( links, action, actionName ) {
-				var url = [ action.url ];
+				var urlSegments = [ action.url ];
 				if( parentUrl ) {
-					url.unshift( parentUrl );
+					urlSegments.unshift( parentUrl );
 				}
 				if( prefix ) {
-					url.unshift( prefix );
+					urlSegments.unshift( prefix );
 				}
-				var link = { href: url.join( "" ), method: action.method.toUpperCase() };
+				var link = { href: url.create( urlSegments.join( "" ) ), method: action.method.toUpperCase() };
 				if( isTemplated( action.url ) ) {
 					link.templated = true;
 				}
@@ -213,7 +213,7 @@ function generateOptions( resources, version, prefix, engines, auth ) { // jshin
 function generateResource( resources, version, prefix, model, resourceName, view, auth, parentUrl ) { // jshint ignore:line
 	var resource = resources[ resourceName ];
 	if( !resource ) {
-		throw new Error( "Could not find resource '" + resourceName );
+		throw new Error( "Could not find resource '" + resourceName + "'" );
 	}
 	resource = applyVersion( resource, version );
 	var action = resource.actions[ view ];

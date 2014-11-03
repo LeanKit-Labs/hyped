@@ -7,6 +7,7 @@ var halEngine = require( "./halEngine.js" );
 var engines = {};
 var hypermodels = {};
 var resources = {};
+var optionModel;
 var prefix;
 var maxVersion;
 var preferLatest = false;
@@ -35,6 +36,7 @@ var wrapper = {
 	optionsMiddleware: optionsMiddleware,
 	registerEngine: addEngine,
 	setupMiddleware: addMiddleware,
+	urlStrategy: urlStrategy,
 	versionWith: setVersioningStrategy,
 };
 
@@ -90,11 +92,22 @@ function getEngine( mediaType ) { // jshint ignore:line
 }
 
 function getHyperModel( req ) { // jshint ignore:line
-	var version = getVersion( req );
+	var version = 1;
+	if( req ) {
+		version = getVersion( req );
+	}
 	if( !hypermodels[ version ] ) {
-		hypermodels[ version ] = HyperModel( resources, version, prefix ); // jshint ignore: line
+		hypermodels[ version ] = HyperModel( resources, version, prefix ); // jshint ignore:line
 	}
 	return hypermodels[ version ];
+}
+
+function getOptionModel( req ) {
+	if( !optionModel ) {
+		hyperModel = getHyperModel( req );
+		optionModel = hyperModel( engines );
+	}
+	return optionModel;
 }
 
 function getMaxVersion() { // jshint ignore:line
@@ -111,7 +124,7 @@ function hyperMiddleware( req, res, next ) { // jshint ignore:line
 	var contentType = getContentType( req );
 	var engine = getEngine( contentType );
 	var hyperModel = getHyperModel( req );
-	var response = new HyperResponse( req, res, engine, hyperModel, contentType ); // jshint ignore: line
+	var response = new HyperResponse( req, res, engine, hyperModel, contentType ); // jshint ignore:line
 	next();
 }
 
@@ -119,10 +132,8 @@ function optionsMiddleware( req, res, next ) { // jshint ignore:line
 	if( req.method === "OPTIONS" || req.method === "options" ) {
 		var contentType = getContentType( req );
 		var engine = getEngine( contentType );
-		var hyperModel = getHyperModel( req );
-		var hypermedia = hyperModel( engines );
-		console.log( hypermedia );
-		var body = engine( hypermedia, true );
+		var optionModel = getOptionModel( req );
+		var body = engine( optionModel, true );
 		res.status( 200 ).set( "Content-Type", contentType ).send( body );
 	} else {
 		next();
@@ -131,6 +142,14 @@ function optionsMiddleware( req, res, next ) { // jshint ignore:line
 
 function setVersioningStrategy( fn ) { // jshint ignore:line
 	getVersion = fn;
+}
+
+function urlStrategy( resourceName, actionName, action, resourceList ) { // jshint ignore:line
+	if( _.isEmpty( resources ) ) {
+		resources = resourceList;
+	}
+	var options = getOptionModel();
+	return options[ resourceName ][ actionName ].href;
 }
 
 module.exports = function( resourceList, defaultToNewest ) {

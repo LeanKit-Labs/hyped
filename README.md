@@ -60,13 +60,12 @@ Example:
 ```javascript
 {
 	name: "user",
-	actions: [
-		{
-			alias: "self",
-			verb: "get",
-			path: "/user/:user.name"
+	actions: {
+		self: {
+			method: "get",
+			url: "/user/:user.name"
 		}
-	]
+	}
 }
 ```
 
@@ -76,7 +75,7 @@ If the user model in question had a name property of `"leroyJenkins"`, the respo
 {
 	"name": "leroyJenkins",
 	"_links": {
-		"self": { "href": "/user/leroyJenkins", "verb": "GET" }
+		"self": { "href": "/user/leroyJenkins", "method": "GET" }
 	}
 }
 ```
@@ -97,7 +96,9 @@ When a URL contains path variables that could not be replaced by a value in the 
 These examples show the bare minimum. You'll only get support for built in mediatypes - presently `application/json` and `application/hal+json`. This means if you don't provide your own engine for custom media types and a client sends an accept header for a media type hyped knows about, it will send back a 415 (unsupported media type) to the client rather than throwing an exception.
 
 ### With Autohost
-This example will add an express middleware to `autohost` that extends the envelope with a fluent set of calls that can be used to construct and render a hypermedia response. The correct version, rendering engine, 
+This example will add an express middleware to `autohost` that extends the envelope with a fluent set of calls that can be used to construct and render a hypermedia response. The correct version, rendering engine, resource and action are all determined during the hyped middleware you add to autohost so that when rendering a response, the only things you must provide is the model.
+
+	Note: at this time autohost 0.3.0-3 or greater is required
 
 __index.js__
 ```javascript
@@ -105,7 +106,8 @@ var autohost = require( "autohost" );
 var hyped = require( "hyped" )();
 autohost
 	.init( {
-		noOptions: true // turn off autohost's OPTIONS middleware
+		noOptions: true, // turn off autohost's OPTIONS middleware
+		urlStrategy: hyped.urlStrategy // use hyped's URL strategy
 	} )
 	.then( hyped.addResources );
 hyped.setupMiddleware( autohost );

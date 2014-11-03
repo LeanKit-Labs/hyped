@@ -67,17 +67,17 @@ describe( "when fetching options", function() {
 		actions: {
 			self: {
 				include: [ "id", "title", "description" ],
-				url: "/card/:card.id",
+				url: "/card/:id",
 				method: "GET"
 			},
 			move: {
 				include: [ "id", "laneId" ],
-				url: "/card/:card.id/board/:boardId/lane/:laneId",
+				url: "/card/:id/board/:board.id/lane/:lane.id",
 				method: "PUT"
 			},
 			block: {
 				include: [ "id", "laneId" ],
-				url: "/card/:card.id/block",
+				url: "/card/:id/block",
 				method: "PUT"
 			}
 		}
@@ -91,13 +91,13 @@ describe( "when fetching options", function() {
 			lanes: { href: "/board/:id/lane", method: "GET", templated: true },
 		},
 		lane: {		
-			self: { href: "/board/:id/lane/:lane.id", method: "GET", templated: true },
-			cards: { href: "/board/:id/lane/:lane.id/card", method: "GET", templated: true }
+			self: { href: "/board/:id/lane/:laneId", method: "GET", templated: true },
+			cards: { href: "/board/:id/lane/:laneId/card", method: "GET", templated: true }
 		},
 		card: {				
-			self: { href: "/card/:card.id", method: "GET", templated: true },
-			move: { href: "/card/:card.id/board/:boardId/lane/:laneId", method: "PUT", templated: true },
-			block: { href: "/card/:card.id/block", method: "PUT", templated: true },
+			self: { href: "/card/:id", method: "GET", templated: true },
+			move: { href: "/card/:id/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+			block: { href: "/card/:id/block", method: "PUT", templated: true },
 		},
 		_mediaTypes: [
 			"application/json",
