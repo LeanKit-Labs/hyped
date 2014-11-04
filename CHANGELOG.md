@@ -1,3 +1,6 @@
+## 0.0.6
+Fix a bug in determining when a templated link exists in a link href.
+
 ## 0.0.5
 Embedded properties are no longer included in the response model by default. The only way to get a property on the model that was listed under the `embed` section is to also list the property in an `include` property.
 

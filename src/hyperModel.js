@@ -146,7 +146,7 @@ function getLinks( auth, model, prefix, resource, view, parentPath ) { // jshint
 				}
 				href = href.join( "" );
 				var templated = isTemplated( href );
-				var valid = ( option && !inherit && isTemplated( url ) ) || ( !option );
+				var valid = ( option && !inherit && templated ) || ( !option );
 				if( valid ) {
 					links[ rel ] = {
 						href: href, method: action.method.toUpperCase()
