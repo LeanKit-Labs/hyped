@@ -1,4 +1,5 @@
 var model = require( "../../model.js" );
+var _ = require( "lodash" );
 
 module.exports = function( host ) {
 	return {
@@ -17,6 +18,16 @@ module.exports = function( host ) {
 				},
 				handle: function( envelope ) {
 					envelope.hyped( model.board1 ).render();
+				}
+			},
+			cards: {
+				method: "get",
+				url: "/board/:id/card",
+				handle: function( envelope ) {
+					var cards = _.reduce( model.board1.lanes, function( acc, lane ) {
+						return acc.concat( lane.cards );
+					}, [] );
+					envelope.hyped( cards ).resource( "card" ).action( "self" ).render();
 				}
 			}
 		},

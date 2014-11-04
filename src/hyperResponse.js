@@ -31,7 +31,9 @@ HyperResponse.prototype.resource = function( resource ) {
 
 HyperResponse.prototype.render = function() {
 	if( this._engine ) {
-		var hypermedia = this._hyperModel( this._model, this._req._resource, this._req._action, this._authCheck );
+		var resource = this._resource || this._req._resource;
+		var action = this._action || this._req._action;
+		var hypermedia = this._hyperModel( this._model, resource, action, this._authCheck );
 		var body = this._engine( hypermedia );
 		this._res.set( "Content-Type", this._contentType ).status( this._code ).send( body );
 	} else {

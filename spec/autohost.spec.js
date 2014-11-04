@@ -41,6 +41,243 @@ describe( "with oldest version as default", function() {
 
 		var body, contentType, elapsedMs;
 
+		var expectedJson = {
+			id: 100,
+			title: "Test Board",
+			description: "This is a board and stuff!",
+			_origin: {
+				href: "/api/board/100",
+				method: "GET"
+			},
+			_links: {
+				self: {
+					href: "/api/board/100",
+					method: "GET"
+				},
+				cards: {
+					href: "/api/board/100/card",
+					method: "GET"
+				}
+			},
+			_embedded: {
+				lanes: [ 
+					{ 
+						id: 200,
+						title: "To Do",
+						wip: 0,
+						_origin: {
+							href: "/api/board/100/lane/200",
+							method: "GET"
+						},
+						_links: {
+							self: {
+								href: "/api/board/100/lane/200",
+								method: "GET"
+							},
+							cards: {
+								href: "/api/board/100/lane/200/card",
+								method: "GET"
+							}
+						},
+						_embedded: {
+							cards: [ 
+								{ 
+									id: 301,
+									title: "Card 1",
+									description: "This is card 1",
+									_origin: {
+										href: "/api/card/301",
+										method: "GET"
+									},
+									_links: {
+										self: {
+											href: "/api/card/301",
+											method: "GET"
+										},
+										move: {
+											href: "/api/card/301/board/:boardId/lane/:laneId",
+											method: "PUT",
+											templated: true
+										},
+										block: {
+											href: "/api/card/301/block",
+											method: "PUT"
+										}
+									}
+								},
+								{
+									id: 302,
+									title: "Card 2",
+									description: "This is card 2",
+									_origin: {
+										href: "/api/card/302",
+										method: "GET"
+									},
+									_links: {
+										self: {
+											href: "/api/card/302",
+											method: "GET"
+										},
+										move: {
+											href: "/api/card/302/board/:boardId/lane/:laneId",
+											method: "PUT",
+											templated: true
+										},
+										block: {
+											href: "/api/card/302/block",
+											method: "PUT"
+										}
+									}
+								},
+								{
+									id: 303,
+									title: "Card 3",
+									description: "This is card 3",
+									_origin: {
+										href: "/api/card/303",
+										method: "GET"
+									},
+									_links: {
+										self: {
+											href: "/api/card/303",
+											method: "GET"
+										},
+										move: {
+											href: "/api/card/303/board/:boardId/lane/:laneId",
+											method: "PUT",
+											templated: true
+										},
+										block: {
+											href: "/api/card/303/block",
+											method: "PUT"
+										}
+									}
+								} 
+							]
+						}
+					},
+					{
+						id: 201,
+						title: "Doing",
+						wip: 0,
+						_origin: {
+							href: "/api/board/100/lane/201",
+							method: "GET"
+						},
+						_links: {
+							self: {
+								href: "/api/board/100/lane/201",
+								method: "GET"
+							},
+							cards: {
+								href: "/api/board/100/lane/201/card",
+								method: "GET"
+							}
+						},
+						_embedded: {
+							cards: [
+								{
+									id: 304,
+									title: "Card 4",
+									description: "This is card 4",
+									_origin: {
+										href: "/api/card/304",
+										method: "GET"
+									},
+									_links: {
+										self: {
+											href: "/api/card/304",
+											method: "GET"
+										},
+										move: {
+											href: "/api/card/304/board/:boardId/lane/:laneId",
+											method: "PUT",
+											templated: true
+										},
+										block: {
+											href: "/api/card/304/block",
+											method: "PUT"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						id: 202,
+						title: "Done",
+						wip: 0,
+						_origin: {
+							href: "/api/board/100/lane/202",
+							method: "GET"
+						},
+						_links: {
+							self: {
+								href: "/api/board/100/lane/202",
+								method: "GET"
+							},
+							cards: {
+								href: "/api/board/100/lane/202/card",
+								method: "GET"
+							}
+						},
+						_embedded: {
+							cards: [
+								{
+									id: 305,
+									title: "Card 5",
+									description: "This is card 5",
+									_origin: {
+										href: "/api/card/305",
+										method: "GET"
+									},
+									_links: {
+										self: {
+											href: "/api/card/305",
+											method: "GET"
+										},
+										move: {
+											href: "/api/card/305/board/:boardId/lane/:laneId",
+											method: "PUT",
+											templated: true
+										},
+										block: {
+											href: "/api/card/305/block",
+											method: "PUT"
+										}
+									}
+								},
+								{
+									id: 306,
+									title: "Card 6",
+									description: "This is card 6",
+									_origin: {
+										href: "/api/card/306",
+										method: "GET"
+									},
+									_links: {
+										self: {
+											href: "/api/card/306",
+											method: "GET"
+										},
+										move: {
+											href: "/api/card/306/board/:boardId/lane/:laneId",
+											method: "PUT",
+											templated: true
+										},
+										block: {
+											href: "/api/card/306/block",
+											method: "PUT"
+										}
+									}
+								}
+							]
+						}
+					}
+				]
+			}
+		};
+
 		before( function( done ) {
 			var start = Date.now();
 			request.get( "http://localhost:8800/api/board/100", { headers: { accept: "application/hal.v2+json" } }, function( err, res ) {
@@ -53,9 +290,8 @@ describe( "with oldest version as default", function() {
 
 		it( "should get HAL version 2", function() {
 			contentType.should.equal( "application/hal.v2+json" );
-			body
-				.replace( /\s*/g, "" )
-				.should.equal( '{"id":100,"title":"TestBoard","description":"Thisisaboardandstuff!","_origin":{"href":"/api/board/100","method":"GET"},"_links":{"self":{"href":"/api/board/100","method":"GET"}},"_embedded":{"lanes":[{"id":200,"title":"ToDo","wip":0,"_origin":{"href":"/api/board/100/lane/200","method":"GET"},"_links":{"self":{"href":"/api/board/100/lane/200","method":"GET"},"cards":{"href":"/api/board/100/lane/200/card","method":"GET"}},"_embedded":{"cards":[{"id":301,"title":"Card1","description":"Thisiscard1","_origin":{"href":"/api/card/301","method":"GET"},"_links":{"self":{"href":"/api/card/301","method":"GET"},"move":{"href":"/api/card/301/board/:boardId/lane/:laneId","method":"PUT","templated":true},"block":{"href":"/api/card/301/block","method":"PUT"}}},{"id":302,"title":"Card2","description":"Thisiscard2","_origin":{"href":"/api/card/302","method":"GET"},"_links":{"self":{"href":"/api/card/302","method":"GET"},"move":{"href":"/api/card/302/board/:boardId/lane/:laneId","method":"PUT","templated":true},"block":{"href":"/api/card/302/block","method":"PUT"}}},{"id":303,"title":"Card3","description":"Thisiscard3","_origin":{"href":"/api/card/303","method":"GET"},"_links":{"self":{"href":"/api/card/303","method":"GET"},"move":{"href":"/api/card/303/board/:boardId/lane/:laneId","method":"PUT","templated":true},"block":{"href":"/api/card/303/block","method":"PUT"}}}]}},{"id":201,"title":"Doing","wip":0,"_origin":{"href":"/api/board/100/lane/201","method":"GET"},"_links":{"self":{"href":"/api/board/100/lane/201","method":"GET"},"cards":{"href":"/api/board/100/lane/201/card","method":"GET"}},"_embedded":{"cards":[{"id":304,"title":"Card4","description":"Thisiscard4","_origin":{"href":"/api/card/304","method":"GET"},"_links":{"self":{"href":"/api/card/304","method":"GET"},"move":{"href":"/api/card/304/board/:boardId/lane/:laneId","method":"PUT","templated":true},"block":{"href":"/api/card/304/block","method":"PUT"}}}]}},{"id":202,"title":"Done","wip":0,"_origin":{"href":"/api/board/100/lane/202","method":"GET"},"_links":{"self":{"href":"/api/board/100/lane/202","method":"GET"},"cards":{"href":"/api/board/100/lane/202/card","method":"GET"}},"_embedded":{"cards":[{"id":305,"title":"Card5","description":"Thisiscard5","_origin":{"href":"/api/card/305","method":"GET"},"_links":{"self":{"href":"/api/card/305","method":"GET"},"move":{"href":"/api/card/305/board/:boardId/lane/:laneId","method":"PUT","templated":true},"block":{"href":"/api/card/305/block","method":"PUT"}}},{"id":306,"title":"Card6","description":"Thisiscard6","_origin":{"href":"/api/card/306","method":"GET"},"_links":{"self":{"href":"/api/card/306","method":"GET"},"move":{"href":"/api/card/306/board/:boardId/lane/:laneId","method":"PUT","templated":true},"block":{"href":"/api/card/306/block","method":"PUT"}}}]}}]}}' );
+			var json = JSON.parse( body );
+			json.should.eql( expectedJson );
 		} );
 
 		it( "should be 'quick'", function() {
@@ -87,9 +323,245 @@ describe( "with oldest version as default", function() {
 		} );
 	} );
 
-	describe( "when requesting board json with no version specifier", function() {
+	describe( "when requesting board hal with no version specifier", function() {
 
 		var body, contentType, elapsedMs;
+
+		var expectedJson = {
+			id: 100,
+			title: "Test Board",
+			_origin: {
+				href: "/api/board/100",
+				method: "GET"
+			},
+			_links: {
+				self: {
+					href: "/api/board/100",
+					method: "GET"
+				},
+				cards: {
+					href: "/api/board/100/card",
+					method: "GET"
+				}
+			},
+			_embedded: {
+				lanes: [ 
+					{ 
+						id: 200,
+						title: "To Do",
+						wip: 0,
+						_origin: {
+							href: "/api/board/100/lane/200",
+							method: "GET"
+						},
+						_links: {
+							self: {
+								href: "/api/board/100/lane/200",
+								method: "GET"
+							},
+							cards: {
+								href: "/api/board/100/lane/200/card",
+								method: "GET"
+							}
+						},
+						_embedded: {
+							cards: [ 
+								{ 
+									id: 301,
+									title: "Card 1",
+									description: "This is card 1",
+									_origin: {
+										href: "/api/card/301",
+										method: "GET"
+									},
+									_links: {
+										self: {
+											href: "/api/card/301",
+											method: "GET"
+										},
+										move: {
+											href: "/api/card/301/board/:boardId/lane/:laneId",
+											method: "PUT",
+											templated: true
+										},
+										block: {
+											href: "/api/card/301/block",
+											method: "PUT"
+										}
+									}
+								},
+								{
+									id: 302,
+									title: "Card 2",
+									description: "This is card 2",
+									_origin: {
+										href: "/api/card/302",
+										method: "GET"
+									},
+									_links: {
+										self: {
+											href: "/api/card/302",
+											method: "GET"
+										},
+										move: {
+											href: "/api/card/302/board/:boardId/lane/:laneId",
+											method: "PUT",
+											templated: true
+										},
+										block: {
+											href: "/api/card/302/block",
+											method: "PUT"
+										}
+									}
+								},
+								{
+									id: 303,
+									title: "Card 3",
+									description: "This is card 3",
+									_origin: {
+										href: "/api/card/303",
+										method: "GET"
+									},
+									_links: {
+										self: {
+											href: "/api/card/303",
+											method: "GET"
+										},
+										move: {
+											href: "/api/card/303/board/:boardId/lane/:laneId",
+											method: "PUT",
+											templated: true
+										},
+										block: {
+											href: "/api/card/303/block",
+											method: "PUT"
+										}
+									}
+								} 
+							]
+						}
+					},
+					{
+						id: 201,
+						title: "Doing",
+						wip: 0,
+						_origin: {
+							href: "/api/board/100/lane/201",
+							method: "GET"
+						},
+						_links: {
+							self: {
+								href: "/api/board/100/lane/201",
+								method: "GET"
+							},
+							cards: {
+								href: "/api/board/100/lane/201/card",
+								method: "GET"
+							}
+						},
+						_embedded: {
+							cards: [
+								{
+									id: 304,
+									title: "Card 4",
+									description: "This is card 4",
+									_origin: {
+										href: "/api/card/304",
+										method: "GET"
+									},
+									_links: {
+										self: {
+											href: "/api/card/304",
+											method: "GET"
+										},
+										move: {
+											href: "/api/card/304/board/:boardId/lane/:laneId",
+											method: "PUT",
+											templated: true
+										},
+										block: {
+											href: "/api/card/304/block",
+											method: "PUT"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						id: 202,
+						title: "Done",
+						wip: 0,
+						_origin: {
+							href: "/api/board/100/lane/202",
+							method: "GET"
+						},
+						_links: {
+							self: {
+								href: "/api/board/100/lane/202",
+								method: "GET"
+							},
+							cards: {
+								href: "/api/board/100/lane/202/card",
+								method: "GET"
+							}
+						},
+						_embedded: {
+							cards: [
+								{
+									id: 305,
+									title: "Card 5",
+									description: "This is card 5",
+									_origin: {
+										href: "/api/card/305",
+										method: "GET"
+									},
+									_links: {
+										self: {
+											href: "/api/card/305",
+											method: "GET"
+										},
+										move: {
+											href: "/api/card/305/board/:boardId/lane/:laneId",
+											method: "PUT",
+											templated: true
+										},
+										block: {
+											href: "/api/card/305/block",
+											method: "PUT"
+										}
+									}
+								},
+								{
+									id: 306,
+									title: "Card 6",
+									description: "This is card 6",
+									_origin: {
+										href: "/api/card/306",
+										method: "GET"
+									},
+									_links: {
+										self: {
+											href: "/api/card/306",
+											method: "GET"
+										},
+										move: {
+											href: "/api/card/306/board/:boardId/lane/:laneId",
+											method: "PUT",
+											templated: true
+										},
+										block: {
+											href: "/api/card/306/block",
+											method: "PUT"
+										}
+									}
+								}
+							]
+						}
+					}
+				]
+			}
+		};
 
 		before( function( done ) {
 			var start = Date.now();
@@ -103,9 +575,8 @@ describe( "with oldest version as default", function() {
 
 		it( "should get HAL version 1", function() {
 			contentType.should.equal( "application/hal+json" );
-			body
-				.replace( /\s*/g, "" )
-				.should.equal( '{"id":100,"title":"TestBoard","_origin":{"href":"/api/board/100","method":"GET"},"_links":{"self":{"href":"/api/board/100","method":"GET"}},"_embedded":{"lanes":[{"id":200,"title":"ToDo","wip":0,"_origin":{"href":"/api/board/100/lane/200","method":"GET"},"_links":{"self":{"href":"/api/board/100/lane/200","method":"GET"},"cards":{"href":"/api/board/100/lane/200/card","method":"GET"}},"_embedded":{"cards":[{"id":301,"title":"Card1","description":"Thisiscard1","_origin":{"href":"/api/card/301","method":"GET"},"_links":{"self":{"href":"/api/card/301","method":"GET"},"move":{"href":"/api/card/301/board/:boardId/lane/:laneId","method":"PUT","templated":true},"block":{"href":"/api/card/301/block","method":"PUT"}}},{"id":302,"title":"Card2","description":"Thisiscard2","_origin":{"href":"/api/card/302","method":"GET"},"_links":{"self":{"href":"/api/card/302","method":"GET"},"move":{"href":"/api/card/302/board/:boardId/lane/:laneId","method":"PUT","templated":true},"block":{"href":"/api/card/302/block","method":"PUT"}}},{"id":303,"title":"Card3","description":"Thisiscard3","_origin":{"href":"/api/card/303","method":"GET"},"_links":{"self":{"href":"/api/card/303","method":"GET"},"move":{"href":"/api/card/303/board/:boardId/lane/:laneId","method":"PUT","templated":true},"block":{"href":"/api/card/303/block","method":"PUT"}}}]}},{"id":201,"title":"Doing","wip":0,"_origin":{"href":"/api/board/100/lane/201","method":"GET"},"_links":{"self":{"href":"/api/board/100/lane/201","method":"GET"},"cards":{"href":"/api/board/100/lane/201/card","method":"GET"}},"_embedded":{"cards":[{"id":304,"title":"Card4","description":"Thisiscard4","_origin":{"href":"/api/card/304","method":"GET"},"_links":{"self":{"href":"/api/card/304","method":"GET"},"move":{"href":"/api/card/304/board/:boardId/lane/:laneId","method":"PUT","templated":true},"block":{"href":"/api/card/304/block","method":"PUT"}}}]}},{"id":202,"title":"Done","wip":0,"_origin":{"href":"/api/board/100/lane/202","method":"GET"},"_links":{"self":{"href":"/api/board/100/lane/202","method":"GET"},"cards":{"href":"/api/board/100/lane/202/card","method":"GET"}},"_embedded":{"cards":[{"id":305,"title":"Card5","description":"Thisiscard5","_origin":{"href":"/api/card/305","method":"GET"},"_links":{"self":{"href":"/api/card/305","method":"GET"},"move":{"href":"/api/card/305/board/:boardId/lane/:laneId","method":"PUT","templated":true},"block":{"href":"/api/card/305/block","method":"PUT"}}},{"id":306,"title":"Card6","description":"Thisiscard6","_origin":{"href":"/api/card/306","method":"GET"},"_links":{"self":{"href":"/api/card/306","method":"GET"},"move":{"href":"/api/card/306/board/:boardId/lane/:laneId","method":"PUT","templated":true},"block":{"href":"/api/card/306/block","method":"PUT"}}}]}}]}}' );
+			var json = JSON.parse( body );
+			json.should.eql( expectedJson );
 		} );
 
 		it( "should be 'quick'", function() {
@@ -178,45 +649,45 @@ describe( "with oldest version as default", function() {
 
 		var expectedLane = {
 			id: 201,
-			title: 'Doing',
+			title: "Doing",
 			wip: 0,
 			_origin: {
-					href: '/api/board/100/lane/201',
-					method: 'GET'
+					href: "/api/board/100/lane/201",
+					method: "GET"
 			},
 			_links: {
 					self: {
-							href: '/api/board/100/lane/201',
-							method: 'GET'
+							href: "/api/board/100/lane/201",
+							method: "GET"
 					},
 					cards: {
-							href: '/api/board/100/lane/201/card',
-							method: 'GET'
+							href: "/api/board/100/lane/201/card",
+							method: "GET"
 					}
 			},
 			_embedded: {
 				cards: [
 					{
 						id: 304,
-						title: 'Card 4',
-						description: 'This is card 4',
+						title: "Card 4",
+						description: "This is card 4",
 						_origin: {
-								href: '/api/card/304',
-								method: 'GET'
+								href: "/api/card/304",
+								method: "GET"
 						},
 						_links: {
 								self: {
-										href: '/api/card/304',
-										method: 'GET'
+										href: "/api/card/304",
+										method: "GET"
 								},
 								move: {
-										href: '/api/card/304/board/:boardId/lane/:laneId',
-										method: 'PUT',
+										href: "/api/card/304/board/:boardId/lane/:laneId",
+										method: "PUT",
 										templated: true
 								},
 								block: {
-										href: '/api/card/304/block',
-										method: 'PUT'
+										href: "/api/card/304/block",
+										method: "PUT"
 								}
 						}
 					}
@@ -233,6 +704,32 @@ describe( "with oldest version as default", function() {
 			json.should.eql( expectedLane );
 		} );
 	} );
+
+	describe( "when rendering related list of resources as hal", function() {
+
+		var body, contentType, elapsedMs;
+
+		before( function( done ) {
+			var start = Date.now();
+			request.get( "http://localhost:8800/api/board/100/card", { headers: { accept: "application/hal+json" } }, function( err, res ) {
+				elapsedMs = ( Date.now() - start );
+				body = res.body;
+				contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+				done();
+			} );
+		} );
+
+		it( "should get HAL", function() {
+			contentType.should.equal( "application/hal+json" );
+			var json = JSON.parse( body );
+			json.should.equal( {} );
+		} );
+
+		it( "should be 'quick'", function() {
+			elapsedMs.should.be.below( 10 );
+		} );
+	} );
+
 
 	describe( "when hitting root with options verb", function() {
 		var body, contentType, elapsedMs;
@@ -262,6 +759,7 @@ describe( "with oldest version as default", function() {
 				 "disable-user": { href: "/api/_autohost/user/:userName", method: "DELETE", templated: true },
 				 metrics: { href: "/api/_autohost/metrics", method: "GET" } },
 			board: { 
+				cards: { href: "/api/board/:id/card", method: "GET", templated: true },
 				self: { href: "/api/board/:id", method: "GET", templated: true } 
 			},
 			card: { 
