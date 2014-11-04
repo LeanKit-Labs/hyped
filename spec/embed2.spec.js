@@ -198,7 +198,6 @@ describe( "without inherited URL", function() {
 	} );
 
 	it( 'should generate self hypermedia object model', function() {
-		console.log( self );
 		deepCompare( self, expectedSelf );
 	} );
 

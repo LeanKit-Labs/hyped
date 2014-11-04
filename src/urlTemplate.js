@@ -3,9 +3,13 @@ var find = /[:]([^:\/?]*)/g;
 var replace = /[:]replace/g;
 
 function camelCase ( token ) {
-	return _.isEmpty( token.resource ) ? 
-			token.property :
-			token.resource + token.property[ 0 ].toUpperCase() + token.property.slice( 1 );
+	return camelize( token.resource, token.property );
+}
+
+function camelize( resource, property ) { // jshint ignore:line
+	return _.isEmpty( resource ) ? 
+			property :
+			resource + property[ 0 ].toUpperCase() + property.slice( 1 );	
 }
 
 function createUrl( url, data, resource ) {

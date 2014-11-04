@@ -223,6 +223,9 @@ function generateResource( resources, version, prefix, model, resourceName, view
 	if( !action ) {
 		throw new Error( "Could not find action '" + view + "' for resource '" + resourceName + "'");
 	}
+	if( resource.parent && !parentUrl ) {
+		parentUrl = prefix + buildParentUrl( resources, resource.parent, model );
+	}
 	var hypermodel = filterProperties( model, action );
 	addOrigin( hypermodel, resources, resourceName, resource, action, model, prefix, parentUrl );
 	addLinks( hypermodel, auth, model, prefix, resource, view, parentUrl );

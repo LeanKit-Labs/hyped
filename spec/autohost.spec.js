@@ -138,7 +138,7 @@ describe( "with oldest version as default", function() {
 		} );
 	} );
 
-	describe( "when requesting lane self action", function() {
+	describe( "when requesting lane self action as JSON", function() {
 		var body, contentType, elapsedMs, status;
 
 		before( function( done ) {
@@ -158,7 +158,79 @@ describe( "with oldest version as default", function() {
 
 		it( "should get lane back", function() {
 			var json = JSON.parse( body );
-			json.should.eql( board1.lanes[ 0 ] );
+			json.should.eql( _.omit( board1.lanes[ 0 ], [ "board", "boardId" ] ) );
+		} );
+	} );
+
+	describe( "when requesting lane self action as HAL", function() {
+		var body, contentType, elapsedMs, status;
+
+		before( function( done ) {
+			var start = Date.now();
+			elapsedMs = ( Date.now() - start );
+			request.get( "http://localhost:8800/api/board/100/lane/201", { headers: { accept: "application/hal+json" } }, function( err, res ) {
+				body = res.body;
+				status = res.statusCode;
+				contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+				done();
+			} );
+		} );
+
+		var expectedLane = {
+			id: 201,
+			title: 'Doing',
+			wip: 0,
+			_origin: {
+					href: '/api/board/100/lane/201',
+					method: 'GET'
+			},
+			_links: {
+					self: {
+							href: '/api/board/100/lane/201',
+							method: 'GET'
+					},
+					cards: {
+							href: '/api/board/100/lane/201/card',
+							method: 'GET'
+					}
+			},
+			_embedded: {
+				cards: [
+					{
+						id: 304,
+						title: 'Card 4',
+						description: 'This is card 4',
+						_origin: {
+								href: '/api/card/304',
+								method: 'GET'
+						},
+						_links: {
+								self: {
+										href: '/api/card/304',
+										method: 'GET'
+								},
+								move: {
+										href: '/api/card/304/board/:boardId/lane/:laneId',
+										method: 'PUT',
+										templated: true
+								},
+								block: {
+										href: '/api/card/304/block',
+										method: 'PUT'
+								}
+						}
+					}
+				]
+			}
+		};
+
+		it( "should be correct media type", function() {
+			contentType.should.equal( "application/hal+json" );
+		} );
+
+		it( "should get lane back", function() {
+			var json = JSON.parse( body );
+			json.should.eql( expectedLane );
 		} );
 	} );
 
