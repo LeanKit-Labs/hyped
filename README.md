@@ -153,7 +153,12 @@ app.get( "something/:id", function( req, res ) {
 
 ### Resource Definition
 
-	Note: include and exclude are mutually exclusive
+> __Notes__
+
+> 1. `include` and `exclude` are mutually exclusive
+
+> 1. Properties listed in `embed` are not included in the response body. To override this, you'll need to list them in the `include` array.
+
 
 ```
 {

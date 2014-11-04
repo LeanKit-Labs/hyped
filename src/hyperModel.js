@@ -86,11 +86,13 @@ function filterProperties ( model, action ) {
 	var filter = action.filter;
 	var exclude = action.exclude;
 	var map = action.transform;
+	var embeddedProperties = _.keys( action.embed );
 
 	var filtered;
 	if( map ) {
 		filtered = map( model );
 	} else if( include ) {
+		embeddedProperties = _.difference( embeddedProperties, include );
 		filtered = _.pick( model, include );
 	} else if ( exclude ) {
 		filtered = _.omit( model, exclude );
@@ -100,6 +102,7 @@ function filterProperties ( model, action ) {
 	if( filter ) {
 		filtered = _.pick( filtered, filter );
 	}
+	filtered = _.omit( filtered, embeddedProperties );
 	return filtered;
 }
 

@@ -43,7 +43,6 @@ describe( "without inherited URL", function() {
 			self: {
 				method: "get",
 				url: "/lane/:lane.id",
-				include: [ "id", "title", "wip" ],
 				embed: {
 					cards: {
 						resource: "card",
@@ -199,6 +198,7 @@ describe( "without inherited URL", function() {
 	} );
 
 	it( 'should generate self hypermedia object model', function() {
+		console.log( self );
 		deepCompare( self, expectedSelf );
 	} );
 
