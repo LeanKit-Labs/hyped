@@ -1,5 +1,5 @@
 var _ = require( "lodash" );
-var HyperModel = require( "./hypermodel.js" );
+var HyperModel = require( "./hyperModel.js" );
 var HyperResponse = require( "./HyperResponse.js" );
 var jsonEngine = require( "./jsonEngine.js" );
 var halEngine = require( "./halEngine.js" );
@@ -97,7 +97,7 @@ function getHyperModel( req ) { // jshint ignore:line
 		version = getVersion( req );
 	}
 	if( !hypermodels[ version ] ) {
-		hypermodels[ version ] = HyperModel( resources, version, prefix ); // jshint ignore:line
+		hypermodels[ version ] = HyperModel( resources, version, prefix ); // jshint ignore: line
 	}
 	return hypermodels[ version ];
 }
@@ -105,7 +105,7 @@ function getHyperModel( req ) { // jshint ignore:line
 function getOptionModel( req ) {
 	if( !optionModel ) {
 		hyperModel = getHyperModel( req );
-		optionModel = hyperModel( engines );
+		optionModel = hyperModel( engines ).render();
 	}
 	return optionModel;
 }

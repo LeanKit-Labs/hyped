@@ -1,35 +1,7 @@
-var url = require( "../src/urlTemplate.js" );
-var plural = require( "plural" );
 var _ = require( "lodash" );
+var url = require( "./urlTemplate.js" );
+var plural = require( "plural" );
 var options;
-
-function addEmbedded( hypermodel, auth, resources, version, prefix, action, model ) {
-	var embedded = getEmbedded( auth, resources, version, prefix, action, model, hypermodel._links.self ? hypermodel._links.self.href : "" );
-	if( embedded ) {
-		hypermodel._embedded = embedded;
-	}
-}
-
-function addLinks( hypermodel, auth, model, prefix, resource, view, parentUrl ) {
-	var links = getLinks( auth, model, prefix, resource, view, parentUrl );
-	if( links ) {
-		hypermodel._links = links;
-	}
-}
-
-function addOrigin( hypermodel, resources, resourceName, resource, action, model, prefix, parentUrl ) {
-	parentUrl = ( resource.parent && ( !parentUrl || isTemplated( parentUrl ) ) ) ? buildParentUrl( resources, resource.parent, model ) : parentUrl;
-	var origin = [ url.create( action.url, model, resourceName ) ];
-	if( parentUrl && resource.parent ) {
-		origin.unshift( parentUrl );
-	} else {
-		origin.unshift( prefix );
-	}
-	hypermodel._origin = { href: origin.join( "" ), method: action.method.toUpperCase() };
-	if( isTemplated( origin ) ) {
-		hypermodel._origin.templated = true;
-	}
-}
 
 function applyVersion( resource, version ) {
 	var target = _.cloneDeep( resource );
@@ -44,27 +16,30 @@ function applyVersion( resource, version ) {
 	return target;
 }
 
-function buildParentUrl( resources, parent, model ) { // jshint ignore:line
-	var resource = resources[ parent ];
-	var self = resource.actions.self.url;
-	var tokens = url.getTokens( self );
-	if( tokens.length > 0 ) {
-		var values = {};
-		if( model && model[ parent ] ) {
-			_.each( tokens, function( token ) {
-				values[ token.property ] = model[ parent ][ token.property ];
-			} );
-		} else {
-			_.each( tokens, function( token ) {
-				token.resource = parent;
-				var property = url.toCamel( token );
-				if( model && model[ property ] ) {
-					token.resource = undefined;
-					values[ token.property ] = model[ property ];
-				}
-			} );
+function buildParentUrl( resources, parent, model, prefix ) { // jshint ignore:line
+	var self = "";
+	if( parent && resources[ parent ] ) {
+		var resource = resources[ parent ];
+		self = ( prefix || "" ) + resource.actions.self.url;
+		var tokens = url.getTokens( self );
+		if( tokens.length > 0 ) {
+			var values = {};
+			if( model && model[ parent ] ) {
+				_.each( tokens, function( token ) {
+					values[ token.property ] = model[ parent ][ token.property ];
+				} );
+			} else {
+				_.each( tokens, function( token ) {
+					token.resource = parent;
+					var property = url.toCamel( token );
+					if( model && model[ property ] ) {
+						token.resource = undefined;
+						values[ token.property ] = model[ property ];
+					}
+				} );
+			}
+			self = url.create( self, values, parent );
 		}
-		self = url.create( self, values, parent );
 	}
 	return self;
 }
@@ -106,86 +81,7 @@ function filterProperties ( model, action ) {
 	return filtered;
 }
 
-function getEmbedded( auth, resources, version, prefix, action, model, parentPath ) { // jshint ignore:line
-	var embed = action.embed;
-	var embedded;
-
-	if( embed && model ) {
-		embedded = {};
-		_.each( embed, function( opts, property ) {
-			var child = model[ property ];
-			var resourceName = opts.resource;
-			if( _.isArray( child ) ) {
-				embedded[ property ] = _.map( child, function( item ) {
-					return generate( resources, version, prefix, item, resourceName, opts.render, auth, parentPath );
-				} );
-			} else {
-				embedded[ property ] = generate( resources, version, prefix, child, resourceName, opts.render, auth, parentPath );
-			}
-		} );
-	}
-
-	return embedded;
-}
-
-function getLinks( auth, model, prefix, resource, view, parentPath ) { // jshint ignore:line
-	var links;
-	if( resource.actions ) {
-		links = {};
-		_.each( resource.actions, function( action, rel ) {
-			var hasPermission = !auth || auth( resource.name + "." + rel );
-			var canRender = action.condition ? action.condition( model ) : true;
-			if( hasPermission && canRender ) {
-				var href = [ url.create( action.url, model, resource.name ) ];
-				var option = !model;
-				var inherit = resource.parent !== undefined;
-				if( inherit ) {
-					href.unshift( parentPath );
-				} else {
-					href.unshift( prefix );
-				}
-				href = href.join( "" );
-				var templated = isTemplated( href );
-				var valid = ( option && !inherit && templated ) || ( !option );
-				if( valid ) {
-					links[ rel ] = {
-						href: href, method: action.method.toUpperCase()
-					};
-					if( templated ) {
-						links[ rel ].templated = true;
-					}
-				}
-			}
-		} );
-	}
-	return links;
-}
-
-function generate( resources, version, prefix, model, resourceName, view, auth, parentUrl ) { // jshint ignore:line
-	if( !resourceName ) {
-		return generateOptions(resources, version, prefix, model, auth );
-	} else if( _.isArray( model ) ) {
-		return generateCollection( resources, version, prefix, model, resourceName, view, auth, parentUrl );
-	} else {
-		return generateResource( resources, version, prefix, model, resourceName, view, auth, parentUrl );
-	}
-}
-
-function generateCollection( resources, version, prefix, collection, resourceName, view, auth, parentUrl ) { // jshint ignore:line
-	var resource = resources[ resourceName ];
-	var action = resource.actions[ view ];
-	var list = _.map( collection, function( model ) {
-		return generateResource( resources, version, prefix, model, resourceName, view, parentUrl );
-	} );
-	var hypermodel = {};
-	var origin = url.create( action.url, hypermodel, resourceName );
-	hypermodel._origin = { href: origin, method: action.method.toUpperCase() };
-	hypermodel[ plural( resourceName ) ] = list;
-	return hypermodel;
-}
-
-// TODO: use auth (if available) to filter actions in options as well
-function generateOptions( resources, version, prefix, engines, auth ) { // jshint ignore:line
+function getOptions( resources, prefix, engines ) { // jshint ignore:line
 	if( !options ) {
 		options = _.reduce( resources, function( options, resource, resourceName ) {
 			var parentUrl = resource.parent ? resources[ resource.parent ].actions.self.url : undefined;
@@ -213,31 +109,167 @@ function generateOptions( resources, version, prefix, engines, auth ) { // jshin
 	return options;
 }
 
-function generateResource( resources, version, prefix, model, resourceName, view, auth, parentUrl ) { // jshint ignore:line
-	var resource = resources[ resourceName ];
-	if( !resource ) {
-		throw new Error( "Could not find resource '" + resourceName + "'" );
-	}
-	resource = applyVersion( resource, version );
-	var action = resource.actions[ view ];
-	if( !action ) {
-		throw new Error( "Could not find action '" + view + "' for resource '" + resourceName + "'");
-	}
-	if( resource.parent && !parentUrl ) {
-		parentUrl = prefix + buildParentUrl( resources, resource.parent, model );
-	}
-	var hypermodel = filterProperties( model, action );
-	addOrigin( hypermodel, resources, resourceName, resource, action, model, prefix, parentUrl );
-	addLinks( hypermodel, auth, model, prefix, resource, view, parentUrl );
-	addEmbedded( hypermodel, auth, resources, version, prefix, action, model );
-	
-	return hypermodel;
-}
-
 function isTemplated( url ) { // jshint ignore:line
 	return url.indexOf( ":" ) > 0;
 }
 
-module.exports = function( resources, version, prefix ) {
-	return generate.bind( null, resources, version, prefix );
-};
+function initialize( resources, version, prefix ) {
+	options = undefined;
+	return function( model, resourceName, actionName ) {
+		var parentUrl, authorize, filtered;
+		var originResourceName = resourceName;
+		var originActionName = actionName;
+		var originResource = resources[ originResourceName ];
+		var originAction = originResource ? originResource.actions[ originActionName ] : undefined;
+		var resource = ( resources[ resourceName ] ) ? applyVersion( resources[ resourceName ], version ) : undefined;
+		var action = resource ? resource.actions[ actionName ] : undefined;
+		
+		if( resourceName && !resource ) {
+			throw new Error( "Could not find resource '" + resourceName + "'" );
+		}
+
+		if( actionName && !action ) {
+			throw new Error( "Could not find action '" + actionName + "' for resource '" + resourceName + "'" );
+		}
+
+		if( model ) {
+			filtered = action ? filterProperties( model, action ) : undefined;
+			parentUrl = parentUrl || resource ? buildParentUrl( resources, resource.parent, model, prefix ) : "";
+		}
+
+		return {
+			auth: function( auth ) {
+				authorize = auth;
+				return this;
+			},
+			getEmbedded: function( item, _parentUrl ) {
+				item = item || model;
+				var embed = action.embed;
+				var embedded;
+
+				if( embed && item ) {
+					embedded = {};
+					_.each( embed, function( opts, property ) {
+						var child = item[ property ];
+						var resourceName = opts.resource;
+						if( _.isArray( child ) ) {
+							var fn = initialize( resources, version, prefix );
+							embedded[ property ] = _.map( child, function( item ) {
+								return fn( item, resourceName, opts.render ).auth( authorize ).parentUrl( _parentUrl ).render();
+							} );
+						} else {
+							embedded[ property ] = initialize( resources, version, prefix )( child, resourceName, opts.render ).auth( authorize ).parentUrl( _parentUrl ).render();
+						}
+					} );
+				}
+
+				return embedded;
+			},
+			getLinks: function( item ) { // jshint ignore:line
+				item = item || model;
+				var links;
+				if( resource.actions ) {
+					links = {};
+					_.each( resource.actions, function( action, rel ) {
+						var hasPermission = !authorize || authorize( resource.name + "." + rel );
+						var canRender = action.condition ? action.condition( item ) : true;
+						if( hasPermission && canRender ) {
+							var href = [ url.create( action.url, item, resource.name ) ];
+							var option = !item;
+							var inherit = resource.parent !== undefined;
+							if( inherit ) {
+								href.unshift( parentUrl );
+							} else {
+								href.unshift( prefix );
+							}
+							href = href.join( "" );
+							var templated = isTemplated( href );
+							var valid = ( option && !inherit && templated ) || ( !option );
+							if( valid ) {
+								links[ rel ] = {
+									href: href, method: action.method.toUpperCase()
+								};
+								if( templated ) {
+									links[ rel ].templated = true;
+								}
+							}
+						}
+					} );
+				}
+				return links;
+			},
+			getOrigin: function( item ) {
+				item = item || model;
+				var origin = [ url.create( originAction.url, item, originResourceName ) ];
+				if( parentUrl && resource.parent ) {
+					origin.unshift( parentUrl );
+				} else {
+					origin.unshift( prefix );
+				}
+				var link = { href: origin.join( "" ), method: action.method.toUpperCase() };
+				if( isTemplated( link.href ) ) {
+					link.templated = true;
+				}
+				return link;
+			},
+			originalResource: function( name ) {
+				originResourceName = name;
+				originResource = resources[ originResourceName ];
+				return this;
+			},
+			parentUrl: function( url ) {
+				parentUrl = url;
+				return this;
+			},
+			render: function() {
+				if( !resource ) {
+					return this.renderOptions();
+				} else if ( _.isArray( model ) ) {
+					return this.renderResources();
+				} else {
+					return this.renderResource();
+				}
+			},
+			renderOptions: function() {
+				return getOptions( resources, prefix, model );
+			},
+			renderResource: function( item ) {
+				if( item ) {
+					filtered = action ? filterProperties( item, action ) : undefined;
+				}
+				var hyperModel = filtered;
+				hyperModel._origin = this.getOrigin( item );
+				hyperModel._links = this.getLinks( item );
+				hyperModel._embedded = this.getEmbedded( item, hyperModel._links.self.href );
+				return _.omit( hyperModel, function( val ) { return val === undefined; } );
+			},
+			renderResources: function() {
+				var hyperModel = {};
+
+				var fn = initialize( resources, version, prefix );
+				var list = _.map( model, function( item ) {
+					return fn( item, resourceName, actionName ).auth( authorize ).render();
+				} );
+				hyperModel._origin = this.getOrigin( model[ 0 ] );
+				hyperModel[ plural( resourceName ) ] = list;
+				return hyperModel;
+			},
+			useAction: function( name ) {
+				if( name ) {
+					actionName = name;
+					action = resources[ resourceName ].actions[ name ];
+				}
+				return this;
+			},
+			useResource: function( name ) {
+				if( name ) {
+					resourceName = name;
+					resource = resources[ resourceName ];
+				}
+				return this;
+			}
+		};
+	};
+}
+
+module.exports = initialize;

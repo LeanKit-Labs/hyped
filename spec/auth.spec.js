@@ -41,10 +41,11 @@ describe( "when filtering links by permission", function() {
 
 	before( function() {
 		var hypermodel = HyperModel( { board: resource } );
-		self = hypermodel( board1, "board", "self", authCheck );
+		self = hypermodel( board1, "board", "self" ).auth( authCheck ).render();
 	} );
 
 	it( 'should generate self hypermedia object model', function() {
-		deepCompare( self, expectedSelf );
+		//deepCompare( self, expectedSelf );
+		self.should.eql( expectedSelf );
 	} );
 } );

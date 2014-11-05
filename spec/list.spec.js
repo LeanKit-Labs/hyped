@@ -2,7 +2,7 @@ var should = require( "should" ); // jshint ignore: line
 var _ = require( "lodash" );
 var when = require( "when" );
 var model = require( "./model.js" );
-var HyperModel = require( "../src/hypermodel.js" );
+var HyperModel = require( "../src/hyperModel.js" );
 
 var board1 = model.board1;
 var board2 = model.board2;
@@ -96,12 +96,12 @@ describe( "when rendering simple list", function() {
 		var board1b = _.cloneDeep( board1 );
 		var board1c = _.cloneDeep( board1 );
 		var hypermodel = HyperModel( { board: boardResource } );
-		self = hypermodel( board1a, "board", "self" );
-		tagList = hypermodel( board1a, "board", "tags" );
+		self = hypermodel( board1a, "board", "self" ).render();
+		tagList = hypermodel( board1a, "board", "tags" ).render();
 		board1b.tags.push( "four" );
-		postAdd = hypermodel(board1b, "board", "addTag" );
+		postAdd = hypermodel(board1b, "board", "addTag" ).render();
 		board1c.tags.splice( 2, 1 );
-		postRemove = hypermodel( board1c, "board", "removeTag" );
+		postRemove = hypermodel( board1c, "board", "removeTag" ).render();
 	} );
 
 	it( 'should generate self hypermedia object model', function() {

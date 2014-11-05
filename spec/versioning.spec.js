@@ -412,11 +412,11 @@ describe( "when fetching options", function() {
 		hypermodelv1 = HyperModel( { board: boardResource, lane: laneResource, card: cardResource } );
 		hypermodelv2 = HyperModel( { board: boardResource, lane: laneResource, card: cardResource }, 2 );
 		hypermodelv3 = HyperModel( { board: boardResource, lane: laneResource, card: cardResource }, 3 );
-		selfv1 = hypermodelv1( board1, "board", "self" );
-		selfv2 = hypermodelv2( board1, "board", "self" );
-		selfv3 = hypermodelv3( board1, "board", "self" );
+		selfv1 = hypermodelv1( board1, "board", "self" ).render();
+		selfv2 = hypermodelv2( board1, "board", "self" ).render();
+		selfv3 = hypermodelv3( board1, "board", "self" ).render();
 
-		fullv1 = hypermodelv1( board1, "board", "full" );
+		fullv1 = hypermodelv1( board1, "board", "full" ).render();
 	} );
 
 	it( "should generate selfv1", function() {
@@ -436,6 +436,6 @@ describe( "when fetching options", function() {
 	} );
 
 	it( "should throw an exception when rendering missing action", function() {
-		( function() { hypermodelv3( board1, "board", "full" ); } ).should.throw( "Could not find action 'full' for resource 'board'" );
+		( function() { hypermodelv3( board1, "board", "full" ).render(); } ).should.throw( "Could not find action 'full' for resource 'board'" );
 	} );
 } );

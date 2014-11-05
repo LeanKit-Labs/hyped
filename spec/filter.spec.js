@@ -37,7 +37,7 @@ describe( "with property filter", function() {
 
 	before( function() {
 		var hypermodel = HyperModel( { board: resource } );
-		self = hypermodel( board1, "board", "self" );
+		self = hypermodel( board1, "board", "self" ).render();
 	} );
 
 	it( 'should generate self hypermedia object model', function() {

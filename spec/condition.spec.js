@@ -73,16 +73,16 @@ describe( "when filtering links by predicate", function() {
 
 	before( function() {
 		var hypermodel = HyperModel( { account: resource } );
-		newAccount = hypermodel( acct, "account", "self" );
+		newAccount = hypermodel( acct, "account", "self" ).render();
 		acct.balance = 100;
-		withMoney = hypermodel( acct, "account", "self" );
+		withMoney = hypermodel( acct, "account", "self" ).render();
 		acct.balance = 0;
-		noMoney = hypermodel( acct, "account", "self" );
+		noMoney = hypermodel( acct, "account", "self" ).render();
 	} );
 
 	it( 'should only show withdrawal if balance is greater than 0', function() {
-		deepCompare( newAccount, expected1 );
-		deepCompare( withMoney, expected2 );
-		deepCompare( noMoney, expected3 );
+		newAccount.should.eql( expected1 );
+		withMoney.should.eql( expected2 );
+		noMoney.should.eql( expected3 );
 	} );
 } );

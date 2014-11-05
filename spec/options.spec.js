@@ -103,15 +103,15 @@ describe( "when fetching options", function() {
 			"application/json",
 			"application/hal+json"
 		],
-		_versions: [ 1, 2 ]
+		_versions: [ "1", "2" ]
 	};
 
 	before( function() {
 		var hypermodel = HyperModel( { board: boardResource, lane: laneResource, card: cardResource } );
-		options = hypermodel( { "application/json": function() {}, "application/hal+json": function() {} } );
+		options = hypermodel( { "application/json": function() {}, "application/hal+json": function() {} } ).render();
 	} );
 
 	it( 'should generate options', function() {
-		deepCompare( expectedOptions, options );
+		options.should.eql( expectedOptions );
 	} );
 } );

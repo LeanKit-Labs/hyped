@@ -29,6 +29,7 @@ describe( "when rendering a collection of child resources", function() {
 					_embedded: {
 						cards: [
 							{ id: 301, title: "Card 1", description: "This is card 1",
+								_origin: { href: "/card/301", method: "GET" },
 								_links: {
 									self: { href: "/card/301", method: "GET" },
 									move: { href: "/card/301/board/:boardId/lane/:laneId", method: "PUT", templated: true },
@@ -36,6 +37,7 @@ describe( "when rendering a collection of child resources", function() {
 								}
 							},
 							{ id: 302, title: "Card 2", description: "This is card 2",
+								_origin: { href: "/card/302", method: "GET" },
 								_links: {
 									self: { href: "/card/302", method: "GET" },
 									move: { href: "/card/302/board/:boardId/lane/:laneId", method: "PUT", templated: true },
@@ -43,6 +45,7 @@ describe( "when rendering a collection of child resources", function() {
 								}
 							},
 							{ id: 303, title: "Card 3", description: "This is card 3",
+								_origin: { href: "/card/303", method: "GET" },
 								_links: {
 									self: { href: "/card/303", method: "GET" },
 									move: { href: "/card/303/board/:boardId/lane/:laneId", method: "PUT", templated: true },
@@ -62,6 +65,7 @@ describe( "when rendering a collection of child resources", function() {
 					_embedded: {
 						cards: [
 							{ id: 304, title: "Card 4", description: "This is card 4",
+								_origin: { href: "/card/304", method: "GET" },
 								_links: {
 									self: { href: "/card/304", method: "GET" },
 									move: { href: "/card/304/board/:boardId/lane/:laneId", method: "PUT", templated: true },
@@ -81,6 +85,7 @@ describe( "when rendering a collection of child resources", function() {
 					_embedded: {
 						cards: [
 							{ id: 305, title: "Card 5", description: "This is card 5",
+								_origin: { href: "/card/305", method: "GET" },
 								_links: {
 									self: { href: "/card/305", method: "GET" },
 									move: { href: "/card/305/board/:boardId/lane/:laneId", method: "PUT", templated: true },
@@ -88,6 +93,7 @@ describe( "when rendering a collection of child resources", function() {
 								}
 							},
 							{ id: 306, title: "Card 6", description: "This is card 6",
+								_origin: { href: "/card/306", method: "GET" },
 								_links: {
 									self: { href: "/card/306", method: "GET" },
 									move: { href: "/card/306/board/:boardId/lane/:laneId", method: "PUT", templated: true },
@@ -138,7 +144,13 @@ describe( "when rendering a collection of child resources", function() {
 			self: {
 				method: "get",
 				url: "/lane/:lane.id",
-				include: [ "id", "title", "wip" ]
+				include: [ "id", "title", "wip" ],
+				embed: {
+					cards: {
+						resource: "card",
+						render: "self"
+					}
+				}
 			},
 			cards: {
 				method: "get",
@@ -147,10 +159,31 @@ describe( "when rendering a collection of child resources", function() {
 		}
 	};
 
+	var cardResource = {
+		name: "card",
+		actions: {
+			self: {
+				include: [ "id", "title", "description" ],
+				url: "/card/:card.id",
+				method: "GET"
+			},
+			move: {
+				include: [ "id", "laneId" ],
+				url: "/card/:card.id/board/:boardId/lane/:laneId",
+				method: "PUT"
+			},
+			block: {
+				include: [ "id", "laneId" ],
+				url: "/card/:card.id/block",
+				method: "PUT"
+			}
+		}
+	};
+
 	before( function() {
 		var list = { lanes: board1.lanes, id: board1.id };
-		var hypermodel = HyperModel( { board: boardResource, lane: laneResource } );
-		self = hypermodel( list, "board", "lanes" );
+		var hypermodel = HyperModel( { board: boardResource, lane: laneResource, card: cardResource } );
+		self = hypermodel( list, "board", "lanes" ).render();
 	} );
 
 	it( 'should generate embedded resource list', function() {

@@ -2,7 +2,7 @@ var should = require( "should" ); // jshint ignore: line
 var _ = require( "lodash" );
 var when = require( "when" );
 var model = require( "./model.js" );
-var HyperModel = require( "../src/hypermodel.js" );
+var HyperModel = require( "../src/hyperModel.js" );
 
 var board1 = model.board1;
 var board2 = model.board2;
@@ -49,8 +49,8 @@ describe( "with inclusion list", function() {
 
 		before( function() {
 			var hypermodel = HyperModel( { board: resource } );
-			self = hypermodel( board1, "board", "self" );
-			full = hypermodel( board1, "board", "full" );
+			self = hypermodel( board1, "board", "self" ).render();
+			full = hypermodel( board1, "board", "full" ).render();
 		} );
 
 		it( 'should generate self hypermedia object model', function() {

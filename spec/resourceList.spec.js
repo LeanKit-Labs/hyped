@@ -18,7 +18,7 @@ describe( "when rendering a collection of resources", function() {
 				"id": 100,
 				"title": "Test Board",
 				"_origin": {
-					"href": "/board",
+					"href": "/board/100",
 					"method": "GET"
 				},
 				"_links": {
@@ -40,7 +40,7 @@ describe( "when rendering a collection of resources", function() {
 				"id": 101,
 				"title": "Another Test Board",
 				"_origin": {
-					"href": "/board",
+					"href": "/board/101",
 					"method": "GET"
 				},
 				"_links": {
@@ -72,14 +72,7 @@ describe( "when rendering a collection of resources", function() {
 			self: {
 				method: "get",
 				url: "/board/:id",
-				include: [ "id", "title" ],
-				embed: {
-					lanes: {
-						resource: "lane",
-						render: "self",
-						actions: [ "self", "cards" ]
-					}
-				}
+				include: [ "id", "title" ]
 			},
 			lanes: {
 				method: "get",
@@ -115,11 +108,12 @@ describe( "when rendering a collection of resources", function() {
 	before( function() {
 		var list = [ board1, board2 ];
 		var hypermodel = HyperModel( { board: boardResource, lane: laneResource } );
-		self = hypermodel( list, "board", "list" );
+		self = hypermodel( list, "board", "list" ).useAction( "self" ).render();
 	} );
 
 	it( 'should generate embedded resource list', function() {
-		deepCompare( self, expectedBoards );
+		self.should.eql( expectedBoards );
+		// deepCompare( self, expectedBoards );
 	} );
 
 } );

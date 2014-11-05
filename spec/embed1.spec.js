@@ -100,8 +100,8 @@ describe( "with inherited URL", function() {
 
 	before( function() {
 		var hypermodel = HyperModel( { board: boardResource, lane: laneResource } );
-		self = hypermodel( board1, "board", "self" );
-		full = hypermodel( board1, "board", "full" );
+		self = hypermodel( board1, "board", "self" ).render();
+		full = hypermodel( board1, "board", "full" ).render();
 	} );
 
 	it( 'should generate self hypermedia object model', function() {

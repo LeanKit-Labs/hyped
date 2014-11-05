@@ -1,6 +1,6 @@
 {
   "name": "hyped",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Hypermedia response generation engine",
   "main": "src/index.js",
   "dependencies": {

@@ -1,3 +1,6 @@
+### 0.0.8
+Refactor how hyperModel works in order to support the ability to render a collection of related resources from another resource's action.
+
 ### 0.0.7
 Fix edge case causing origins and links rendered for a nested resource not to have the correct prefix or parentUrl.
 
