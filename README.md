@@ -6,6 +6,140 @@ A simple approach to generating [HAL](http://stateless.co/hal_specification.html
 ## Concepts
 You can skip to the [Using](#Using) section but understanding the concepts behind should explain
 
+### Resource Definition
+The resource definition provides the metadata necessary for hyped to generate the hypermedia based on the model you provide it. This declaritive approach takes advantage of the structure and property names you provide to make implicit associations. The trade-off is that the associations are made based on consistent naming across several properties and values and __typos will break the expected outcome__.
+
+> __Notes__
+
+> 1. `include` and `exclude` are mutually exclusive
+
+> 1. Properties listed in `embed` are not included in the response body. To override this, you'll need to list them in the `include` array.
+
+
+```
+{
+	[resourceName]: the resource name (must be unique)
+	parent: (optional) the name of the resource that this "belongs" to.
+	actions: {
+		[actionName]: {
+			method: the http verb/method
+			url: the URL for this action
+			include: property names array to include in the rendered response
+			exclude: property names array to exclude from rendered response
+			filter: predicate to determine if a property's key/value should be included
+			condition: returns true if the action is valid for the given model
+			embed: defines which model properties are embedded resources and how to render them
+		}
+	},
+	versions: {
+		#: {
+			[actionName]: {
+				// provide any of the above properties to change how this
+				// version will differ from the previous version
+				// these changes are applied cumulatively in descending order
+			}
+		}
+	}
+}
+
+// an embed section looks like this:
+{
+	[propertyName]: {
+		resource: name of the embedded resource
+		render: which action will be used to render the resource (usually "self")
+		actions: an array of the actions that should be included
+	}
+}
+```
+
+<dl>
+	<dt>resourceName</dt>
+	<dd>The name of your resource. This will be important to keep unique and easy to remember because the <tt>parent</tt> property of other resources and the <tt>resource</tt> property of an embed section will need to match one of your resource names.</dd>
+	<dt>parent</dt>
+	<dd>Defines this resource as belonging to another resource. This will cause all of the action URLs in this resource to be prefixed by the parent resource's <tt>self</tt> href.</dd>
+	<dt>actionName</dt>
+	<dd>The name of the action will determine the name of the link exposed in the resource's links.</dd>
+	<dt>method</dt>
+	<dd>The HTTP method used to activate this action.</dd>
+	<dt>url</dt>
+	<dd>The URL segment for this action. If there is no parent resource, this will be the URL for this action. If a parent resource has been specified, the parent's <tt>self</tt> URL will get pre-pended to the URL provided here.</dd>
+	<dt>include</dt>
+	<dd>A list of properties to include from the raw data model in the response.</dd>
+	<dt>exclude</dt>
+	<dd>A list of properties to exclude from the raw data model in the response.</dd>
+	<dt>filter</dt>
+	<dd>A function to determine which data model keys shouldn't be included in the response.</dd>
+	<dt>transform</dt>
+	<dd>A way to perform a map function against the model to produce the response body.</dd>
+	<dt>condition</dt>
+	<dd>A predicate used to determine if this action should be included in the link list when rendering a response.</dd>
+	<dt>embed</dt>
+	<dd>This section defines whether or not other resources can/should be included in the action's response. It effectively allows the server to provide pre-fetched, related resources to the client.</dd>
+	<dt>embed - propertyName</dt>
+	<dd>The name of the property on the data model that will contain one or more of the embedded resources. This property name will, by default, be removed from the response.</dd>
+	<dt>embed - resource</dt>
+	<dd>The name of the resource that defines how each item under the data model property should be rendered as a resource.</dd>
+	<dt>embed - render</dt>
+	<dd>Determines which of the embedded resource's actions should be used to produce its representation as an embedded resource.</dd>
+	<dt>embed - actions</dt>
+	<dd>A string array listing which links should be provided per embedded resource.</dd>
+
+</dl>
+
+#### Example
+
+```javascript
+// account resource
+{
+	name: "account",
+	actions: {
+		self: {
+			method: "get",
+			url: "/account/:id",
+			include: [ "id", "balance" ],
+			embed: {
+				transactions: {
+					resource: "transaction",
+					render: "self",
+					actions: [ "self", "detail" ]
+				}
+			}
+		},
+		withdraw: {
+			method: "POST",
+			url: "/account/:id/withdrawal",
+			condition: function( account ) {
+				return account.balance > 0;
+			},
+			include: [ "id", "accountId", "amount", "balance", "newBalance" ]
+		},
+		deposit: {
+			method: "POST",
+			url: "/account/:id/deposit",
+			include: [ "id", "accountId", "amount", "balance", "newBalance" ]
+		}
+	}
+}
+
+//transaction resource
+{
+	name: "transaction",
+	parent: "account",
+	actions: {
+		self: {
+			method: "get",
+			url: "/transaction/:transaction.id",
+			include: [ "id", "amount", "date" ]
+		},
+		detail: {
+			method: "get",
+			url: "/transaction/:transaction.id?detailed=true",
+			include: [ "id", "amount", "date", "location", "method" ]
+		}
+	}
+}
+```
+
 ### Rendering
 hyped generates an abstract hypermedia model based off a resource definition and data model. This hypermedia model is then passed to a "rendering engine" that produces a HTTP response body based on the requested media type.
 
@@ -29,6 +163,18 @@ __HyperModel Structure__
 	}
 }
 ```
+
+<dl>
+	<dt>_origin</dt>
+	<dd>The origin provides the <tt>method</tt> and <tt>href</tt> that you would use to get to the current result. <tt>_origin</tt> is repeated even for embedded resources so that the consumer can tell how they would get to the same representation that was included in the embedded section.</dd>
+
+	<dt>_links</dt>
+	<dd>The actions available for the given resource.</dd>
+	
+	<dt>_embedded</dt>
+	<dd>If a key in the <tt>embed</tt> section matches one on the data model provided, the resources contained will show up under the property matching the one on the data model. Each embedded resource will contain <tt>_origin</tt> and <tt>_links</tt> and may also include its own <tt>_embedded</tt> section.</dd>
+
+</dl>
 
 ### Rendering engine
 Rendering engines are simply functions with the signature `function( hyperModel )`. These functions take the hyperModel and produce the correct response body for their given media type. The built in engine for "application/hal+json" looks like this:
@@ -54,7 +200,7 @@ hyped will attempt to replace path variables following two formats:
  1. `:property`
  1. `:property.childProperty`
 
-The fist form will be used to attempt to read a property directly on the model. The second will attempt to read a nested property. In either case, if no match is found, the variable will be left in tact. In the second case, the period is removed and the variable becomes camel-case.
+The fist form will be used to attempt to read a property directly on the model. The second will attempt to read a nested property _or_ a property name that combines the two in camel-case fahsion (i.e. `propertyChildProperty`). In either case, if no match is found, the variable will be left in tact. In the second case, the period is removed and the variable becomes camel-case.
 
 Example:
 ```javascript
@@ -151,95 +297,6 @@ app.get( "something/:id", function( req, res ) {
 } );
 ```
 
-### Resource Definition
-
-> __Notes__
-
-> 1. `include` and `exclude` are mutually exclusive
-
-> 1. Properties listed in `embed` are not included in the response body. To override this, you'll need to list them in the `include` array.
-
-
-```
-{
-	name: the resource name (must be unique)
-	[inherit]: indicate if this resource should inherit a parent url
-	actions: {
-		alias: {
-			method: the http verb/method
-			url: the URL for this action
-			include: property names array to include in the rendered response
-			exclude: property names array to exclude from rendered response
-			filter: predicate to determine if a property's key/value should be included
-			condition: returns true if the action is valid for the given model
-			embed: defines which model properties are embedded resources and how to render them
-		}
-	},
-	versions: {
-		#: {
-			actionAlias: {
-				// any properties valid 
-			}
-		}
-	}
-}
-
-// an embed section looks like this:
-{
-	propertyName: {
-		resource: name of the embedded resource
-		render: which action will be used to render the resource (usually "self")
-		actions: an array of the actions that should be included
-	}
-}
-```
-
-#### Example
-
-```javascript
-// account resource
-{
-	name: "account",
-	actions: {
-		self: {
-			method: "get",
-			url: "/account/:id",
-			include: [ "id", "balance" ]
-		},
-		withdraw: {
-			method: "POST",
-			url: "/account/:id/withdrawal",
-			condition: function( account ) {
-				return account.balance > 0;
-			},
-			include: [ "id", "accountId", "amount", "balance", "newBalance" ]
-		},
-		deposit: {
-			method: "POST",
-			url: "/account/:id/deposit",
-			include: [ "id", "accountId", "amount", "balance", "newBalance" ]
-		}
-	}
-}
-
-//transaction resource
-{
-	name: "transaction",
-	actions: {
-		self: {
-			method: "get",
-			url: "/account/:account.id/transaction/:id",
-			include: [ "id", "amount", "date" ]
-		},
-		detail: {
-			method: "get",
-			url: "/account/:account.id/transaction/:id?detailed=true",
-			include: [ "id", "amount", "date", "location", "method" ]
-		}
-	}
-}
-```
-
 ## API
 
 If you are using this library with Autohost, the only API you really need to know about is used for the initial setup and the response generation.
@@ -299,10 +356,10 @@ Keep in mind that normally, you will only use the `hyped`, `status` and `render`
 You provide the data model that the resource will render a response based on. The resources are designed to work with models that may have a great deal more information than should ever be exposed to the client.
 
 ### .resource( resourceName )
-For use in rare occasions when the resource that needs to be rendered is not the one the action is contained within.
+When the resource that needs to be rendered is not the one the action is contained within.
 
 ### .action( actionName )
-For use in rare occasions when the action you want rendered is not the one being activated.
+When the action you want rendered is not the one being activated.
 
 ### .status( statusCode )
 If omitted, this is always 200. Be good to your API's consumers and use proper status codes.
@@ -336,7 +393,12 @@ HAL does not include the HTTP verb/method used for an link"s `href`. Our version
 ```
 
 ## Contributing
-The tests are a bit of a contrived mess at the moment but do excercise the features. If submitting a PR, please be sure to include tests to cover any new feature or changes as well as making sure no existing tests have broken.
+The tests are a bit of a contrived mess at the moment but do exercise the features and known use cases. If submitting a PR, please do the following:
+
+ * Branch for the feature/fix
+ * Make any changes to the README required to reflect changes
+ * Create/modify tests
+
 
 ## Roadmap
 None of this is guaranteed but here are some items that would be nice/great to have.
