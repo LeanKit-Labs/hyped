@@ -6,16 +6,30 @@ var HyperResponse = function( req, res, engine, hyperModel, contentType ) {
 	this._req = req;
 	this._res = res;
 	this._contentType = contentType;
-		
+	this._context = {};
+
 	var self = this;
-	req.extendHttp.hyped = req.hyped = function( model ) {
+	req.extendHttp.hyped = req.hyped = function( model, context ) {
 		self._model = model;
+		self._context = context;
 		return self;
 	};
 };
 
 HyperResponse.prototype.action = function( action ) {
 	this._action = action;
+	this._originUrl = undefined;
+	return this;
+};
+
+HyperResponse.prototype.context = function( context ) {
+	this._context = context;
+	return this;
+};
+
+HyperResponse.prototype.origin = function( originUrl, method ) {
+	this._originUrl = originUrl;
+	this._originMethod = method;
 	return this;
 };
 
@@ -26,6 +40,7 @@ HyperResponse.prototype.status = function( code ) {
 
 HyperResponse.prototype.resource = function( resource ) {
 	this._resource = resource;
+	this._originUrl = undefined;
 	return this;
 };
 
@@ -36,6 +51,8 @@ HyperResponse.prototype.render = function() {
 		var hypermedia = this._hyperModel( this._model, resource, action )
 			.useResource( this._resource )
 			.useAction( this._action )
+			.useOrigin( this._originUrl, this._originMethod )
+			.useContext( this._context )
 			.auth( this._authCheck )
 			.render();
 		var body = this._engine( hypermedia );

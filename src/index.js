@@ -125,7 +125,7 @@ function hyperMiddleware( req, res, next ) { // jshint ignore:line
 	var contentType = getContentType( req );
 	var engine = getEngine( contentType );
 	var hyperModel = getHyperModel( req );
-	var response = new HyperResponse( req, res, engine, hyperModel, contentType ); // jshint ignore:line
+	var response = new HyperResponse( req, res, engine, hyperModel, contentType ).origin( req.originalUrl, req.method ); // jshint ignore:line
 	next();
 }
 

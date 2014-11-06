@@ -1,3 +1,9 @@
+### 0.0.11
+
+ * Support the ability to include additional links per action
+ * Allow the render to specify the origin instead of calculating it
+ * Bug fix - missing embedded properties should not cause the world to end
+
 ### 0.0.10
 Handle an edge case where rendering can fail due to defaulting the response body to undefined.
 

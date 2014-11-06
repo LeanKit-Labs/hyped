@@ -29,6 +29,7 @@ The resource definition provides the metadata necessary for hyped to generate th
 			filter: predicate to determine if a property's key/value should be included
 			condition: returns true if the action is valid for the given model
 			embed: defines which model properties are embedded resources and how to render them
+			links: provides alternate/compatible urls for activating this action
 		}
 	},
 	versions: {
@@ -50,8 +51,14 @@ The resource definition provides the metadata necessary for hyped to generate th
 		actions: an array of the actions that should be included
 	}
 }
+
+// a link section looks like this:
+{
+	[actionName]: url|generator
+}
 ```
 
+### Resource Fields
 <dl>
 	<dt>resourceName</dt>
 	<dd>The name of your resource. This will be important to keep unique and easy to remember because the <tt>parent</tt> property of other resources and the <tt>resource</tt> property of an embed section will need to match one of your resource names.</dd>
@@ -73,7 +80,7 @@ The resource definition provides the metadata necessary for hyped to generate th
 	<dd>A way to perform a map function against the model to produce the response body.</dd>
 	<dt>condition</dt>
 	<dd>A predicate used to determine if this action should be included in the link list when rendering a response.</dd>
-	<dt>embed</dt>
+	<dt><h3>embed</h3></dt>
 	<dd>This section defines whether or not other resources can/should be included in the action's response. It effectively allows the server to provide pre-fetched, related resources to the client.</dd>
 	<dt>embed - propertyName</dt>
 	<dd>The name of the property on the data model that will contain one or more of the embedded resources. This property name will, by default, be removed from the response.</dd>
@@ -83,7 +90,23 @@ The resource definition provides the metadata necessary for hyped to generate th
 	<dd>Determines which of the embedded resource's actions should be used to produce its representation as an embedded resource.</dd>
 	<dt>embed - actions</dt>
 	<dd>A string array listing which links should be provided per embedded resource.</dd>
+	<dt><h3>links</h3></dt>
+	<dd>A hash of additional actions to include in the links related to this action. These additional links will only be included in a resource's `_links` when the action itself is valid (passes both auth and `condition` checks when provided). Note - you cannot provide a method other than what already exists on the action the links belong to (it wouldn't make sense).
 
+	This feature is to allow action aliases for known sets of query parameters.
+	</dd>
+	<dt>links - url</dt>
+	<dd>Works the same as the `url` for the action.</dd>
+	<dt>links - generator</dt>
+	<dd>A function that takes the data model and a context hash and optionally returns a url string. Returning an empty string or undefined will exclude the link from rendered results. See <a href="#rendering-api">Rendering API</a> for how the context is specified.
+	<div class="highlight highlight-javascript">	<pre>
+	"next-page": function( data, context ) {
+		// results in a url like "/thing?page=1&amp;size=10"
+		return "/thing?page=" + ( context.page + 1 ) + "&amp;size=" + context.size;
+	}
+	</pre>
+	</div>
+	</dd>
 </dl>
 
 #### Example
@@ -129,12 +152,10 @@ The resource definition provides the metadata necessary for hyped to generate th
 		self: {
 			method: "get",
 			url: "/transaction/:transaction.id",
-			include: [ "id", "amount", "date" ]
-		},
-		detail: {
-			method: "get",
-			url: "/transaction/:transaction.id?detailed=true",
-			include: [ "id", "amount", "date", "location", "method" ]
+			include: [ "id", "amount", "date" ],
+			links: {
+				"details": "/transaction/:transaction.id?detail=true"
+			}
 		}
 	}
 }
@@ -361,7 +382,7 @@ Keep in mind that normally, you will only use the `hyped`, `status` and `render`
 	req.hyped( myData ).status( 200 ).render();
 ```
 
-### .hyped( model )
+### .hyped( model, [context] )
 You provide the data model that the resource will render a response based on. The resources are designed to work with models that may have a great deal more information than should ever be exposed to the client.
 
 ### .resource( resourceName )
@@ -369,6 +390,9 @@ When the resource that needs to be rendered is not the one the action is contain
 
 ### .action( actionName )
 When the action you want rendered is not the one being activated.
+
+### .context( context )
+Another way to provide context to any link generators for this action.
 
 ### .status( statusCode )
 If omitted, this is always 200. Be good to your API's consumers and use proper status codes.

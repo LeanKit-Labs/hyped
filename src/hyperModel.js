@@ -120,8 +120,9 @@ function isTemplated( url ) { // jshint ignore:line
 function initialize( resources, version, prefix ) {
 	options = undefined;
 	return function( model, resourceName, actionName ) {
-		var parentUrl, authorize;
+		var parentUrl, authorize, originLink;
 		var filtered = {};
+		var requestContext = {};
 		var originResourceName = resourceName;
 		var originActionName = actionName;
 		var originResource = resources[ originResourceName ];
@@ -156,14 +157,16 @@ function initialize( resources, version, prefix ) {
 					embedded = {};
 					_.each( embed, function( opts, property ) {
 						var child = item[ property ];
-						var resourceName = opts.resource;
-						if( _.isArray( child ) ) {
-							var fn = initialize( resources, version, prefix );
-							embedded[ property ] = _.map( child, function( item ) {
-								return fn( item, resourceName, opts.render ).auth( authorize ).parentUrl( _parentUrl ).render();
-							} );
-						} else {
-							embedded[ property ] = initialize( resources, version, prefix )( child, resourceName, opts.render ).auth( authorize ).parentUrl( _parentUrl ).render();
+						if( child ) {
+							var resourceName = opts.resource;
+							if( _.isArray( child ) ) {
+								var fn = initialize( resources, version, prefix );
+								embedded[ property ] = _.map( child, function( item ) {
+									return fn( item, resourceName, opts.render ).auth( authorize ).parentUrl( _parentUrl ).render();
+								} );
+							} else {
+								embedded[ property ] = initialize( resources, version, prefix )( child, resourceName, opts.render ).auth( authorize ).parentUrl( _parentUrl ).render();
+							}
 						}
 					} );
 				}
@@ -175,35 +178,52 @@ function initialize( resources, version, prefix ) {
 				var links;
 				if( resource.actions ) {
 					links = {};
-					_.each( resource.actions, function( action, rel ) {
-						var hasPermission = !authorize || authorize( resource.name + "." + rel );
+					_.each( resource.actions, function( action, alias ) {
+						var hasPermission = !authorize || authorize( resource.name + "." + alias );
 						var canRender = action.condition ? action.condition( item ) : true;
 						if( hasPermission && canRender ) {
-							var href = [ url.create( action.url, item, resource.name ) ];
-							var option = !item;
-							var inherit = resource.parent !== undefined;
-							if( inherit ) {
-								href.unshift( parentUrl );
-							} else {
-								href.unshift( prefix );
-							}
-							href = href.join( "" );
-							var templated = isTemplated( href );
-							var valid = ( option && !inherit && templated ) || ( !option );
-							if( valid ) {
-								links[ rel ] = {
-									href: href, method: action.method.toUpperCase()
-								};
-								if( templated ) {
-									links[ rel ].templated = true;
+							function genLink( rel, template, method ) {
+								var href = [ url.create( template, item, resource.name ) ];
+								var option = !item;
+								var inherit = resource.parent !== undefined;
+								if( inherit ) {
+									href.unshift( parentUrl );
+								} else {
+									href.unshift( prefix );
+								}
+								href = href.join( "" );
+								var templated = isTemplated( href );
+								var valid = ( option && !inherit && templated ) || ( !option );
+								if( valid ) {
+									links[ rel ] = {
+										href: href, method: method.toUpperCase()
+									};
+									if( templated ) {
+										links[ rel ].templated = true;
+									}
 								}
 							}
+							genLink( alias, action.url, action.method );
+							_.each( action.links, function( lnk, rel ) {
+								var template;
+								if( _.isFunction( lnk ) ) {
+									template = lnk( item, requestContext );
+								} else {
+									template = lnk.url || lnk;
+								}
+								if( template ) {
+									genLink( rel, template, action.method );
+								}
+							} );
 						}
 					} );
 				}
 				return links;
 			},
 			getOrigin: function( item ) {
+				if( originLink ) {
+					return originLink;
+				}
 				item = item || model;
 				var origin = [ url.create( originAction.url, item, originResourceName ) ];
 				if( parentUrl && resource.parent ) {
@@ -266,10 +286,22 @@ function initialize( resources, version, prefix ) {
 				}
 				return this;
 			},
+			useContext: function( context ) {
+				if( context ) {
+					requestContext = context;
+				}
+				return this;
+			},
 			useResource: function( name ) {
 				if( name ) {
 					resourceName = name;
 					resource = resources[ resourceName ];
+				}
+				return this;
+			},
+			useOrigin: function( url, method ) {
+				if( url ) {
+					originLink = { href: url, method: method };
 				}
 				return this;
 			}

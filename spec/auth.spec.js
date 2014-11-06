@@ -20,7 +20,10 @@ describe( "when filtering links by permission", function() {
 			full: {
 				method: "get",
 				url: "/board/:id?embed=lanes,cards,classOfService",
-				include: [ "id", "title", "description" ]
+				include: [ "id", "title", "description" ],
+				links: {
+					"shouldGetOmitted": "/board/:id?WAT"
+				}
 			}
 		}
 	};
