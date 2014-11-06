@@ -120,7 +120,7 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/301", method: "GET" },
 								_links: {
 									self: { href: "/card/301", method: "GET" },
-									move: { href: "/card/301/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/301/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/301/block", method: "PUT" },
 								}
 							},
@@ -128,7 +128,7 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/302", method: "GET" },
 								_links: {
 									self: { href: "/card/302", method: "GET" },
-									move: { href: "/card/302/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/302/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/302/block", method: "PUT" },
 								}
 							},
@@ -136,7 +136,7 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/303", method: "GET" },
 								_links: {
 									self: { href: "/card/303", method: "GET" },
-									move: { href: "/card/303/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/303/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/303/block", method: "PUT" },
 								}
 							}
@@ -156,7 +156,7 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/304", method: "GET" },
 								_links: {
 									self: { href: "/card/304", method: "GET" },
-									move: { href: "/card/304/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/304/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/304/block", method: "PUT" },
 								}
 							}
@@ -176,7 +176,7 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/305", method: "GET" },
 								_links: {
 									self: { href: "/card/305", method: "GET" },
-									move: { href: "/card/305/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/305/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/305/block", method: "PUT" },
 								}
 							},
@@ -184,7 +184,7 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/306", method: "GET" },
 								_links: {
 									self: { href: "/card/306", method: "GET" },
-									move: { href: "/card/306/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/306/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/306/block", method: "PUT" },
 								}
 							}
@@ -231,7 +231,7 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/301", method: "GET" },
 								_links: {
 									self: { href: "/card/301", method: "GET" },
-									move: { href: "/card/301/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/301/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/301/block", method: "PUT" },
 								}
 							},
@@ -239,7 +239,7 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/302", method: "GET" },
 								_links: {
 									self: { href: "/card/302", method: "GET" },
-									move: { href: "/card/302/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/302/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/302/block", method: "PUT" },
 								}
 							},
@@ -247,7 +247,7 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/303", method: "GET" },
 								_links: {
 									self: { href: "/card/303", method: "GET" },
-									move: { href: "/card/303/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/303/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/303/block", method: "PUT" },
 								}
 							}
@@ -267,7 +267,7 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/304", method: "GET" },
 								_links: {
 									self: { href: "/card/304", method: "GET" },
-									move: { href: "/card/304/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/304/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/304/block", method: "PUT" },
 								}
 							}
@@ -287,7 +287,7 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/305", method: "GET" },
 								_links: {
 									self: { href: "/card/305", method: "GET" },
-									move: { href: "/card/305/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/305/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/305/block", method: "PUT" },
 								}
 							},
@@ -295,7 +295,7 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/306", method: "GET" },
 								_links: {
 									self: { href: "/card/306", method: "GET" },
-									move: { href: "/card/306/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/306/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/306/block", method: "PUT" },
 								}
 							}
@@ -331,7 +331,8 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/301", method: "GET" },
 								_links: {
 									self: { href: "/card/301", method: "GET" },
-									move: { href: "/card/301/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/301/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
+									move: { href: "/card/301/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/301/block", method: "PUT" },
 								}
 							},
@@ -339,7 +340,8 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/302", method: "GET" },
 								_links: {
 									self: { href: "/card/302", method: "GET" },
-									move: { href: "/card/302/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/302/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
+									move: { href: "/card/302/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/302/block", method: "PUT" },
 								}
 							},
@@ -347,7 +349,8 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/303", method: "GET" },
 								_links: {
 									self: { href: "/card/303", method: "GET" },
-									move: { href: "/card/303/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/303/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
+									move: { href: "/card/303/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/303/block", method: "PUT" },
 								}
 							}
@@ -367,7 +370,8 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/304", method: "GET" },
 								_links: {
 									self: { href: "/card/304", method: "GET" },
-									move: { href: "/card/304/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/304/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
+									move: { href: "/card/304/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/304/block", method: "PUT" },
 								}
 							}
@@ -387,7 +391,8 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/305", method: "GET" },
 								_links: {
 									self: { href: "/card/305", method: "GET" },
-									move: { href: "/card/305/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/305/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
+									move: { href: "/card/305/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/305/block", method: "PUT" },
 								}
 							},
@@ -395,7 +400,8 @@ describe( "when fetching options", function() {
 								_origin: { href: "/card/306", method: "GET" },
 								_links: {
 									self: { href: "/card/306", method: "GET" },
-									move: { href: "/card/306/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/306/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
+									move: { href: "/card/306/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/306/block", method: "PUT" },
 								}
 							}
@@ -420,19 +426,19 @@ describe( "when fetching options", function() {
 	} );
 
 	it( "should generate selfv1", function() {
-		deepCompare( selfv1, expectedSelfv1 );
+		selfv1.should.eql( expectedSelfv1 );
 	} );
 
 	it( "should generate selfv2", function() {
-		deepCompare( selfv2, expectedSelfv2 );
+		selfv2.should.eql( expectedSelfv2 );
 	} );
 
 	it( "should generate selfv3", function() {
-		deepCompare( selfv3, expectedSelfv3 );
+		selfv3.should.eql( expectedSelfv3 );
 	} );
 
 	it( "should generate fullv1", function() {
-		deepCompare( fullv1, expectedFullv1 );
+		fullv1.should.eql( expectedFullv1 );
 	} );
 
 	it( "should throw an exception when rendering missing action", function() {

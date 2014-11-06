@@ -83,9 +83,11 @@ function filterProperties ( model, action ) {
 
 function getOptions( resources, prefix, engines ) { // jshint ignore:line
 	if( !options ) {
-		options = _.reduce( resources, function( options, resource, resourceName ) {
+		var linkList = {};
+
+		options = _.reduce( resources, function( opts, resource, resourceName ) {
 			var parentUrl = resource.parent ? resources[ resource.parent ].actions.self.url : undefined;
-			options[ resourceName ] = _.reduce( resource.actions, function( links, action, actionName ) {
+			_.reduce( resource.actions, function( links, action, actionName ) {
 				var urlSegments = [ action.url ];
 				if( parentUrl ) {
 					urlSegments.unshift( parentUrl );
@@ -97,12 +99,14 @@ function getOptions( resources, prefix, engines ) { // jshint ignore:line
 				if( isTemplated( action.url ) ) {
 					link.templated = true;
 				}
-				links[ actionName ] = link;
+				links[ [ resourceName, actionName ].join( ":" ) ] = link;
 				return links;
-			}, {} );
-			options._versions = options._versions.concat( _.keys( resource.versions ) );
-			return options;
+			}, linkList );
+			opts._versions = opts._versions.concat( _.keys( resource.versions ) );
+			return opts;
 		}, { _versions: [ "1" ] } );
+
+		options._links = linkList;
 		options._versions = _.unique( options._versions );
 		options._mediaTypes = _.keys( engines );
 	}
@@ -110,7 +114,7 @@ function getOptions( resources, prefix, engines ) { // jshint ignore:line
 }
 
 function isTemplated( url ) { // jshint ignore:line
-	return url.indexOf( ":" ) > 0;
+	return url.indexOf( "{" ) > 0 || url.indexOf( ":") > 0;
 }
 
 function initialize( resources, version, prefix ) {

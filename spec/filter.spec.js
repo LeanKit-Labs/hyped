@@ -30,8 +30,7 @@ describe( "with property filter", function() {
 		description: "This is a board and stuff!",
 		_origin: { href: "/board/100", method: "GET" },
 		_links: {
-			self: { href: "/board/100", method: "GET" },
-			full: { href: "/board/100?embed=lanes,cards,classOfService", method: "GET" }
+			self: { href: "/board/100", method: "GET" }
 		}
 	};
 
@@ -41,6 +40,6 @@ describe( "with property filter", function() {
 	} );
 
 	it( 'should generate self hypermedia object model', function() {
-		deepCompare( self, expectedSelf );
+		self.should.eql( expectedSelf );
 	} );
 } );

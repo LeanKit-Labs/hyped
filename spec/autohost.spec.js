@@ -101,7 +101,7 @@ describe( "with oldest version as default", function() {
 											method: "GET"
 										},
 										move: {
-											href: "/test/api/card/301/board/:boardId/lane/:laneId",
+											href: "/test/api/card/301/board/{boardId}/lane/{laneId}",
 											method: "PUT",
 											templated: true
 										},
@@ -125,7 +125,7 @@ describe( "with oldest version as default", function() {
 											method: "GET"
 										},
 										move: {
-											href: "/test/api/card/302/board/:boardId/lane/:laneId",
+											href: "/test/api/card/302/board/{boardId}/lane/{laneId}",
 											method: "PUT",
 											templated: true
 										},
@@ -149,7 +149,7 @@ describe( "with oldest version as default", function() {
 											method: "GET"
 										},
 										move: {
-											href: "/test/api/card/303/board/:boardId/lane/:laneId",
+											href: "/test/api/card/303/board/{boardId}/lane/{laneId}",
 											method: "PUT",
 											templated: true
 										},
@@ -196,7 +196,7 @@ describe( "with oldest version as default", function() {
 											method: "GET"
 										},
 										move: {
-											href: "/test/api/card/304/board/:boardId/lane/:laneId",
+											href: "/test/api/card/304/board/{boardId}/lane/{laneId}",
 											method: "PUT",
 											templated: true
 										},
@@ -243,7 +243,7 @@ describe( "with oldest version as default", function() {
 											method: "GET"
 										},
 										move: {
-											href: "/test/api/card/305/board/:boardId/lane/:laneId",
+											href: "/test/api/card/305/board/{boardId}/lane/{laneId}",
 											method: "PUT",
 											templated: true
 										},
@@ -267,7 +267,7 @@ describe( "with oldest version as default", function() {
 											method: "GET"
 										},
 										move: {
-											href: "/test/api/card/306/board/:boardId/lane/:laneId",
+											href: "/test/api/card/306/board/{boardId}/lane/{laneId}",
 											method: "PUT",
 											templated: true
 										},
@@ -386,7 +386,7 @@ describe( "with oldest version as default", function() {
 											method: "GET"
 										},
 										move: {
-											href: "/test/api/card/301/board/:boardId/lane/:laneId",
+											href: "/test/api/card/301/board/{boardId}/lane/{laneId}",
 											method: "PUT",
 											templated: true
 										},
@@ -410,7 +410,7 @@ describe( "with oldest version as default", function() {
 											method: "GET"
 										},
 										move: {
-											href: "/test/api/card/302/board/:boardId/lane/:laneId",
+											href: "/test/api/card/302/board/{boardId}/lane/{laneId}",
 											method: "PUT",
 											templated: true
 										},
@@ -434,7 +434,7 @@ describe( "with oldest version as default", function() {
 											method: "GET"
 										},
 										move: {
-											href: "/test/api/card/303/board/:boardId/lane/:laneId",
+											href: "/test/api/card/303/board/{boardId}/lane/{laneId}",
 											method: "PUT",
 											templated: true
 										},
@@ -481,7 +481,7 @@ describe( "with oldest version as default", function() {
 											method: "GET"
 										},
 										move: {
-											href: "/test/api/card/304/board/:boardId/lane/:laneId",
+											href: "/test/api/card/304/board/{boardId}/lane/{laneId}",
 											method: "PUT",
 											templated: true
 										},
@@ -528,7 +528,7 @@ describe( "with oldest version as default", function() {
 											method: "GET"
 										},
 										move: {
-											href: "/test/api/card/305/board/:boardId/lane/:laneId",
+											href: "/test/api/card/305/board/{boardId}/lane/{laneId}",
 											method: "PUT",
 											templated: true
 										},
@@ -552,7 +552,7 @@ describe( "with oldest version as default", function() {
 											method: "GET"
 										},
 										move: {
-											href: "/test/api/card/306/board/:boardId/lane/:laneId",
+											href: "/test/api/card/306/board/{boardId}/lane/{laneId}",
 											method: "PUT",
 											templated: true
 										},
@@ -687,7 +687,7 @@ describe( "with oldest version as default", function() {
 										method: "GET"
 								},
 								move: {
-										href: "/test/api/card/304/board/:boardId/lane/:laneId",
+										href: "/test/api/card/304/board/{boardId}/lane/{laneId}",
 										method: "PUT",
 										templated: true
 								},
@@ -725,7 +725,7 @@ describe( "with oldest version as default", function() {
 					_origin: { href: "/test/api/card/301", method: "GET" },
 					_links: { 
 						self: { href: "/test/api/card/301", method: "GET" },
-						move: { href: "/test/api/card/301/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+						move: { href: "/test/api/card/301/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 						block: { href: "/test/api/card/301/block", method: "PUT" } 
 					}
 				},
@@ -736,7 +736,7 @@ describe( "with oldest version as default", function() {
 					_origin: { href: "/test/api/card/302", method: "GET" },
 					_links: { 
 						self: { href: "/test/api/card/302", method: "GET" },
-						move: { href: "/test/api/card/302/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+						move: { href: "/test/api/card/302/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 						block: { href: "/test/api/card/302/block", method: "PUT" } 
 					}
 				},
@@ -747,7 +747,7 @@ describe( "with oldest version as default", function() {
 					_origin: { href: "/test/api/card/303", method: "GET" },
 					_links: { 
 						self: { href: "/test/api/card/303", method: "GET" },
-						move: { href: "/test/api/card/303/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+						move: { href: "/test/api/card/303/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 						block: { href: "/test/api/card/303/block", method: "PUT" } 
 					}
 				},
@@ -758,7 +758,7 @@ describe( "with oldest version as default", function() {
 					_origin: { href: "/test/api/card/304", method: "GET" },
 					_links: {
 						self: { href: "/test/api/card/304", method: "GET" },
-						move: { href: "/test/api/card/304/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+						move: { href: "/test/api/card/304/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 						block: { href: "/test/api/card/304/block", method: "PUT" }
 					}
 				},
@@ -769,7 +769,7 @@ describe( "with oldest version as default", function() {
 					_origin: { href: "/test/api/card/305", method: "GET" },
 					_links: { 
 						self: { href: "/test/api/card/305", method: "GET" },
-						move: { href: "/test/api/card/305/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+						move: { href: "/test/api/card/305/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 						block: { href: "/test/api/card/305/block", method: "PUT" } 
 					} 
 				},
@@ -780,7 +780,7 @@ describe( "with oldest version as default", function() {
 				 _origin: { href: "/test/api/card/306", method: "GET" },
 				 _links: {
 						self: { href: "/test/api/card/306", method: "GET" },
-						move: { href: "/test/api/card/306/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+						move: { href: "/test/api/card/306/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 						block: { href: "/test/api/card/306/block", method: "PUT" } 
 					} 
 				} 
@@ -812,41 +812,37 @@ describe( "with oldest version as default", function() {
 		var body, contentType, elapsedMs;
 
 		var expectedOptions = {
-			_autohost: 
-			 { api: { href: "/test/api/_autohost", method: "GET" },
-				 resources: { href: "/test/api/_autohost/resource", method: "GET" },
-				 actions: { href: "/test/api/_autohost/action", method: "GET" },
-				 "connected-sockets": { href: "/test/api/_autohost/sockets", method: "GET" },
-				 "list-users": { href: "/test/api/_autohost/user", method: "GET" },
-				 "list-roles": { href: "/test/api/_autohost/role", method: "GET" },
-				 "list-user-roles": { href: "/test/api/_autohost/user/:user/role", method: "GET", templated: true },
-				 "list-action-roles": { href: "/test/api/_autohost/action/:action/role", method: "GET", templated: true },
-				 "add-action-roles":  { href: "/test/api/_autohost/action/:action/role", method: "PATCH", templated: true },
-				 "remove-action-roles": { href: "/test/api/_autohost/action/:action/role", method: "DELETE", templated: true },
-				 "add-user-roles": { href: "/test/api/_autohost/user/:user/role", method: "PATCH", templated: true },
-				 "remove-user-roles":  { href: "/test/api/_autohost/user/:user/role", method: "DELETE", templated: true },
-				 "add-role": { href: "/test/api/_autohost/role/:role", method: "POST", templated: true },
-				 "remove-role": { href: "/test/api/_autohost/role/:role", method: "DELETE", templated: true },
-				 "create-user": { href: "/test/api/_autohost/user/:userName", method: "POST", templated: true },
-				 "change-password": { href: "/test/api/_autohost/user/:userName", method: "PATCH", templated: true },
-				 "create-token": { href: "/test/api/_autohost/token", method: "POST" },
-				 "destroy-token": { href: "/test/api/_autohost/token/:token", method: "DELETE", templated: true },
-				 "list-tokens": { href: "/test/api/_autohost/token/", method: "GET" },
-				 "enable-user": { href: "/test/api/_autohost/user/:userName", method: "PUT", templated: true },
-				 "disable-user": { href: "/test/api/_autohost/user/:userName", method: "DELETE", templated: true },
-				 metrics: { href: "/test/api/_autohost/metrics", method: "GET" } },
-			board: { 
-				cards: { href: "/test/api/board/:id/card", method: "GET", templated: true },
-				self: { href: "/test/api/board/:id", method: "GET", templated: true } 
-			},
-			card: { 
-				self: { href: "/test/api/card/:id", method: "GET", templated: true },
-				move: { href: "/test/api/card/:id/board/:boardId/lane/:laneId", method: "PUT", templated: true },
-				 block: { href: "/test/api/card/:id/block", method: "PUT", templated: true }
-			},
-			lane: { 
-				self: { href: "/test/api/board/:id/lane/:laneId", method: "GET", templated: true },
-				cards: { href: "/test/api/board/:id/lane/:laneId/card", method: "GET", templated: true }
+			_links: 
+			 { 
+			 	"_autohost:api": { href: "/test/api/_autohost", method: "GET" },
+				"_autohost:resources": { href: "/test/api/_autohost/resource", method: "GET" },
+				"_autohost:actions": { href: "/test/api/_autohost/action", method: "GET" },
+				"_autohost:connected-sockets": { href: "/test/api/_autohost/sockets", method: "GET" },
+				"_autohost:list-users": { href: "/test/api/_autohost/user", method: "GET" },
+				"_autohost:list-roles": { href: "/test/api/_autohost/role", method: "GET" },
+				"_autohost:list-user-roles": { href: "/test/api/_autohost/user/{user}/role", method: "GET", templated: true },
+				"_autohost:list-action-roles": { href: "/test/api/_autohost/action/{action}/role", method: "GET", templated: true },
+				"_autohost:add-action-roles":  { href: "/test/api/_autohost/action/{action}/role", method: "PATCH", templated: true },
+				"_autohost:remove-action-roles": { href: "/test/api/_autohost/action/{action}/role", method: "DELETE", templated: true },
+				"_autohost:add-user-roles": { href: "/test/api/_autohost/user/{user}/role", method: "PATCH", templated: true },
+				"_autohost:remove-user-roles":  { href: "/test/api/_autohost/user/{user}/role", method: "DELETE", templated: true },
+				"_autohost:add-role": { href: "/test/api/_autohost/role/{role}", method: "POST", templated: true },
+				"_autohost:remove-role": { href: "/test/api/_autohost/role/{role}", method: "DELETE", templated: true },
+				"_autohost:create-user": { href: "/test/api/_autohost/user/{userName}", method: "POST", templated: true },
+				"_autohost:change-password": { href: "/test/api/_autohost/user/{userName}", method: "PATCH", templated: true },
+				"_autohost:create-token": { href: "/test/api/_autohost/token", method: "POST" },
+				"_autohost:destroy-token": { href: "/test/api/_autohost/token/{token}", method: "DELETE", templated: true },
+				"_autohost:list-tokens": { href: "/test/api/_autohost/token/", method: "GET" },
+				"_autohost:enable-user": { href: "/test/api/_autohost/user/{userName}", method: "PUT", templated: true },
+				"_autohost:disable-user": { href: "/test/api/_autohost/user/{userName}", method: "DELETE", templated: true },
+				"_autohost:metrics": { href: "/test/api/_autohost/metrics", method: "GET" },
+				"board:cards": { href: "/test/api/board/{id}/card", method: "GET", templated: true },
+				"board:self": { href: "/test/api/board/{id}", method: "GET", templated: true },
+				"card:self": { href: "/test/api/card/{id}", method: "GET", templated: true },
+				"card:move": { href: "/test/api/card/{id}/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
+				"card:block": { href: "/test/api/card/{id}/block", method: "PUT", templated: true },
+				"lane:self": { href: "/test/api/board/{id}/lane/{laneId}", method: "GET", templated: true },
+				"lane:cards": { href: "/test/api/board/{id}/lane/{laneId}/card", method: "GET", templated: true }
 			},
 			_mediaTypes: [ "application/json", "application/hal+json" ],
 			_versions: [ "1", "2" ]

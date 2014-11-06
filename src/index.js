@@ -3,6 +3,7 @@ var HyperModel = require( "./hyperModel.js" );
 var HyperResponse = require( "./HyperResponse.js" );
 var jsonEngine = require( "./jsonEngine.js" );
 var halEngine = require( "./halEngine.js" );
+var url = require( "./urlTemplate.js" );
 
 var engines = {};
 var hypermodels = {};
@@ -149,7 +150,7 @@ function urlStrategy( resourceName, actionName, action, resourceList ) { // jshi
 		resources = resourceList;
 	}
 	var options = getOptionModel();
-	return options[ resourceName ][ actionName ].href;
+	return url.forExpress( options._links[ [ resourceName, actionName ].join( ":" ) ].href );
 }
 
 module.exports = function( resourceList, defaultToNewest ) {

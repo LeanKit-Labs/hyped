@@ -1,6 +1,10 @@
 var _ = require( "lodash" );
-var find = /[:]([^:\/?]*)/g;
-var replace = /[:]replace/g;
+
+var expressFind = /[:]([^:\/?]*)/g;
+var expressReplace = /[:]replace/g;
+
+var braceFind = /[{]([^}]*)[}]/g;
+var braceReplace = /[{]replace[}]/g;
 
 function camelCase ( token ) {
 	return camelize( token.resource, token.property );
@@ -13,6 +17,9 @@ function camelize( resource, property ) { // jshint ignore:line
 }
 
 function createUrl( url, data, resource ) {
+	if( isExpressStyle( url ) ) {
+		url = halStylePathVariables( url );
+	}
 	var tokens = getTokens( url );
 	if( tokens.length > 0 ) {
 		url = processTokens( tokens, url, data, resource );
@@ -20,16 +27,43 @@ function createUrl( url, data, resource ) {
 	return url;
 }
 
+function expressStylePathVarialbes( url ) {
+	var tokens = [];
+	var match;
+	var expressUrl = url;
+	while( ( match = braceFind.exec( url ) ) ) {
+		expressUrl = expressUrl.replace( match[ 0 ], ":" + match[ 1 ] );
+	}
+	return expressUrl;
+}
+
+function halStylePathVariables( url ) {
+	var tokens = [];
+	var match;
+	var expressUrl = url;
+	while( ( match = expressFind.exec( url ) ) ) {
+		expressUrl = expressUrl.replace( match[ 0 ], "{" + match[ 1 ] + "}" );
+	}
+	return expressUrl;
+}
+
 function getTokens( url ) { // jshint ignore:line
 	var tokens = [];
 	var match, tokenName;
-	while( ( match = find.exec( url ) ) ) {
+	var pattern = isExpressStyle( url ) ? expressFind : braceFind;
+	while( ( match = pattern.exec( url ) ) ) {
 		tokenName = match[ 1 ];
 		tokens.push( parseToken( tokenName ) );
 	}
 	return tokens;
 }
 
+function isExpressStyle( url ) {
+	var found = expressFind.test( url );
+	expressFind.lastIndex = 0;
+	return found;
+}
+ 
 function parseRegex( regex ) {
 	return regex.match( /\/g$/ ) ?
 		new RegExp( regex.replace(/\/g$/, "").substring( 1 ), "g" ) :
@@ -47,16 +81,19 @@ function parseToken( token ) { // jshint ignore:line
 }
 
 function readDataByToken( resource, data, token ) {
-	var result = ":" + camelCase( token );
 	var value;
+	var camel = camelCase( token );
 	if( data ) {
 		if( token.resource === "" || token.resource === resource ) {
 			value = data[ token.property ];
 		} else if( data[ token.resource ] ) {
 			value = data[ token.resource ][ token.property ];
+		} else if( data[ camel ] ) {
+			value = data[ camel ];
 		}
 	}
 	var empty = value === undefined || value === {};
+	var result = "{" + camel + "}";
 	return empty ? result : value;
 }
 
@@ -64,7 +101,7 @@ function processTokens( tokens, url, data, resource ) { // jshint ignore:line
 	var token = tokens.pop();
 	if( token ) {
 		var replacement = readDataByToken( resource, data, token );
-		var stringified = ( replace.toString() ).replace( /replace/, token.original );
+		var stringified = ( braceReplace.toString() ).replace( /replace/, token.original );
 		var replacer = parseRegex( stringified );
 		var newUrl = url.replace( replacer, replacement );
 		return processTokens( tokens, newUrl, data, resource );
@@ -75,5 +112,7 @@ function processTokens( tokens, url, data, resource ) { // jshint ignore:line
 module.exports = {
 	toCamel: camelCase,
 	create: createUrl,
-	getTokens: getTokens
+	getTokens: getTokens,
+	forExpress: expressStylePathVarialbes,
+	forHal: halStylePathVariables
 };

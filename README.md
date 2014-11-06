@@ -195,12 +195,19 @@ The accept header is used to select an appropriate rendering engine (if one is a
 New versions are implemented as diffs that get applied, in order, against the baseline. Each version provides new values for properties that replace parts of the metadata for the resource. This will hopefully make it easy to see the differences between versions of a resource and reduce the amount of copy/pasted code between versions of a resource definition.
 
 ### URLs
-hyped will attempt to replace path variables following two formats:
+hyped will attempt to replace path variables specified in two separate styles for two separate use cases:
 
+__Express style variables__
  1. `:property`
  1. `:property.childProperty`
 
-The fist form will be used to attempt to read a property directly on the model. The second will attempt to read a nested property _or_ a property name that combines the two in camel-case fahsion (i.e. `propertyChildProperty`). In either case, if no match is found, the variable will be left in tact. In the second case, the period is removed and the variable becomes camel-case.
+__Brace style variables__
+ 1. `{property}`
+ 1. `{property.childProperty}`
+
+Either style is valid when specifying the URL in the action, hyped will make sure that the correct form is used (Express style gets used server side for assigning routes while brace style is returned in all client responses).
+
+The first form will be used to attempt to read a property directly on the model. The second will attempt to read a nested property _or_ a property name that combines the two in camel-case fahsion (i.e. `propertyChildProperty`). In either case, if no match is found, the variable will be left in tact. In the second case, the period is removed and the variable becomes camel-case.
 
 Example:
 ```javascript
@@ -228,12 +235,14 @@ If the user model in question had a name property of `"leroyJenkins"`, the respo
 
 When a URL contains path variables that could not be replaced by a value in the model, the action/origin link will indicated this with a `templated` property set to `true`.
 
+	Note: the client will always see brace-style path variables
+
 ```javascript
 {
 	"name": "leroyJenkins",
 	"_links": {
 		"self": { "href": "/user/leroyJenkins", "verb": "GET" },
-		"insult": { "href": "/user/leroyJenkins/:insult", "verb": "POST", "templated": true }
+		"insult": { "href": "/user/leroyJenkins/{insult}", "verb": "POST", "templated": true }
 	}
 }
 ```
@@ -372,6 +381,17 @@ I think HAL is pretty awesome. We"ve added a few minor extensions and may contin
 
 ### Options
 `_versions` and `_mediatypes` properties have been added to the payload returned from the OPTIONS call to the API root. They will list the available versions and mediatypes currently supported by the server.
+
+__OPTIONS response structure__
+```javascript
+{
+	"_links": {
+		"resource:action": { href: "", method: "", templated: true }
+	}
+}
+```
+
+All actions will be returned under the top-level `_links` property. The action names returned from OPTIONS will be namespaced by the resource name delimited by a colon.
 
 ### Origin
 Provides a data structure identical to the link that would be called to produce the response. This is especially useful within embedded resources as it allows the client to see what link action was used to produce the embedded resource included in the payload.

@@ -27,8 +27,7 @@ describe( "with exclusion list", function() {
 		description: "This is a board and stuff!",
 		_origin: { href: "/board/100", method: "GET" },
 		_links: {
-			self: { href: "/board/100", method: "GET" },
-			full: { href: "/board/100?embed=lanes,cards,classOfService", method: "GET" }
+			self: { href: "/board/100", method: "GET" }
 		}
 	};
 
@@ -38,6 +37,6 @@ describe( "with exclusion list", function() {
 	} );
 
 	it( 'should generate self hypermedia object model', function() {
-		deepCompare( self, expectedSelf );
+		self.should.eql( expectedSelf );
 	} );
 } );

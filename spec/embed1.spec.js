@@ -105,10 +105,10 @@ describe( "with inherited URL", function() {
 	} );
 
 	it( 'should generate self hypermedia object model', function() {
-		deepCompare( self, expectedSelf );
+		self.should.eql( expectedSelf );
 	} );
 
 	it( 'should generate full hypermedia object model', function() {
-		deepCompare( full, expectedFull );
+		full.should.eql( expectedFull );
 	} );
 } );

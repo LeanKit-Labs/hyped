@@ -45,7 +45,6 @@ describe( "when filtering links by permission", function() {
 	} );
 
 	it( 'should generate self hypermedia object model', function() {
-		//deepCompare( self, expectedSelf );
 		self.should.eql( expectedSelf );
 	} );
 } );

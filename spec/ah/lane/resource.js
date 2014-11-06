@@ -20,6 +20,7 @@ module.exports = function( host ) {
 				handle: function( envelope ) {
 					var lane = _.cloneDeep( _.where( model.board1.lanes, { id: parseInt( envelope.data.laneId ) } )[ 0 ] );
 					lane.boardId = model.board1.id;
+					// lane.board = { id: model.board1.id };
 					envelope
 						.hyped( lane )
 						.render();

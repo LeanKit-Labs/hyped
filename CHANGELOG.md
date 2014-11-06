@@ -1,3 +1,8 @@
+### 0.0.9
+
+ * Change options response to be more in-line/consistent with HAL
+ * Return `braced` path variables to clients and `:` prefixed path variables for server-side routing
+
 ### 0.0.8
 Refactor how hyperModel works in order to support the ability to render a collection of related resources from another resource's action.
 

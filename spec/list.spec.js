@@ -50,8 +50,8 @@ describe( "when rendering simple list", function() {
 			self: { href: "/board/100", method: "GET" },
 			full: { href: "/board/100?embed=lanes,cards,classOfService", method: "GET" },
 			tags: { href: "/board/100/tag", method: "GET" },
-			addTag: { href: "/board/100/tag/:tag", method: "POST", templated: true },
-			removeTag: { href: "/board/100/tag/:tag", method: "DELETE", templated: true }
+			addTag: { href: "/board/100/tag/{tag}", method: "POST", templated: true },
+			removeTag: { href: "/board/100/tag/{tag}", method: "DELETE", templated: true }
 		}
 	};
 
@@ -62,32 +62,32 @@ describe( "when rendering simple list", function() {
 			self: { href: "/board/100", method: "GET" },
 			full: { href: "/board/100?embed=lanes,cards,classOfService", method: "GET" },
 			tags: { href: "/board/100/tag", method: "GET" },
-			addTag: { href: "/board/100/tag/:tag", method: "POST", templated: true },
-			removeTag: { href: "/board/100/tag/:tag", method: "DELETE", templated: true }
+			addTag: { href: "/board/100/tag/{tag}", method: "POST", templated: true },
+			removeTag: { href: "/board/100/tag/{tag}", method: "DELETE", templated: true }
 		}
 	};
 
 	var expectedPostAdd = {
 		tags: [ "one", "two", "three", "four" ],
-		_origin: { href: "/board/100/tag/:tag", method: "POST", templated: true },
+		_origin: { href: "/board/100/tag/{tag}", method: "POST", templated: true },
 		_links: {
 			self: { href: "/board/100", method: "GET" },
 			full: { href: "/board/100?embed=lanes,cards,classOfService", method: "GET" },
 			tags: { href: "/board/100/tag", method: "GET" },
-			addTag: { href: "/board/100/tag/:tag", method: "POST", templated: true },
-			removeTag: { href: "/board/100/tag/:tag", method: "DELETE", templated: true }
+			addTag: { href: "/board/100/tag/{tag}", method: "POST", templated: true },
+			removeTag: { href: "/board/100/tag/{tag}", method: "DELETE", templated: true }
 		}
 	};
 
 	var expectedPostRemove = {
 		tags: [ "one", "two", "four" ],
-		_origin: { href: "/board/100/tag/:tag", method: "DELETE", templated: true },
+		_origin: { href: "/board/100/tag/{tag}", method: "DELETE", templated: true },
 		_links: {
 			self: { href: "/board/100", method: "GET" },
 			full: { href: "/board/100?embed=lanes,cards,classOfService", method: "GET" },
 			tags: { href: "/board/100/tag", method: "GET" },
-			addTag: { href: "/board/100/tag/:tag", method: "POST", templated: true },
-			removeTag: { href: "/board/100/tag/:tag", method: "DELETE", templated: true }
+			addTag: { href: "/board/100/tag/{tag}", method: "POST", templated: true },
+			removeTag: { href: "/board/100/tag/{tag}", method: "DELETE", templated: true }
 		}
 	};
 
@@ -100,24 +100,25 @@ describe( "when rendering simple list", function() {
 		tagList = hypermodel( board1a, "board", "tags" ).render();
 		board1b.tags.push( "four" );
 		postAdd = hypermodel(board1b, "board", "addTag" ).render();
+		board1c.tags.push( "four" );
 		board1c.tags.splice( 2, 1 );
 		postRemove = hypermodel( board1c, "board", "removeTag" ).render();
 	} );
 
 	it( 'should generate self hypermedia object model', function() {
-		deepCompare( self, expectedSelf );
+		self.should.eql( expectedSelf );
 	} );
 
 	it( 'should generate tag list', function() {
-		deepCompare( tagList, expectedTagList );
+		tagList.should.eql( expectedTagList );
 	} );
 
 	it( 'should generate tag list post add', function() {
-		deepCompare( postAdd, expectedPostAdd );
+		postAdd.should.eql( expectedPostAdd );
 	} );
 
 	it( 'should generate tag list post remove', function() {
-		deepCompare( postRemove, expectedPostRemove );
+		postRemove.should.eql( expectedPostRemove );
 	} );
 
 	after( function() {
