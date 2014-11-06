@@ -120,7 +120,8 @@ function isTemplated( url ) { // jshint ignore:line
 function initialize( resources, version, prefix ) {
 	options = undefined;
 	return function( model, resourceName, actionName ) {
-		var parentUrl, authorize, filtered;
+		var parentUrl, authorize;
+		var filtered = {};
 		var originResourceName = resourceName;
 		var originActionName = actionName;
 		var originResource = resources[ originResourceName ];
@@ -137,7 +138,7 @@ function initialize( resources, version, prefix ) {
 		}
 
 		if( model ) {
-			filtered = action ? filterProperties( model, action ) : undefined;
+			filtered = action ? filterProperties( model, action ) : {};
 			parentUrl = parentUrl || resource ? buildParentUrl( resources, resource.parent, model, prefix ) : "";
 		}
 
@@ -239,7 +240,7 @@ function initialize( resources, version, prefix ) {
 			},
 			renderResource: function( item ) {
 				if( item ) {
-					filtered = action ? filterProperties( item, action ) : undefined;
+					filtered = action ? filterProperties( item, action ) : {};
 				}
 				var hyperModel = filtered;
 				hyperModel._origin = this.getOrigin( item );

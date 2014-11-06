@@ -1,3 +1,6 @@
+### 0.0.10
+Handle an edge case where rendering can fail due to defaulting the response body to undefined.
+
 ### 0.0.9
 
  * Change options response to be more in-line/consistent with HAL
