@@ -182,6 +182,15 @@ function initialize( resources, version, prefix ) {
 						var hasPermission = !authorize || authorize( resource.name + "." + alias );
 						var canRender = action.condition ? action.condition( item ) : true;
 						if( hasPermission && canRender ) {
+							var parameters = _.reduce( action.parameters, function( acc, val, key )  {
+								if( _.isFunction( val ) ) {
+									acc[ key ] = val( item, requestContext );
+								} else {
+									acc[ key ] = val;
+								}
+								return acc;
+							}, {} );
+
 							function genLink( rel, template, method ) {
 								var href = [ url.create( template, item, resource.name ) ];
 								var option = !item;
@@ -200,6 +209,9 @@ function initialize( resources, version, prefix ) {
 									};
 									if( templated ) {
 										links[ rel ].templated = true;
+									}
+									if( !_.isEmpty( parameters ) ) {
+										links[ rel ].parameters = parameters;
 									}
 								}
 							}

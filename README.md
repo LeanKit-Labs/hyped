@@ -17,12 +17,13 @@ The resource definition provides the metadata necessary for hyped to generate th
 
 
 ```
+// resource
 {
 	[resourceName]: the resource name (must be unique)
 	parent: (optional) the name of the resource that this "belongs" to.
 	actions: {
 		[actionName]: {
-			method: the http verb/method
+			method: the http method
 			url: the URL for this action
 			include: property names array to include in the rendered response
 			exclude: property names array to exclude from rendered response
@@ -30,6 +31,7 @@ The resource definition provides the metadata necessary for hyped to generate th
 			condition: returns true if the action is valid for the given model
 			embed: defines which model properties are embedded resources and how to render them
 			links: provides alternate/compatible urls for activating this action
+			parameters: provide metadata to describe available query parameters for this action
 		}
 	},
 	versions: {
@@ -43,7 +45,7 @@ The resource definition provides the metadata necessary for hyped to generate th
 	}
 }
 
-// an embed section looks like this:
+// embed
 {
 	[propertyName]: {
 		resource: name of the embedded resource
@@ -52,9 +54,16 @@ The resource definition provides the metadata necessary for hyped to generate th
 	}
 }
 
-// a link section looks like this:
+// links
 {
 	[actionName]: url|generator
+}
+
+// parameters
+{
+	parameterName: {
+		[ range|choice|list|validate|invalidate ]: specification
+	}
 }
 ```
 
@@ -107,6 +116,20 @@ The resource definition provides the metadata necessary for hyped to generate th
 	</pre>
 	</div>
 	</dd>
+	<dt><h3>parameters</h3></dt>
+	<dd>A hash of parameter names and metadata about each parameter. Each parameter should specify what "type" it is along with a specification that the client can use to validate possible parameter values. Any of the specifications can be a generator function to allow for dynamic specification.</dd>
+	<dt>choice</dt>
+	<dd>An array of valid choices where the consumer is expected to provide a single value.</dd>
+	<dt>multi</dt>
+	<dd>An array of valid choices where the consumer can provide multiple values.</dd>
+	<dt>range</dt>
+	<dd>A two-element array consisting of a lower and upper bound for the parameter value.</dd>
+	<dt>validate</dt>
+	<dd>A regular expression used to determine if a parameter value is valid.</dd>
+	<dt>invalidate</dt>
+	<dd>A regular expression used to detect invalid parameter values.</dd>
+	<dt>required</dt>
+	<dd>A boolean indicating that this parameter is required.</dd>
 </dl>
 
 #### Example
@@ -262,8 +285,8 @@ When a URL contains path variables that could not be replaced by a value in the 
 {
 	"name": "leroyJenkins",
 	"_links": {
-		"self": { "href": "/user/leroyJenkins", "verb": "GET" },
-		"insult": { "href": "/user/leroyJenkins/{insult}", "verb": "POST", "templated": true }
+		"self": { "href": "/user/leroyJenkins", "method": "GET" },
+		"insult": { "href": "/user/leroyJenkins/{insult}", "method": "POST", "templated": true }
 	}
 }
 ```
@@ -425,13 +448,44 @@ We added this to make it easier for clients to know which representation they ha
 ### Links
 
 #### Methods
-HAL does not include the HTTP verb/method used for an link"s `href`. Our version does include this information in the link using the `verb` property. As in our URL example from above:
+HAL does not include the HTTP method used for an link"s `href`. Our version does include this information in the link using the `method` property. As in our URL example from above:
 
 ```javascript
 {
 	"name": "leroyJenkins",
 	"_links": {
-		"self": { "href": "/user/leroyJenkins", "verb": "GET" }
+		"self": { "href": "/user/leroyJenkins", "method": "GET" }
+	}
+}
+```
+
+#### Parameters
+While the `links` property allows you to provide actions with the parameters already attached to the URL, there will be times when defining every possible combination of parameters as a specific action won't make sense.
+
+In those cases, we believe hypermedia should include metadata about the available parameters. This at least reduces the amount of implementation details exposed to API consumers.
+
+```javascript
+{
+	"_links": {
+		"self": { 
+			"href": "/thing/100",
+			"method": "GET", 
+			"parameters": {
+				"arg1": {
+					"range": [ 0, 100 ]
+				},
+				"arg2": {
+					"choice": [ 4, 8, 15, 16, 23, 42 ]
+				},
+				"arg3": {
+					"multi": [ "a", "b", "c", "d" ]
+				},
+				"arg4": {
+					"validate": "/^starts with.*/",
+					"invalidate": "/.*ends with$"
+				}
+			}
+		}
 	}
 }
 ```

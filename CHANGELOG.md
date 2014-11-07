@@ -1,3 +1,6 @@
+### 0.0.12
+Add support for query parameter definition.
+
 ### 0.0.11
 
  * Support the ability to include additional links per action
