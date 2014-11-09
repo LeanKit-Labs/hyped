@@ -1,7 +1,7 @@
 var _ = require( "lodash" );
 
 var expressFind = /[:]([^:\/?]*)/g;
-var expressReplace = /[:]replace/g;
+var expressReplace = /[:]replace/g; // jshint ignore:line
 
 var braceFind = /[{]([^}]*)[}]/g;
 var braceReplace = /[{]replace[}]/g;
@@ -28,7 +28,6 @@ function createUrl( url, data, resource ) {
 }
 
 function expressStylePathVarialbes( url ) {
-	var tokens = [];
 	var match;
 	var expressUrl = url;
 	while( ( match = braceFind.exec( url ) ) ) {
@@ -37,8 +36,7 @@ function expressStylePathVarialbes( url ) {
 	return expressUrl;
 }
 
-function halStylePathVariables( url ) {
-	var tokens = [];
+function halStylePathVariables( url ) { // jshint ignore:line
 	var match;
 	var expressUrl = url;
 	while( ( match = expressFind.exec( url ) ) ) {
@@ -58,7 +56,7 @@ function getTokens( url ) { // jshint ignore:line
 	return tokens;
 }
 
-function isExpressStyle( url ) {
+function isExpressStyle( url ) { // jshint ignore:line
 	var found = expressFind.test( url );
 	expressFind.lastIndex = 0;
 	return found;
@@ -84,16 +82,15 @@ function readDataByToken( resource, data, token ) {
 	var value;
 	var camel = camelCase( token );
 	if( data ) {
-		if( token.resource === "" || token.resource === resource ) {
-			value = data[ token.property ];
-		} else if( data[ token.resource ] ) {
-			value = data[ token.resource ][ token.property ];
-		} else if( data[ camel ] ) {
-			value = data[ camel ];
-		}
+		value = 
+			data[ camel ]
+			|| ( data[ token.resource ] ? data[ token.resource ][ token.property ] : undefined )
+			//|| data[ token.property ];
+			|| ( resource === token.resource ? data[ token.property ] : undefined );
 	}
 	var empty = value === undefined || value === {};
-	var result = "{" + camel + "}";
+	var backup = !token.isChild && token.resource && token.resource === resource ? token.property : camel;
+	var result = "{" + backup + "}";
 	return empty ? result : value;
 }
 
@@ -114,5 +111,7 @@ module.exports = {
 	create: createUrl,
 	getTokens: getTokens,
 	forExpress: expressStylePathVarialbes,
-	forHal: halStylePathVariables
+	forHal: halStylePathVariables,
+	process: processTokens,
+	readToken: readDataByToken
 };

@@ -7,14 +7,7 @@ A simple approach to generating [HAL](http://stateless.co/hal_specification.html
 You can skip to the [Using](#Using) section but understanding the concepts behind should explain
 
 ### Resource Definition
-The resource definition provides the metadata necessary for hyped to generate the hypermedia based on the model you provide it. This declaritive approach takes advantage of the structure and property names you provide to make implicit associations. The trade-off is that the associations are made based on consistent naming across several properties and values and __typos will break the expected outcome__.
-
-> __Notes__
-
-> 1. `include` and `exclude` are mutually exclusive
-
-> 1. Properties listed in `embed` are not included in the response body. To override this, you'll need to list them in the `include` array.
-
+The resource definition provides the metadata necessary for hyped to generate hypermedia based on the model you provide it. This declaritive approach takes advantage of the structure and property names you provide to make implicit associations. The trade-off is that the associations are made based on consistent naming across several properties and values and __typos will break the expected outcome__.
 
 ```
 // resource
@@ -25,10 +18,12 @@ The resource definition provides the metadata necessary for hyped to generate th
 		[actionName]: {
 			method: the http method
 			url: the URL for this action
+			render: override the resource/action that gets rendered from this action
 			include: property names array to include in the rendered response
 			exclude: property names array to exclude from rendered response
 			filter: predicate to determine if a property's key/value should be included
 			condition: returns true if the action is valid for the given model
+			transform: a map function that operates against the data
 			embed: defines which model properties are embedded resources and how to render them
 			links: provides alternate/compatible urls for activating this action
 			parameters: provide metadata to describe available query parameters for this action
@@ -45,7 +40,16 @@ The resource definition provides the metadata necessary for hyped to generate th
 	}
 }
 
+// render
+// use case: when returning child items from a parent resource's action
+{
+	resource: the resource that is actually being returned from this action
+	action: the action that should be used to render the resource
+}
+
 // embed
+// use case: when returning a parent object that contains properties that should
+// be rendered/treated like nested resources
 {
 	[propertyName]: {
 		resource: name of the embedded resource
@@ -55,11 +59,15 @@ The resource definition provides the metadata necessary for hyped to generate th
 }
 
 // links
+// use case: when an action has a limited set of parameter values that should be
+// given a friendly name
 {
 	[actionName]: url|generator
 }
 
 // parameters
+// use case: when you want to define the available parameters for an action
+// for use by the client
 {
 	parameterName: {
 		[ range|choice|list|validate|invalidate ]: specification
@@ -91,22 +99,22 @@ The resource definition provides the metadata necessary for hyped to generate th
 	<dd>A predicate used to determine if this action should be included in the link list when rendering a response.</dd>
 	<dt><h3>embed</h3></dt>
 	<dd>This section defines whether or not other resources can/should be included in the action's response. It effectively allows the server to provide pre-fetched, related resources to the client.</dd>
-	<dt>embed - propertyName</dt>
+	<dt>propertyName</dt>
 	<dd>The name of the property on the data model that will contain one or more of the embedded resources. This property name will, by default, be removed from the response.</dd>
-	<dt>embed - resource</dt>
+	<dt>resource</dt>
 	<dd>The name of the resource that defines how each item under the data model property should be rendered as a resource.</dd>
-	<dt>embed - render</dt>
+	<dt>render</dt>
 	<dd>Determines which of the embedded resource's actions should be used to produce its representation as an embedded resource.</dd>
-	<dt>embed - actions</dt>
+	<dt>actions</dt>
 	<dd>A string array listing which links should be provided per embedded resource.</dd>
 	<dt><h3>links</h3></dt>
 	<dd>A hash of additional actions to include in the links related to this action. These additional links will only be included in a resource's `_links` when the action itself is valid (passes both auth and `condition` checks when provided). Note - you cannot provide a method other than what already exists on the action the links belong to (it wouldn't make sense).
 
 	This feature is to allow action aliases for known sets of query parameters.
 	</dd>
-	<dt>links - url</dt>
+	<dt>url</dt>
 	<dd>Works the same as the `url` for the action.</dd>
-	<dt>links - generator</dt>
+	<dt>generator</dt>
 	<dd>A function that takes the data model and a context hash and optionally returns a url string. Returning an empty string or undefined will exclude the link from rendered results. See <a href="#rendering-api">Rendering API</a> for how the context is specified.
 	<div class="highlight highlight-javascript">	<pre>
 	"next-page": function( data, context ) {
@@ -130,6 +138,14 @@ The resource definition provides the metadata necessary for hyped to generate th
 	<dd>A regular expression used to detect invalid parameter values.</dd>
 	<dt>required</dt>
 	<dd>A boolean indicating that this parameter is required.</dd>
+	<dt><h3>render</h3></dt>
+	<dd>Use this when the resource and action that should get rendered differs from the
+	resource and action currently being rendered.
+	</dd>
+	<dt>resource</dt>
+	<dd>The name of the resource that is being rendered.</dd>
+	<dt>action</dt>
+	<dd>The name of the action to use in rendering the resource.</dd>
 </dl>
 
 #### Example
@@ -346,7 +362,7 @@ hyped.setupMiddleware( app );
 app.get( "something/:id", function( req, res ) {
 	var id = req.param( "id" );
 	var model = databass.getSomethingById( id );
-	req.hyped( model ).resource( "something" ).action( "self" ).status( 200 ).render();
+	req.hyped( model ).status( 200 ).render();
 } );
 ```
 
@@ -355,6 +371,12 @@ app.get( "something/:id", function( req, res ) {
 If you are using this library with Autohost, the only API you really need to know about is used for the initial setup and the response generation.
 
 ## Setup API
+
+### require( "hyped" )( [resourceList], [defaultToNewest], [includeChildrenInOptions] )
+You can skip passing resource list at all and provide the two booleans in the order specified.
+
+__defaultToNewest__: causes hyped to default to the newest available version when one isn't specified
+__includeChildrenInOptions__: include child resource actions in the OPTIONS response
 
 ### addResource( resource, resourceName )
 Adds the metadata for a particular resource.
@@ -407,12 +429,6 @@ Keep in mind that normally, you will only use the `hyped`, `status` and `render`
 
 ### .hyped( model, [context] )
 You provide the data model that the resource will render a response based on. The resources are designed to work with models that may have a great deal more information than should ever be exposed to the client.
-
-### .resource( resourceName )
-When the resource that needs to be rendered is not the one the action is contained within.
-
-### .action( actionName )
-When the action you want rendered is not the one being activated.
 
 ### .context( context )
 Another way to provide context to any link generators for this action.
@@ -501,7 +517,6 @@ The tests are a bit of a contrived mess at the moment but do exercise the featur
 ## Roadmap
 None of this is guaranteed but here are some items that would be nice/great to have.
 
- * Add extension to hypermedia for describing query parameters
  * Add ability to define data contracts for request/response bodies per resource and action
  * Filter options response based on authorization method
  * Support for websockets

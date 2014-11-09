@@ -1,19 +1,16 @@
 var should = require( "should" ); // jshint ignore: line
 var _ = require( "lodash" );
-var when = require( "when" );
 var model = require( "./model.js" );
 var request = require( "request" );
 
 var board1 = model.board1;
-var board2 = model.board2;
-var deepCompare = model.deepCompare;
 var limit = 10;
 
 describe( "with oldest version as default", function() {
 	var autohost = require( "autohost" );
 	var hyped;
 	before( function( done ) {
-		hyped = require( "../src/index.js" )();
+		hyped = require( "../src/index.js" )( false, true );
 		autohost.init( { 
 				resources: "./spec/ah", 
 				noOptions: true, 
@@ -31,7 +28,7 @@ describe( "with oldest version as default", function() {
 
 		before( function( done ) {
 			request( "http://localhost:8800/test/api/board/100", function( err, res ) {
-				body = res.body;
+				body = JSON.parse( res.body );
 				contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
 				done();
 			} );
@@ -39,7 +36,7 @@ describe( "with oldest version as default", function() {
 
 		it( "should get JSON version 1", function() {
 			contentType.should.equal( "application/json" );
-			body.should.equal( '{"id":100,"title":"Test Board","lanes":[{"id":200,"title":"To Do","wip":0,"cards":[{"id":301,"title":"Card 1","description":"This is card 1"},{"id":302,"title":"Card 2","description":"This is card 2"},{"id":303,"title":"Card 3","description":"This is card 3"}]},{"id":201,"title":"Doing","wip":0,"cards":[{"id":304,"title":"Card 4","description":"This is card 4"}]},{"id":202,"title":"Done","wip":0,"cards":[{"id":305,"title":"Card 5","description":"This is card 5"},{"id":306,"title":"Card 6","description":"This is card 6"}]}]}' );
+			body.should.eql( {"id":100,"title":"Test Board","lanes":[{"id":200,"title":"To Do","wip":0,"cards":[{"id":301,"title":"Card 1","description":"This is card 1"},{"id":302,"title":"Card 2","description":"This is card 2"},{"id":303,"title":"Card 3","description":"This is card 3"}]},{"id":201,"title":"Doing","wip":0,"cards":[{"id":304,"title":"Card 4","description":"This is card 4"}]},{"id":202,"title":"Done","wip":0,"cards":[{"id":305,"title":"Card 5","description":"This is card 5"},{"id":306,"title":"Card 6","description":"This is card 6"}]}]} );
 		} );
 	} );
 
@@ -306,14 +303,71 @@ describe( "with oldest version as default", function() {
 	} );
 
 	describe( "when requesting board json version 2", function() {
-
+		var expected = {
+			"id": 100,
+			"title": "Test Board",
+			"description": "This is a board and stuff!",
+			"lanes": [
+				{
+					"id": 200,
+					"title": "To Do",
+					"wip": 0,
+					"cards": [
+						{
+							"id": 301,
+							"title": "Card 1",
+							"description": "This is card 1"
+						},
+						{
+							"id": 302,
+							"title": "Card 2",
+							"description": "This is card 2"
+						},
+						{
+							"id": 303,
+							"title": "Card 3",
+							"description": "This is card 3"
+						}
+					]
+				},
+				{
+					"id": 201,
+					"title": "Doing",
+					"wip": 0,
+					"cards": [
+						{
+							"id": 304,
+							"title": "Card 4",
+							"description": "This is card 4"
+						}
+					]
+				},
+				{
+					"id": 202,
+					"title": "Done",
+					"wip": 0,
+					"cards": [
+						{
+							"id": 305,
+							"title": "Card 5",
+							"description": "This is card 5"
+						},
+						{
+							"id": 306,
+							"title": "Card 6",
+							"description": "This is card 6"
+						}
+					]
+				}
+			]
+		};
 		var body, contentType, elapsedMs;
 
 		before( function( done ) {
 			var start = Date.now();
 			request.get( "http://localhost:8800/test/api/board/100", { headers: { accept: "application/json.v2" } }, function( err, res ) {
 				elapsedMs = ( Date.now() - start );
-				body = res.body;
+				body = JSON.parse( res.body );
 				contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
 				done();
 			} );
@@ -321,7 +375,7 @@ describe( "with oldest version as default", function() {
 
 		it( "should get JSON version 2", function() {
 			contentType.should.equal( "application/json.v2" );
-			body.should.equal( '{"id":100,"title":"Test Board","description":"This is a board and stuff!","lanes":[{"id":200,"title":"To Do","wip":0,"cards":[{"id":301,"title":"Card 1","description":"This is card 1"},{"id":302,"title":"Card 2","description":"This is card 2"},{"id":303,"title":"Card 3","description":"This is card 3"}]},{"id":201,"title":"Doing","wip":0,"cards":[{"id":304,"title":"Card 4","description":"This is card 4"}]},{"id":202,"title":"Done","wip":0,"cards":[{"id":305,"title":"Card 5","description":"This is card 5"},{"id":306,"title":"Card 6","description":"This is card 6"}]}]}' );
+			body.should.eql( expected );
 		} );
 
 		it( "should be 'quick'", function() {
@@ -716,7 +770,7 @@ describe( "with oldest version as default", function() {
 		var body, contentType, elapsedMs;
 
 		var expected = { 
-			_origin: { href: "/test/api/board/301/card", method: "GET" },
+			_origin: { href: "/test/api/board/100/card", method: "GET" },
 			cards: [ 
 				{ 
 					id: 301,
@@ -777,13 +831,13 @@ describe( "with oldest version as default", function() {
 					id: 306,
 					title: "Card 6",
 					description: "This is card 6",
-				 _origin: { href: "/test/api/card/306", method: "GET" },
-				 _links: {
-						self: { href: "/test/api/card/306", method: "GET" },
-						move: { href: "/test/api/card/306/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
-						block: { href: "/test/api/card/306/block", method: "PUT" } 
+					_origin: { href: "/test/api/card/306", method: "GET" },
+					_links: {
+							self: { href: "/test/api/card/306", method: "GET" },
+							move: { href: "/test/api/card/306/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
+							block: { href: "/test/api/card/306/block", method: "PUT" } 
+						} 
 					} 
-				} 
 			] 
 		};
 
@@ -814,7 +868,7 @@ describe( "with oldest version as default", function() {
 		var expectedOptions = {
 			_links: 
 			 { 
-			 	"_autohost:api": { href: "/test/api/_autohost", method: "GET" },
+				"_autohost:api": { href: "/test/api/_autohost", method: "GET" },
 				"_autohost:resources": { href: "/test/api/_autohost/resource", method: "GET" },
 				"_autohost:actions": { href: "/test/api/_autohost/action", method: "GET" },
 				"_autohost:connected-sockets": { href: "/test/api/_autohost/sockets", method: "GET" },
@@ -841,8 +895,8 @@ describe( "with oldest version as default", function() {
 				"card:self": { href: "/test/api/card/{id}", method: "GET", templated: true },
 				"card:move": { href: "/test/api/card/{id}/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 				"card:block": { href: "/test/api/card/{id}/block", method: "PUT", templated: true },
-				"lane:self": { href: "/test/api/board/{id}/lane/{laneId}", method: "GET", templated: true },
-				"lane:cards": { href: "/test/api/board/{id}/lane/{laneId}/card", method: "GET", templated: true }
+				"lane:self": { href: "/test/api/board/{boardId}/lane/{id}", method: "GET", templated: true },
+				"lane:cards": { href: "/test/api/board/{boardId}/lane/{id}/card", method: "GET", templated: true }
 			},
 			_mediaTypes: [ "application/json", "application/hal+json" ],
 			_versions: [ "1", "2" ]
@@ -886,12 +940,12 @@ describe( "with newest version as default", function() {
 	} );
 
 	describe( "when requesting board with no media type", function() {
-
+		var expected = {"id":100,"title":"Test Board","description":"This is a board and stuff!","lanes":[{"id":200,"title":"To Do","wip":0,"cards":[{"id":301,"title":"Card 1","description":"This is card 1"},{"id":302,"title":"Card 2","description":"This is card 2"},{"id":303,"title":"Card 3","description":"This is card 3"}]},{"id":201,"title":"Doing","wip":0,"cards":[{"id":304,"title":"Card 4","description":"This is card 4"}]},{"id":202,"title":"Done","wip":0,"cards":[{"id":305,"title":"Card 5","description":"This is card 5"},{"id":306,"title":"Card 6","description":"This is card 6"}]}]};
 		var body, contentType;
 
 		before( function( done ) {
 			request( "http://localhost:8800/test/api/board/100", function( err, res ) {
-				body = res.body;
+				body = JSON.parse( res.body );
 				contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
 				done();
 			} );
@@ -899,7 +953,7 @@ describe( "with newest version as default", function() {
 
 		it( "should get JSON version 2", function() {
 			contentType.should.equal( "application/json" );
-			body.should.equal( '{"id":100,"title":"Test Board","description":"This is a board and stuff!","lanes":[{"id":200,"title":"To Do","wip":0,"cards":[{"id":301,"title":"Card 1","description":"This is card 1"},{"id":302,"title":"Card 2","description":"This is card 2"},{"id":303,"title":"Card 3","description":"This is card 3"}]},{"id":201,"title":"Doing","wip":0,"cards":[{"id":304,"title":"Card 4","description":"This is card 4"}]},{"id":202,"title":"Done","wip":0,"cards":[{"id":305,"title":"Card 5","description":"This is card 5"},{"id":306,"title":"Card 6","description":"This is card 6"}]}]}' );
+			body.should.eql( expected );
 		} );
 
 	} );

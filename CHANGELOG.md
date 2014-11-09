@@ -1,3 +1,16 @@
+## 0.1.0
+
+### prerelease 1
+
+ * Refactor of the approach to creating hypermedia.
+ * Fix issue #1 - action filter for embedded resources now work correctly
+ * Support the ability to filter out child actions from OPTIONS
+ * Change override to render/action to be statically specified by a `render` property on the action
+ * Bug fixes/changes to how path variables are treated
+ * Elimination of redundant tests
+
+## 0.0.*
+
 ### 0.0.12
 Add support for query parameter definition.
 

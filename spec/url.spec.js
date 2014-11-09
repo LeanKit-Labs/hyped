@@ -1,4 +1,4 @@
-var should = require( "should" );
+var should = require( "should" ); // jshint ignore:line
 var url = require( "../src/urlTemplate.js" );
 
 describe( "when replacing a token property with a model property", function() {
@@ -12,6 +12,21 @@ describe( "when replacing a token property with a model property", function() {
 	} );
 
 	it( "should replace the token with the matching model property", function() {
+		href.should.equal( expected );
+	} );
+} );
+
+describe( "when replacing multiple tokens with matches", function() {
+	var template = "/parent/:parent.id/child/:child.id/grand/:id";
+	var model = { parentId: 1, childId: 2, id: 3 };
+	var expected = "/parent/1/child/2/grand/3";
+	var href;
+
+	before( function() {
+		href = url.create( template, model, "grandChild" );
+	} );
+
+	it( "should replace all tokens correctly", function() {
 		href.should.equal( expected );
 	} );
 } );

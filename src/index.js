@@ -1,6 +1,7 @@
 var _ = require( "lodash" );
-var HyperModel = require( "./hyperModel.js" );
+
 var HyperResponse = require( "./HyperResponse.js" );
+var HyperResource = require( "./HyperResource.js" );
 var jsonEngine = require( "./jsonEngine.js" );
 var halEngine = require( "./halEngine.js" );
 var url = require( "./urlTemplate.js" );
@@ -8,10 +9,12 @@ var url = require( "./urlTemplate.js" );
 var engines = {};
 var hypermodels = {};
 var resources = {};
-var optionModel;
+var optionModels = {};
+var fullOptionModels = {};
 var prefix;
 var maxVersion;
 var preferLatest = false;
+var excludeChildren;
 
 var getVersion = function( req ) {
 	if( !maxVersion ) {
@@ -98,17 +101,31 @@ function getHyperModel( req ) { // jshint ignore:line
 		version = getVersion( req );
 	}
 	if( !hypermodels[ version ] ) {
-		hypermodels[ version ] = HyperModel( resources, version, prefix ); // jshint ignore: line
+		hypermodels[ version ] = HyperResource.renderFn( resources, prefix, version ); // jshint ignore: line
 	}
 	return hypermodels[ version ];
 }
 
 function getOptionModel( req ) {
-	if( !optionModel ) {
-		hyperModel = getHyperModel( req );
-		optionModel = hyperModel( engines ).render();
+	var version = 1;
+	if( req ) {
+		version = getVersion( req );
 	}
-	return optionModel;
+	if( !optionModels[ version ] ) {
+		optionModels[ version ] = HyperResource.optionsFn( resources, prefix, version, excludeChildren )( engines );
+	}
+	return optionModels[ version ];
+}
+
+function getFullOptionModel( req ) {
+	var version = 1;
+	if( req ) {
+		version = getVersion( req );
+	}
+	if( !fullOptionModels[ version ] ) {
+		fullOptionModels[ version ] = HyperResource.optionsFn( resources, prefix, version, false )( engines );
+	}
+	return fullOptionModels[ version ];
 }
 
 function getMaxVersion() { // jshint ignore:line
@@ -133,6 +150,10 @@ function optionsMiddleware( req, res, next ) { // jshint ignore:line
 	if( req.method === "OPTIONS" || req.method === "options" ) {
 		var contentType = getContentType( req );
 		var engine = getEngine( contentType );
+		if( !engine ) {
+			contentType = "application/json";
+			engine = jsonEngine;
+		}
 		var optionModel = getOptionModel( req );
 		var body = engine( optionModel, true );
 		res.status( 200 ).set( "Content-Type", contentType ).send( body );
@@ -149,16 +170,19 @@ function urlStrategy( resourceName, actionName, action, resourceList ) { // jshi
 	if( _.isEmpty( resources ) ) {
 		resources = resourceList;
 	}
-	var options = getOptionModel();
+	// will need to do this for all available versions at some point ...
+	var options = getFullOptionModel();
 	return url.forExpress( options._links[ [ resourceName, actionName ].join( ":" ) ].href );
 }
 
-module.exports = function( resourceList, defaultToNewest ) {
+module.exports = function( resourceList, defaultToNewest, includeChildrenInOptions ) {
 	if( resourceList === true || resourceList === false ) {
 		preferLatest = resourceList;
+		excludeChildren = defaultToNewest === undefined ? true : !defaultToNewest;
 	} else {
 		addResources( resourceList );
 		preferLatest = defaultToNewest;
+		excludeChildren = includeChildrenInOptions === undefined ? true : !includeChildrenInOptions;
 	}
 	addEngine( jsonEngine, "application/json" );
 	addEngine( halEngine, "application/hal+json" );

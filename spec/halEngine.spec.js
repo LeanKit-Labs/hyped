@@ -1,12 +1,5 @@
 var should = require( "should" ); // jshint ignore: line
-var _ = require( "lodash" );
-var when = require( "when" );
-var model = require( "./model.js" );
 var halEngine = require( "../src/halEngine.js" );
-
-var board1 = model.board1;
-var board2 = model.board2;
-var deepCompare = model.deepCompare;
 
 describe( "when rendering HAL", function() {
 	var hal;

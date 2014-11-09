@@ -1,10 +1,9 @@
 var should = require( "should" ); // jshint ignore: line
-var _ = require( "lodash" );
-var when = require( "when" );
 var model = require( "./model.js" );
-var HyperModel = require( "../src/hyperModel.js" );
+var HyperResource = require( "../src/hyperResource.js" );
 
 var board1 = model.board1;
+var limit = 5;
 
 describe( "with static links", function() {
 	var elapsedMs;
@@ -31,7 +30,7 @@ describe( "with static links", function() {
 		}
 	};
 
-	var self1, self2, full;
+	var self1, self2;
 	var expectedSelf1 = {
 		id: 100,
 		title: "Test Board",
@@ -59,18 +58,18 @@ describe( "with static links", function() {
 
 	before( function() {
 		var start = Date.now();
-		var hypermodel = HyperModel( { board: resource } );
-		self1 = hypermodel( board1, "board", "self" ).useContext( { page: 1, size: 10 } ).render();
-		self2 = hypermodel( board1, "board", "self" ).useContext( { page: 2, size: 10 } ).render();
+		var fn = HyperResource.renderFn( { board: resource } );
+		self1 = fn( "board", "self", board1, "", { page: 1, size: 10 } );
+		self2 = fn( "board", "self", board1, "", { page: 2, size: 10 } );
 		elapsedMs = Date.now() - start;
 	} );
 
-	it( 'should generate links correctly', function() {
+	it( "should generate links correctly", function() {
 		self1.should.eql( expectedSelf1 );
 		self2.should.eql( expectedSelf2 );
 	} );
 
-	it( 'should not be slow as a big, dead ass', function() {
-		elapsedMs.should.be.below( 1 );
+	it( "should be 'quick'", function() {
+		elapsedMs.should.be.below( limit );
 	} );
 } );

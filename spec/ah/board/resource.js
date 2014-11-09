@@ -23,11 +23,12 @@ module.exports = function( host ) {
 			cards: {
 				method: "get",
 				url: "/board/:id/card",
+				render: { resource: "card", action: "self" },
 				handle: function( envelope ) {
 					var cards = _.reduce( model.board1.lanes, function( acc, lane ) {
 						return acc.concat( lane.cards );
 					}, [] );
-					envelope.hyped( cards ).resource( "card" ).action( "self" ).render();
+					envelope.hyped( cards ).render();
 				}
 			}
 		},

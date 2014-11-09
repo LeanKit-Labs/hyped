@@ -1,12 +1,8 @@
 var should = require( "should" ); // jshint ignore: line
-var _ = require( "lodash" );
-var when = require( "when" );
 var model = require( "./model.js" );
-var HyperModel = require( "../src/hyperModel.js" );
+var HyperResource = require( "../src/hyperResource.js" );
 
 var board1 = model.board1;
-var board2 = model.board2;
-var deepCompare = model.deepCompare;
 
 describe( "when filtering links by permission", function() {
 	var resource = {
@@ -28,7 +24,7 @@ describe( "when filtering links by permission", function() {
 		}
 	};
 
-	var self, full;
+	var self;
 	var expectedSelf = {
 		id: 100,
 		title: "Test Board",
@@ -38,16 +34,16 @@ describe( "when filtering links by permission", function() {
 		}
 	};
 
-	var authCheck = function( actionName, model ) {
-		return actionName !== "board.full";
+	var authCheck = function( actionName ) {
+		return actionName !== "board:full";
 	};
 
 	before( function() {
-		var hypermodel = HyperModel( { board: resource } );
-		self = hypermodel( board1, "board", "self" ).auth( authCheck ).render();
+		var fn = HyperResource.renderFn( { board: resource } );
+		self = fn( "board", "self", board1, "", undefined, undefined, undefined, authCheck );
 	} );
 
-	it( 'should generate self hypermedia object model', function() {
+	it( "should generate self hypermedia object model", function() {
 		self.should.eql( expectedSelf );
 	} );
 } );

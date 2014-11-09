@@ -1,12 +1,7 @@
 var should = require( "should" ); // jshint ignore: line
 var _ = require( "lodash" );
-var when = require( "when" );
 var model = require( "./model.js" );
 var jsonEngine = require( "../src/jsonEngine.js" );
-
-var board1 = model.board1;
-var board2 = model.board2;
-var deepCompare = model.deepCompare;
 
 describe( "when rendering json", function() {
 	var json;
@@ -23,7 +18,7 @@ describe( "when rendering json", function() {
 		_embedded: {
 			lanes: [
 				{
-					id: 200, title: "To Do", wip: 0,
+					id: 200, title: "To Do", wip: 0, boardId: 100,
 					_origin: { href: "/board/100/lane/200", method: "GET" },
 					_links: {
 						self: { href: "/board/100/lane/200", method: "GET" },
@@ -59,7 +54,7 @@ describe( "when rendering json", function() {
 					}
 				},
 				{
-					id: 201, title: "Doing", wip: 0,
+					id: 201, title: "Doing", wip: 0, boardId: 100,
 					_origin: { href: "/board/100/lane/201", method: "GET" },
 					_links: {
 						self: { href: "/board/100/lane/201", method: "GET" },
@@ -79,7 +74,7 @@ describe( "when rendering json", function() {
 					}
 				},
 				{
-					id: 202, title: "Done", wip: 0,
+					id: 202, title: "Done", wip: 0, boardId: 100,
 					_origin: { href: "/board/100/lane/202", method: "GET" },
 					_links: {
 						self: { href: "/board/100/lane/202", method: "GET" },
