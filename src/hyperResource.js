@@ -94,7 +94,7 @@ function getActionUrlCache( resources, prefix, version ) {
 	_.reduce( resources, function( rAcc, resource, resourceName ) {
 		resource = getVersion( resource, version );
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
-			var actionUrl = resource.actions[ actionName ].url;
+			var actionUrl = [ resource.urlPrefix, resource.actions[ actionName ].url ].join( "" );
 			var templated = isTemplated( actionUrl );
 			var getActionUrl = function() { return actionUrl; };
 			if( templated ) {
@@ -119,7 +119,7 @@ function getActionUrlCache( resources, prefix, version ) {
 			};
 
 			_.each( action.links, function( link, linkName ) {
-				var linkFn = getLinkFn( link, resourceName );
+				var linkFn = getLinkFn( link, resource, resourceName );
 				acc[ linkName ] = function( data, parentUrl, context ) {
 					var href = [
 						getPrefix( parentUrl, data ),
@@ -231,11 +231,12 @@ function getLinksFn( resources, prefix, version ) {
 	};
 }
 
-function getLinkFn( link, resourceName ) { // jshint ignore:line
+function getLinkFn( link, resource, resourceName ) { // jshint ignore:line
 	if( _.isFunction( link ) ) {
 		return function( data, context ) {
 			var linkUrl = link( data, context );
 			if( linkUrl ) {
+				linkUrl = [ resource.urlPrefix, linkUrl ].join( "" );
 				return isTemplated( linkUrl ) ?
 					url.create( linkUrl, data, resourceName ) :
 					linkUrl;
@@ -244,13 +245,15 @@ function getLinkFn( link, resourceName ) { // jshint ignore:line
 			}
 		};
 	} else {
-		var halUrl = url.forHal( link );
+		var halUrl = url.forHal( [ resource.urlPrefix, link ].join( "" ) );
 		var templated = isTemplated( halUrl );
 		if( templated ) {
 			var tokens = url.getTokens( halUrl );
 			return function( data ) {
 				return url.process( _.cloneDeep( tokens ), halUrl, data, resourceName );
 			};
+		} else {
+
 		}
 	}
 }

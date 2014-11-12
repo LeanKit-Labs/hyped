@@ -1,5 +1,8 @@
 ## 0.1.0
 
+### prerelease 2
+Add support for a urlPrefix at the resource level.
+
 ### prerelease 1
 
  * Refactor of the approach to creating hypermedia.

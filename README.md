@@ -13,7 +13,8 @@ The resource definition provides the metadata necessary for hyped to generate hy
 // resource
 {
 	[resourceName]: the resource name (must be unique)
-	parent: (optional) the name of the resource that this "belongs" to.
+	parent: (optional) the name of the resource that this "belongs" to
+	urlPrefix: (optional) a URL prefix for all actions in this resource
 	actions: {
 		[actionName]: {
 			method: the http method
@@ -81,6 +82,8 @@ The resource definition provides the metadata necessary for hyped to generate hy
 	<dd>The name of your resource. This will be important to keep unique and easy to remember because the <tt>parent</tt> property of other resources and the <tt>resource</tt> property of an embed section will need to match one of your resource names.</dd>
 	<dt>parent</dt>
 	<dd>Defines this resource as belonging to another resource. This will cause all of the action URLs in this resource to be prefixed by the parent resource's <tt>self</tt> href.</dd>
+	<dt>urlPrefix</dt>
+	<dd>Provide a common URL prefix for all actions in this resource.</dd>
 	<dt>actionName</dt>
 	<dd>The name of the action will determine the name of the link exposed in the resource's links.</dd>
 	<dt>method</dt>
