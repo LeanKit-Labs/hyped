@@ -1,5 +1,8 @@
 ## 0.1.0
 
+### prerelease 3
+Pass context to the auth check call (new feature available in autohost auth providers for contextual authorization).
+
 ### prerelease 2
 Add support for a urlPrefix at the resource level.
 

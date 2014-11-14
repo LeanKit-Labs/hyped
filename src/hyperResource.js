@@ -533,7 +533,7 @@ function shouldRenderFn( action, actionName, resourceName ) { // jshint ignore:l
 	}
 	var authName = [ resourceName, actionName ].join( ":" );
 	return function( data, context, auth ) {
-		return ( canRender( data, context ) && auth( authName, data ) );
+		return ( canRender( data, context ) && auth( authName, data, context ) );
 	};
 }
 
