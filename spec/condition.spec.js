@@ -1,12 +1,7 @@
 var should = require( "should" ); // jshint ignore: line
-var _ = require( "lodash" );
-var when = require( "when" );
-var model = require( "./model.js" );
-var HyperModel = require( "../src/hyperModel.js" );
+var HyperResource = require( "../src/hyperResource.js" );
 
-var board1 = model.board1;
-var board2 = model.board2;
-var deepCompare = model.deepCompare;
+var limit = 2;
 
 describe( "when filtering links by predicate", function() {
 	var resource = {
@@ -69,20 +64,35 @@ describe( "when filtering links by predicate", function() {
 		}
 	};
 
-	var newAccount, withMoney, noMoney;
+	var newAccount, withMoney, noMoney, elapsed1, elapsed2, elapsed3, elapsed4;
 
 	before( function() {
-		var hypermodel = HyperModel( { account: resource } );
-		newAccount = hypermodel( acct, "account", "self" );
+		var start = Date.now();
+		var fn = HyperResource.renderFn( { account: resource } );
+		elapsed1 = ( Date.now() - start );
+		start = Date.now();
+		newAccount = fn( "account", "self", acct );
+		elapsed2 = ( Date.now() - start );
 		acct.balance = 100;
-		withMoney = hypermodel( acct, "account", "self" );
+		start = Date.now();
+		withMoney = fn( "account", "self", acct );
+		elapsed3 = ( Date.now() - start );
 		acct.balance = 0;
-		noMoney = hypermodel( acct, "account", "self" );
+		start = Date.now();
+		noMoney = fn( "account", "self", acct );
+		elapsed4 = ( Date.now() - start );
 	} );
 
-	it( 'should only show withdrawal if balance is greater than 0', function() {
-		deepCompare( newAccount, expected1 );
-		deepCompare( withMoney, expected2 );
-		deepCompare( noMoney, expected3 );
+	it( "should only show withdrawal if balance is greater than 0", function() {
+		newAccount.should.eql( expected1 );
+		withMoney.should.eql( expected2 );
+		noMoney.should.eql( expected3 );
+	} );
+
+	it( "should be 'quick'", function() {
+		elapsed1.should.be.below( limit );
+		elapsed2.should.be.below( limit );
+		elapsed3.should.be.below( limit );
+		elapsed4.should.be.below( limit );
 	} );
 } );

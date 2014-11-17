@@ -1,12 +1,5 @@
 var should = require( "should" ); // jshint ignore: line
-var _ = require( "lodash" );
-var when = require( "when" );
-var model = require( "./model.js" );
 var halEngine = require( "../src/halEngine.js" );
-
-var board1 = model.board1;
-var board2 = model.board2;
-var deepCompare = model.deepCompare;
 
 describe( "when rendering HAL", function() {
 	var hal;
@@ -35,7 +28,7 @@ describe( "when rendering HAL", function() {
 								_origin: { href: "/card/301", method: "GET" },
 								_links: {
 									self: { href: "/card/301", method: "GET" },
-									move: { href: "/card/301/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/301/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/301/block", method: "PUT" },
 								}
 							},
@@ -43,7 +36,7 @@ describe( "when rendering HAL", function() {
 								_origin: { href: "/card/302", method: "GET" },
 								_links: {
 									self: { href: "/card/302", method: "GET" },
-									move: { href: "/card/302/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/302/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/302/block", method: "PUT" },
 								}
 							},
@@ -51,7 +44,7 @@ describe( "when rendering HAL", function() {
 								_origin: { href: "/card/303", method: "GET" },
 								_links: {
 									self: { href: "/card/303", method: "GET" },
-									move: { href: "/card/303/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/303/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/303/block", method: "PUT" },
 								}
 							}
@@ -71,7 +64,7 @@ describe( "when rendering HAL", function() {
 								_origin: { href: "/card/304", method: "GET" },
 								_links: {
 									self: { href: "/card/304", method: "GET" },
-									move: { href: "/card/304/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/304/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/304/block", method: "PUT" },
 								}
 							}
@@ -91,7 +84,7 @@ describe( "when rendering HAL", function() {
 								_origin: { href: "/card/305", method: "GET" },
 								_links: {
 									self: { href: "/card/305", method: "GET" },
-									move: { href: "/card/305/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/305/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/305/block", method: "PUT" },
 								}
 							},
@@ -99,7 +92,7 @@ describe( "when rendering HAL", function() {
 								_origin: { href: "/card/306", method: "GET" },
 								_links: {
 									self: { href: "/card/306", method: "GET" },
-									move: { href: "/card/306/board/:boardId/lane/:laneId", method: "PUT", templated: true },
+									move: { href: "/card/306/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
 									block: { href: "/card/306/block", method: "PUT" },
 								}
 							}
@@ -117,6 +110,6 @@ describe( "when rendering HAL", function() {
 	} );
 
 	it( "should render hal JSON", function() {
-		deepCompare( hal, expected );
+		hal.should.eql( expected );
 	} );
 } );

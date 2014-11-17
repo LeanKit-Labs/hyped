@@ -7,22 +7,22 @@ module.exports = function( host ) {
 		actions: {
 			self: {
 				include: [ "id", "title", "description" ],
-				url: "/card/:card.id",
+				url: "/card/:id",
 				method: "GET",
 				handle: function( envelope ) {
 					var cards = _.reduce( model.board1.lanes, function( acc, x ) { return acc.concat( x.cards ); } );
-					var card = _.where( cards, { id: envelope.data.cardId } )[ 0 ];
+					var card = _.where( cards, { id: parseInt( envelope.data.cardId ) } )[ 0 ];
 					envelope.hyped( card ).render();
 				}
 			},
 			move: {
 				include: [ "id", "laneId" ],
-				url: "/card/:card.id/board/:boardId/lane/:laneId",
+				url: "/card/:id/board/:board.id/lane/:lane.id",
 				method: "PUT"
 			},
 			block: {
 				include: [ "id", "laneId" ],
-				url: "/card/:card.id/block",
+				url: "/card/:id/block",
 				method: "PUT"
 			}
 		}

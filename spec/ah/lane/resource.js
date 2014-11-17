@@ -18,17 +18,19 @@ module.exports = function( host ) {
 					}
 				},
 				handle: function( envelope ) {
+					var lane = _.cloneDeep( _.where( model.board1.lanes, { id: parseInt( envelope.data.id ) } )[ 0 ] );
 					envelope
-						.hyped( _.where( model.board1.lanes, { id: envelope.data.laneId } )[ 0 ] )
+						.hyped( lane )
 						.render();
 				}
 			},
 			cards: {
 				method: "get",
 				url: "/lane/:lane.id/card",
+				include: [ "id", "title", "wip" ],
 				handle: function( envelope ) {
 					envelope
-						.hyped( _.where( model.board1.lanes, { id: envelope.data.laneId } )[ 0 ].cards )
+						.hyped( _.where( model.board1.lanes, { id: parseInt( envelope.data.id ) } )[ 0 ].cards )
 						.resource( "card" )
 						.action( "self" )
 						.render();

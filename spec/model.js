@@ -8,9 +8,9 @@ var card4 = { id: 304, title: "Card 4", description: "This is card 4" };
 var card5 = { id: 305, title: "Card 5", description: "This is card 5" };
 var card6 = { id: 306, title: "Card 6", description: "This is card 6" };
 
-var lane1 = { id: 200, title: "To Do", wip: 0, cards: [ card1, card2, card3 ] };
-var lane2 = { id: 201, title: "Doing", wip: 0, cards: [ card4 ] };
-var lane3 = { id: 202, title: "Done", wip: 0, cards: [ card5, card6 ] };
+var lane1 = { id: 200, title: "To Do", wip: 0, cards: [ card1, card2, card3 ], boardId: 100 };
+var lane2 = { id: 201, title: "Doing", wip: 0, cards: [ card4 ], boardId: 100 };
+var lane3 = { id: 202, title: "Done", wip: 0, cards: [ card5, card6 ], boardId: 100 };
 
 var board1 = {
 	id: 100,

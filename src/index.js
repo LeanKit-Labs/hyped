@@ -1,15 +1,20 @@
 var _ = require( "lodash" );
-var HyperModel = require( "./hypermodel.js" );
+
 var HyperResponse = require( "./HyperResponse.js" );
+var HyperResource = require( "./HyperResource.js" );
 var jsonEngine = require( "./jsonEngine.js" );
 var halEngine = require( "./halEngine.js" );
+var url = require( "./urlTemplate.js" );
 
 var engines = {};
 var hypermodels = {};
 var resources = {};
+var optionModels = {};
+var fullOptionModels = {};
 var prefix;
 var maxVersion;
 var preferLatest = false;
+var excludeChildren;
 
 var getVersion = function( req ) {
 	if( !maxVersion ) {
@@ -35,6 +40,7 @@ var wrapper = {
 	optionsMiddleware: optionsMiddleware,
 	registerEngine: addEngine,
 	setupMiddleware: addMiddleware,
+	urlStrategy: urlStrategy,
 	versionWith: setVersioningStrategy,
 };
 
@@ -90,11 +96,36 @@ function getEngine( mediaType ) { // jshint ignore:line
 }
 
 function getHyperModel( req ) { // jshint ignore:line
-	var version = getVersion( req );
+	var version = 1;
+	if( req ) {
+		version = getVersion( req );
+	}
 	if( !hypermodels[ version ] ) {
-		hypermodels[ version ] = HyperModel( resources, version, prefix ); // jshint ignore: line
+		hypermodels[ version ] = HyperResource.renderFn( resources, prefix, version ); // jshint ignore: line
 	}
 	return hypermodels[ version ];
+}
+
+function getOptionModel( req ) {
+	var version = 1;
+	if( req ) {
+		version = getVersion( req );
+	}
+	if( !optionModels[ version ] ) {
+		optionModels[ version ] = HyperResource.optionsFn( resources, prefix, version, excludeChildren )( engines );
+	}
+	return optionModels[ version ];
+}
+
+function getFullOptionModel( req ) {
+	var version = 1;
+	if( req ) {
+		version = getVersion( req );
+	}
+	if( !fullOptionModels[ version ] ) {
+		fullOptionModels[ version ] = HyperResource.optionsFn( resources, prefix, version, false )( engines );
+	}
+	return fullOptionModels[ version ];
 }
 
 function getMaxVersion() { // jshint ignore:line
@@ -111,7 +142,7 @@ function hyperMiddleware( req, res, next ) { // jshint ignore:line
 	var contentType = getContentType( req );
 	var engine = getEngine( contentType );
 	var hyperModel = getHyperModel( req );
-	var response = new HyperResponse( req, res, engine, hyperModel, contentType ); // jshint ignore: line
+	var response = new HyperResponse( req, res, engine, hyperModel, contentType ).origin( req.originalUrl, req.method ); // jshint ignore:line
 	next();
 }
 
@@ -119,10 +150,12 @@ function optionsMiddleware( req, res, next ) { // jshint ignore:line
 	if( req.method === "OPTIONS" || req.method === "options" ) {
 		var contentType = getContentType( req );
 		var engine = getEngine( contentType );
-		var hyperModel = getHyperModel( req );
-		var hypermedia = hyperModel( engines );
-		console.log( hypermedia );
-		var body = engine( hypermedia, true );
+		if( !engine ) {
+			contentType = "application/json";
+			engine = jsonEngine;
+		}
+		var optionModel = getOptionModel( req );
+		var body = engine( optionModel, true );
 		res.status( 200 ).set( "Content-Type", contentType ).send( body );
 	} else {
 		next();
@@ -133,12 +166,23 @@ function setVersioningStrategy( fn ) { // jshint ignore:line
 	getVersion = fn;
 }
 
-module.exports = function( resourceList, defaultToNewest ) {
+function urlStrategy( resourceName, actionName, action, resourceList ) { // jshint ignore:line
+	if( _.isEmpty( resources ) ) {
+		resources = resourceList;
+	}
+	// will need to do this for all available versions at some point ...
+	var options = getFullOptionModel();
+	return url.forExpress( options._links[ [ resourceName, actionName ].join( ":" ) ].href );
+}
+
+module.exports = function( resourceList, defaultToNewest, includeChildrenInOptions ) {
 	if( resourceList === true || resourceList === false ) {
 		preferLatest = resourceList;
+		excludeChildren = defaultToNewest === undefined ? true : !defaultToNewest;
 	} else {
 		addResources( resourceList );
 		preferLatest = defaultToNewest;
+		excludeChildren = includeChildrenInOptions === undefined ? true : !includeChildrenInOptions;
 	}
 	addEngine( jsonEngine, "application/json" );
 	addEngine( halEngine, "application/hal+json" );
