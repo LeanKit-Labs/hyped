@@ -206,7 +206,6 @@ describe( "Action links", function() {
 
 		describe( "when rendering action with passed condition and no context", function() {
 			var parameters = {
-				page: { range: [ 1, 1 ] },
 				size: { range: [ 1, 100 ] }
 			};
 			var expected = {
@@ -414,6 +413,9 @@ describe( "Action links", function() {
 				_links: {
 					"parent:self": { href: "/parent/{id}", method: "GET", templated: true },
 					"parent:list": { href: "/parent", method: "GET" },
+					"parent:children": { href: "/parent/{id}/child", method: "GET", templated: true, parameters: {
+						size: { range: [ 1, 100 ] }
+					} },
 					"child:self": { href: "/parent/{parentId}/child/{id}", method: "GET", templated: true },
 					"grandChild:self": { href: "/parent/{parentId}/child/{childId}/grand/{id}", method: "GET", templated: true },
 					"grandChild:create": { href: "/parent/{parentId}/child/{childId}/grand", method: "POST", templated: true },
@@ -438,7 +440,10 @@ describe( "Action links", function() {
 			_versions: [ "1", "2" ],
 			_links: {
 				"parent:self": { href: "/parent/{id}", method: "GET", templated: true },
-				"parent:list": { href: "/parent", method: "GET" }
+				"parent:list": { href: "/parent", method: "GET" },
+				"parent:children": { href: "/parent/{id}/child", method: "GET", templated: true, parameters: {
+					size: { range: [ 1, 100 ] }
+				} }
 			}
 		};
 		var options;
@@ -455,7 +460,6 @@ describe( "Action links", function() {
 
 	describe( "when rendering a list of top-level resources", function() {
 		var parameters = {
-			page: { range: [ 1, 1 ] },
 			size: { range: [ 1, 100 ] }
 		};
 		var expected = {

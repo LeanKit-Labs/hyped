@@ -29,10 +29,10 @@ var resources = {
 					parameters: {
 						"page": function( data, context ) {
 							var limit = 1;
-							if( data.children && context ) {
+							if( data && data.children && context ) {
 								limit = data.children.length / context.size;
+								return { range: [ 1, limit ] };
 							}
-							return { range: [ 1, limit ] };
 						},
 						"size": { range: [ 1, 100 ] }
 					}

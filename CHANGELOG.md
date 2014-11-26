@@ -1,5 +1,8 @@
 ## 0.1.0
 
+### prerelease 4
+Bug fix - acions with conditions should always render during options.
+
 ### prerelease 3
 Pass context to the auth check call (new feature available in autohost auth providers for contextual authorization).
 
