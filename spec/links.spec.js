@@ -35,6 +35,8 @@ describe( "with static links", function() {
 		id: 100,
 		title: "Test Board",
 		_origin: { href: "/board/100", method: "GET" },
+		_resource: "board",
+		_action: "self",
 		_links: {
 			self: { href: "/board/100", method: "GET" },
 			favstarred: { href: "/board/100?favstarred=true", method: "GET" },
@@ -47,6 +49,8 @@ describe( "with static links", function() {
 		id: 100,
 		title: "Test Board",
 		_origin: { href: "/board/100", method: "GET" },
+		_resource: "board",
+		_action: "self",
 		_links: {
 			self: { href: "/board/100", method: "GET" },
 			favstarred: { href: "/board/100?favstarred=true", method: "GET" },
@@ -105,6 +109,8 @@ describe( "with resource prefix", function() {
 		id: 100,
 		title: "Test Board",
 		_origin: { href: "/prefix/board/100", method: "GET" },
+		_resource: "board",
+		_action: "self",
 		_links: {
 			self: { href: "/prefix/board/100", method: "GET" },
 			favstarred: { href: "/prefix/board/100?favstarred=true", method: "GET" },
@@ -117,6 +123,8 @@ describe( "with resource prefix", function() {
 		id: 100,
 		title: "Test Board",
 		_origin: { href: "/prefix/board/100", method: "GET" },
+		_resource: "board",
+		_action: "self",
 		_links: {
 			self: { href: "/prefix/board/100", method: "GET" },
 			favstarred: { href: "/prefix/board/100?favstarred=true", method: "GET" },

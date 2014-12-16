@@ -25,6 +25,8 @@ describe( "with property filter", function() {
 		tags: [ "one", "two", "three" ],
 		description: "This is a board and stuff!",
 		_origin: { href: "/board/100", method: "GET" },
+		_resource: "board",
+		_action: "self",
 		_links: {
 			self: { href: "/board/100", method: "GET" }
 		}

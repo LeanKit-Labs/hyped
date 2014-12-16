@@ -425,6 +425,8 @@ function getResourceCache( resources, prefix, version ) {
 				} );
 				body._links = main;
 				body._origin = origin;
+				body._resource = resourceName;
+				body._action = actionName;
 				var embedded = _.reduce( action.embed, function( eAcc, child, childName ) {
 					var childFn = cache[ child.resource ][ child.render ];
 					var childVal = data[ childName ];

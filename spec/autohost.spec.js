@@ -52,6 +52,8 @@ describe( "with oldest version as default", function() {
 				href: "/test/api/board/100",
 				method: "GET"
 			},
+			_resource: "board",
+			_action: "self",
 			_links: {
 				self: {
 					href: "/test/api/board/100",
@@ -72,6 +74,8 @@ describe( "with oldest version as default", function() {
 							href: "/test/api/board/100/lane/200",
 							method: "GET"
 						},
+						_resource: "lane",
+						_action: "self",
 						_links: {
 							self: {
 								href: "/test/api/board/100/lane/200",
@@ -92,6 +96,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/301",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/301",
@@ -116,6 +122,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/302",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/302",
@@ -140,6 +148,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/303",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/303",
@@ -167,6 +177,8 @@ describe( "with oldest version as default", function() {
 							href: "/test/api/board/100/lane/201",
 							method: "GET"
 						},
+						_resource: "lane",
+						_action: "self",
 						_links: {
 							self: {
 								href: "/test/api/board/100/lane/201",
@@ -187,6 +199,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/304",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/304",
@@ -214,6 +228,8 @@ describe( "with oldest version as default", function() {
 							href: "/test/api/board/100/lane/202",
 							method: "GET"
 						},
+						_resource: "lane",
+						_action: "self",
 						_links: {
 							self: {
 								href: "/test/api/board/100/lane/202",
@@ -234,6 +250,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/305",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/305",
@@ -258,6 +276,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/306",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/306",
@@ -394,6 +414,8 @@ describe( "with oldest version as default", function() {
 				href: "/test/api/board/100",
 				method: "GET"
 			},
+			_resource: "board",
+			_action: "self",
 			_links: {
 				self: {
 					href: "/test/api/board/100",
@@ -414,6 +436,8 @@ describe( "with oldest version as default", function() {
 							href: "/test/api/board/100/lane/200",
 							method: "GET"
 						},
+						_resource: "lane",
+						_action: "self",
 						_links: {
 							self: {
 								href: "/test/api/board/100/lane/200",
@@ -434,6 +458,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/301",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/301",
@@ -458,6 +484,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/302",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/302",
@@ -482,6 +510,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/303",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/303",
@@ -509,6 +539,8 @@ describe( "with oldest version as default", function() {
 							href: "/test/api/board/100/lane/201",
 							method: "GET"
 						},
+						_resource: "lane",
+						_action: "self",
 						_links: {
 							self: {
 								href: "/test/api/board/100/lane/201",
@@ -529,6 +561,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/304",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/304",
@@ -556,6 +590,8 @@ describe( "with oldest version as default", function() {
 							href: "/test/api/board/100/lane/202",
 							method: "GET"
 						},
+						_resource: "lane",
+						_action: "self",
 						_links: {
 							self: {
 								href: "/test/api/board/100/lane/202",
@@ -576,6 +612,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/305",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/305",
@@ -600,6 +638,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/306",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/306",
@@ -715,6 +755,8 @@ describe( "with oldest version as default", function() {
 					href: "/test/api/board/100/lane/201",
 					method: "GET"
 			},
+			_resource: "lane",
+			_action: "self",
 			_links: {
 					self: {
 							href: "/test/api/board/100/lane/201",
@@ -735,6 +777,8 @@ describe( "with oldest version as default", function() {
 								href: "/test/api/card/304",
 								method: "GET"
 						},
+						_resource: "card",
+						_action: "self",
 						_links: {
 								self: {
 										href: "/test/api/card/304",
@@ -777,6 +821,8 @@ describe( "with oldest version as default", function() {
 					title: "Card 1",
 					description: "This is card 1",
 					_origin: { href: "/test/api/card/301", method: "GET" },
+					_resource: "card",
+					_action: "self",
 					_links: { 
 						self: { href: "/test/api/card/301", method: "GET" },
 						move: { href: "/test/api/card/301/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
@@ -788,6 +834,8 @@ describe( "with oldest version as default", function() {
 					title: "Card 2",
 					description: "This is card 2",
 					_origin: { href: "/test/api/card/302", method: "GET" },
+					_resource: "card",
+					_action: "self",
 					_links: { 
 						self: { href: "/test/api/card/302", method: "GET" },
 						move: { href: "/test/api/card/302/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
@@ -799,6 +847,8 @@ describe( "with oldest version as default", function() {
 					title: "Card 3",
 					description: "This is card 3",
 					_origin: { href: "/test/api/card/303", method: "GET" },
+					_resource: "card",
+					_action: "self",
 					_links: { 
 						self: { href: "/test/api/card/303", method: "GET" },
 						move: { href: "/test/api/card/303/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
@@ -810,6 +860,8 @@ describe( "with oldest version as default", function() {
 					title: "Card 4",
 					description: "This is card 4",
 					_origin: { href: "/test/api/card/304", method: "GET" },
+					_resource: "card",
+					_action: "self",
 					_links: {
 						self: { href: "/test/api/card/304", method: "GET" },
 						move: { href: "/test/api/card/304/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
@@ -821,6 +873,8 @@ describe( "with oldest version as default", function() {
 					title: "Card 5",
 					description: "This is card 5",
 					_origin: { href: "/test/api/card/305", method: "GET" },
+					_resource: "card",
+					_action: "self",
 					_links: { 
 						self: { href: "/test/api/card/305", method: "GET" },
 						move: { href: "/test/api/card/305/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
@@ -832,6 +886,8 @@ describe( "with oldest version as default", function() {
 					title: "Card 6",
 					description: "This is card 6",
 					_origin: { href: "/test/api/card/306", method: "GET" },
+					_resource: "card",
+					_action: "self",
 					_links: {
 							self: { href: "/test/api/card/306", method: "GET" },
 							move: { href: "/test/api/card/306/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
