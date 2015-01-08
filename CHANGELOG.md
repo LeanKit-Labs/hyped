@@ -1,5 +1,8 @@
 ## 0.1.0
 
+### prerelease 6
+Fixed case on hyperResource and hyperResponse requires in index.js.
+
 ### prerelease 5
 Add `_resource` and `_action` fields to resources so that consumers can determine "friendly" names by which each resource was produced.
 
