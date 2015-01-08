@@ -77,7 +77,10 @@ function buildParametersFn( action ) {
 	// static at render time
 	return function getParameters( data, context ) {
 		return _.reduce( generators, function( acc, fn, key ) {
-			acc[ key ] = fn( data, context );
+			var param = fn( data, context );
+			if( param ) {
+				acc[ key ] = param;
+			}
 			return acc;
 		}, parameters );
 	};
@@ -172,7 +175,7 @@ function getBodyFn( resources, prefix, version ) {
 	};
 }
 
-function getLinksCache( resources, prefix, version ) {
+function getLinksCache( resources, prefix, version, forOptions ) {
 	var cache = {};
 	var urlFn = getUrlFn( resources, prefix, version );
 
@@ -181,7 +184,7 @@ function getLinksCache( resources, prefix, version ) {
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
 			var parameterFn = buildParametersFn( action );
 			var method = action.method.toUpperCase();
-			var render = shouldRenderFn( action, actionName, resourceName );
+			var render = shouldRenderFn( action, actionName, resourceName, forOptions );
 			acc[ actionName ] = function( data, parentUrl, context, auth ) {
 				var links = {};
 				if( render( data, context, auth ) ) {
@@ -223,8 +226,8 @@ function getLinksCache( resources, prefix, version ) {
 	return cache;
 }
 
-function getLinksFn( resources, prefix, version ) {
-	var linkCache = getLinksCache( resources, prefix, version );
+function getLinksFn( resources, prefix, version, forOptions ) {
+	var linkCache = getLinksCache( resources, prefix, version, forOptions );
 	return function( resourceName, actionName, data, parentUrl, context, auth ) {
 		auth = auth || function() { return true; };
 		return linkCache[ resourceName ][ actionName ]( data, parentUrl, context, auth );
@@ -259,7 +262,7 @@ function getLinkFn( link, resource, resourceName ) { // jshint ignore:line
 }
 
 function getOptionCache( resources, prefix, version, excludeChildren ) {
-	var linkFn = getLinksFn( resources, prefix, version );
+	var linkFn = getLinksFn( resources, prefix, version, true );
 	var options = { _links: {} };
 	var versions = [ "1" ];
 	_.reduce( resources, function( rAcc, resource, resourceName ) {
@@ -422,6 +425,8 @@ function getResourceCache( resources, prefix, version ) {
 				} );
 				body._links = main;
 				body._origin = origin;
+				body._resource = resourceName;
+				body._action = actionName;
 				var embedded = _.reduce( action.embed, function( eAcc, child, childName ) {
 					var childFn = cache[ child.resource ][ child.render ];
 					var childVal = data[ childName ];
@@ -522,9 +527,9 @@ function removeEmbedded( embedded, unit ) { // jshint ignore:line
 		} : unit;
 }
 
-function shouldRenderFn( action, actionName, resourceName ) { // jshint ignore:line
+function shouldRenderFn( action, actionName, resourceName, forOptions ) { // jshint ignore:line
 	var canRender;
-	if( action.condition ) {
+	if( action.condition && !forOptions ) {
 		canRender = function canRender( data, context ) {
 			return action.condition( data || {}, context );
 		};

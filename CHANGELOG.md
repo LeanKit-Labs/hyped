@@ -1,7 +1,13 @@
 ## 0.1.0
 
-### prerelease 4
+### prerelease 6
 Fixed case on hyperResource and hyperResponse requires in index.js.
+
+### prerelease 5
+Add `_resource` and `_action` fields to resources so that consumers can determine "friendly" names by which each resource was produced.
+
+### prerelease 4
+Bug fix - acions with conditions should always render during options.
 
 ### prerelease 3
 Pass context to the auth check call (new feature available in autohost auth providers for contextual authorization).

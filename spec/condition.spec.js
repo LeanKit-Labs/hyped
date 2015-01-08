@@ -37,6 +37,8 @@ describe( "when filtering links by predicate", function() {
 		id: 100100,
 		balance: 0,
 		_origin: { href: "/account/100100", method: "GET" },
+		_resource: "account",
+		_action: "self",
 		_links: {
 			self: { href: "/account/100100", method: "GET" },
 			deposit: { href: "/account/100100/deposit", method: "POST" }
@@ -47,6 +49,8 @@ describe( "when filtering links by predicate", function() {
 		id: 100100,
 		balance: 100,
 		_origin: { href: "/account/100100", method: "GET" },
+		_resource: "account",
+		_action: "self",
 		_links: {
 			self: { href: "/account/100100", method: "GET" },
 			withdraw: { href: "/account/100100/withdrawal", method: "POST" },
@@ -58,6 +62,8 @@ describe( "when filtering links by predicate", function() {
 		id: 100100,
 		balance: 0,
 		_origin: { href: "/account/100100", method: "GET" },
+		_resource: "account",
+		_action: "self",
 		_links: {
 			self: { href: "/account/100100", method: "GET" },
 			deposit: { href: "/account/100100/deposit", method: "POST" }

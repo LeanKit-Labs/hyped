@@ -206,7 +206,6 @@ describe( "Action links", function() {
 
 		describe( "when rendering action with passed condition and no context", function() {
 			var parameters = {
-				page: { range: [ 1, 1 ] },
 				size: { range: [ 1, 100 ] }
 			};
 			var expected = {
@@ -262,6 +261,8 @@ describe( "Action links", function() {
 				id: 1,
 				title: "test",
 				_origin: { href: "/parent/1", method: "GET" },
+				_resource: "parent",
+				_action: "self",
 				_links: {
 					self: { href: "/parent/1", method: "GET" },
 					list: { href: "/parent", method: "GET" },
@@ -302,6 +303,8 @@ describe( "Action links", function() {
 				description: "this is a test",
 				children: [ {}, {}, {}, {}, {} ],
 				_origin: { href: "/parent/1", method: "GET" },
+				_resource: "parent",
+				_action: "self",
 				_links: {
 					self: { href: "/parent/1", method: "GET" },
 					list: { href: "/parent", method: "GET" },
@@ -337,20 +340,26 @@ describe( "Action links", function() {
 				parentId: 1,
 				title: "child",
 				_origin: { href: "/test/api/parent/1/child/2", method: "GET" },
+				_resource: "child",
+				_action: "self",
 				_links: {
 					self: { href: "/test/api/parent/1/child/2", method: "GET" }
 				},
 				_embedded: {
 					grandChildren: [
 						{ id: 1,
-							_origin: { href: "/test/api/parent/1/child/2/grand/1", method: "GET" }, 
+							_origin: { href: "/test/api/parent/1/child/2/grand/1", method: "GET" },
+							_resource: "grandChild",
+							_action: "self",
 							_links: { 
 								self: { href: "/test/api/parent/1/child/2/grand/1", method: "GET" },
 								create: { href: "/test/api/parent/1/child/2/grand", method: "POST" } 
 							}
 						},
 						{ id: 2,
-							_origin: { href: "/test/api/parent/1/child/2/grand/2", method: "GET" }, 
+							_origin: { href: "/test/api/parent/1/child/2/grand/2", method: "GET" },
+							_resource: "grandChild",
+							_action: "self",
 							_links: { 
 								self: { href: "/test/api/parent/1/child/2/grand/2", method: "GET" },
 								create: { href: "/test/api/parent/1/child/2/grand", method: "POST" } 
@@ -358,6 +367,8 @@ describe( "Action links", function() {
 						},
 						{ id: 3,
 							_origin: { href: "/test/api/parent/1/child/2/grand/3", method: "GET" }, 
+							_resource: "grandChild",
+							_action: "self",
 							_links: { 
 								self: { href: "/test/api/parent/1/child/2/grand/3", method: "GET" },
 								create: { href: "/test/api/parent/1/child/2/grand", method: "POST" } 
@@ -365,6 +376,8 @@ describe( "Action links", function() {
 						},
 						{ id: 4,
 							_origin: { href: "/test/api/parent/1/child/2/grand/4", method: "GET" }, 
+							_resource: "grandChild",
+							_action: "self",
 							_links: { 
 								self: { href: "/test/api/parent/1/child/2/grand/4", method: "GET" },
 								create: { href: "/test/api/parent/1/child/2/grand", method: "POST" } 
@@ -372,6 +385,8 @@ describe( "Action links", function() {
 						},
 						{ id: 5,
 							_origin: { href: "/test/api/parent/1/child/2/grand/5", method: "GET" }, 
+							_resource: "grandChild",
+							_action: "self",
 							_links: { 
 								self: { href: "/test/api/parent/1/child/2/grand/5", method: "GET" },
 								create: { href: "/test/api/parent/1/child/2/grand", method: "POST" } 
@@ -414,6 +429,9 @@ describe( "Action links", function() {
 				_links: {
 					"parent:self": { href: "/parent/{id}", method: "GET", templated: true },
 					"parent:list": { href: "/parent", method: "GET" },
+					"parent:children": { href: "/parent/{id}/child", method: "GET", templated: true, parameters: {
+						size: { range: [ 1, 100 ] }
+					} },
 					"child:self": { href: "/parent/{parentId}/child/{id}", method: "GET", templated: true },
 					"grandChild:self": { href: "/parent/{parentId}/child/{childId}/grand/{id}", method: "GET", templated: true },
 					"grandChild:create": { href: "/parent/{parentId}/child/{childId}/grand", method: "POST", templated: true },
@@ -438,7 +456,10 @@ describe( "Action links", function() {
 			_versions: [ "1", "2" ],
 			_links: {
 				"parent:self": { href: "/parent/{id}", method: "GET", templated: true },
-				"parent:list": { href: "/parent", method: "GET" }
+				"parent:list": { href: "/parent", method: "GET" },
+				"parent:children": { href: "/parent/{id}/child", method: "GET", templated: true, parameters: {
+					size: { range: [ 1, 100 ] }
+				} }
 			}
 		};
 		var options;
@@ -455,7 +476,6 @@ describe( "Action links", function() {
 
 	describe( "when rendering a list of top-level resources", function() {
 		var parameters = {
-			page: { range: [ 1, 1 ] },
 			size: { range: [ 1, 100 ] }
 		};
 		var expected = {
@@ -467,6 +487,8 @@ describe( "Action links", function() {
 					children: [ {} ],
 					description: "the first item",
 					_origin: { href: "/parent/1", method: "GET" },
+					_resource: "parent",
+					_action: "self",
 					_links: {	
 						self: { href: "/parent/1", method: "GET" },
 						list: { href: "/parent", method: "GET" },
@@ -479,6 +501,8 @@ describe( "Action links", function() {
 					children: [ {} ],
 					description: "the second item",
 					_origin: { href: "/parent/2", method: "GET" },
+					_resource: "parent",
+					_action: "self",
 					_links: {	
 						self: { href: "/parent/2", method: "GET" },
 						list: { href: "/parent", method: "GET" },
@@ -530,6 +554,8 @@ describe( "Action links", function() {
 					parentId: 1,
 					title: "one",
 					description: "the first item",
+					_resource: "child",
+					_action: "self",
 					_origin: { href: "/parent/1/child/1", method: "GET" },
 					_links: {	
 						self: { href: "/parent/1/child/1", method: "GET" },
@@ -540,6 +566,8 @@ describe( "Action links", function() {
 					parentId: 1,
 					title: "two",
 					description: "the second item",
+					_resource: "child",
+					_action: "self",
 					_origin: { href: "/parent/1/child/2", method: "GET" },
 					_links: {	
 						self: { href: "/parent/1/child/2", method: "GET" },

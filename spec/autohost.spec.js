@@ -11,12 +11,12 @@ describe( "with oldest version as default", function() {
 	var hyped;
 	before( function( done ) {
 		hyped = require( "../src/index.js" )( false, true );
-		autohost.init( { 
-				resources: "./spec/ah", 
-				noOptions: true, 
-				urlPrefix: "/test",
-				urlStrategy: hyped.urlStrategy 
-			} ) // just roll with the defaults...
+		autohost.init( {
+			resources: "./spec/ah",
+			noOptions: true,
+			urlPrefix: "/test",
+			urlStrategy: hyped.urlStrategy
+		} ) // just roll with the defaults...
 			.then( hyped.addResources )
 			.then( done );
 		hyped.setupMiddleware( autohost );
@@ -36,7 +36,7 @@ describe( "with oldest version as default", function() {
 
 		it( "should get JSON version 1", function() {
 			contentType.should.equal( "application/json" );
-			body.should.eql( {"id":100,"title":"Test Board","lanes":[{"id":200,"title":"To Do","wip":0,"cards":[{"id":301,"title":"Card 1","description":"This is card 1"},{"id":302,"title":"Card 2","description":"This is card 2"},{"id":303,"title":"Card 3","description":"This is card 3"}]},{"id":201,"title":"Doing","wip":0,"cards":[{"id":304,"title":"Card 4","description":"This is card 4"}]},{"id":202,"title":"Done","wip":0,"cards":[{"id":305,"title":"Card 5","description":"This is card 5"},{"id":306,"title":"Card 6","description":"This is card 6"}]}]} );
+			body.should.eql( { "id": 100, "title": "Test Board", "lanes": [ { "id": 200, "title": "To Do", "wip": 0, "cards": [ { "id": 301, "title": "Card 1", "description": "This is card 1" }, { "id": 302, "title": "Card 2", "description": "This is card 2" }, { "id": 303, "title": "Card 3", "description": "This is card 3" } ] }, { "id": 201, "title": "Doing", "wip": 0, "cards": [ { "id": 304, "title": "Card 4", "description": "This is card 4" } ] }, { "id": 202, "title": "Done", "wip": 0, "cards": [ { "id": 305, "title": "Card 5", "description": "This is card 5" }, { "id": 306, "title": "Card 6", "description": "This is card 6" } ] } ] } );
 		} );
 	} );
 
@@ -52,6 +52,8 @@ describe( "with oldest version as default", function() {
 				href: "/test/api/board/100",
 				method: "GET"
 			},
+			_resource: "board",
+			_action: "self",
 			_links: {
 				self: {
 					href: "/test/api/board/100",
@@ -63,8 +65,8 @@ describe( "with oldest version as default", function() {
 				}
 			},
 			_embedded: {
-				lanes: [ 
-					{ 
+				lanes: [
+					{
 						id: 200,
 						title: "To Do",
 						wip: 0,
@@ -72,6 +74,8 @@ describe( "with oldest version as default", function() {
 							href: "/test/api/board/100/lane/200",
 							method: "GET"
 						},
+						_resource: "lane",
+						_action: "self",
 						_links: {
 							self: {
 								href: "/test/api/board/100/lane/200",
@@ -83,8 +87,8 @@ describe( "with oldest version as default", function() {
 							}
 						},
 						_embedded: {
-							cards: [ 
-								{ 
+							cards: [
+								{
 									id: 301,
 									title: "Card 1",
 									description: "This is card 1",
@@ -92,6 +96,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/301",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/301",
@@ -116,6 +122,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/302",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/302",
@@ -140,6 +148,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/303",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/303",
@@ -155,7 +165,7 @@ describe( "with oldest version as default", function() {
 											method: "PUT"
 										}
 									}
-								} 
+								}
 							]
 						}
 					},
@@ -167,6 +177,8 @@ describe( "with oldest version as default", function() {
 							href: "/test/api/board/100/lane/201",
 							method: "GET"
 						},
+						_resource: "lane",
+						_action: "self",
 						_links: {
 							self: {
 								href: "/test/api/board/100/lane/201",
@@ -187,6 +199,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/304",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/304",
@@ -214,6 +228,8 @@ describe( "with oldest version as default", function() {
 							href: "/test/api/board/100/lane/202",
 							method: "GET"
 						},
+						_resource: "lane",
+						_action: "self",
 						_links: {
 							self: {
 								href: "/test/api/board/100/lane/202",
@@ -234,6 +250,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/305",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/305",
@@ -258,6 +276,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/306",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/306",
@@ -394,6 +414,8 @@ describe( "with oldest version as default", function() {
 				href: "/test/api/board/100",
 				method: "GET"
 			},
+			_resource: "board",
+			_action: "self",
 			_links: {
 				self: {
 					href: "/test/api/board/100",
@@ -405,8 +427,8 @@ describe( "with oldest version as default", function() {
 				}
 			},
 			_embedded: {
-				lanes: [ 
-					{ 
+				lanes: [
+					{
 						id: 200,
 						title: "To Do",
 						wip: 0,
@@ -414,6 +436,8 @@ describe( "with oldest version as default", function() {
 							href: "/test/api/board/100/lane/200",
 							method: "GET"
 						},
+						_resource: "lane",
+						_action: "self",
 						_links: {
 							self: {
 								href: "/test/api/board/100/lane/200",
@@ -425,8 +449,8 @@ describe( "with oldest version as default", function() {
 							}
 						},
 						_embedded: {
-							cards: [ 
-								{ 
+							cards: [
+								{
 									id: 301,
 									title: "Card 1",
 									description: "This is card 1",
@@ -434,6 +458,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/301",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/301",
@@ -458,6 +484,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/302",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/302",
@@ -482,6 +510,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/303",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/303",
@@ -497,7 +527,7 @@ describe( "with oldest version as default", function() {
 											method: "PUT"
 										}
 									}
-								} 
+								}
 							]
 						}
 					},
@@ -509,6 +539,8 @@ describe( "with oldest version as default", function() {
 							href: "/test/api/board/100/lane/201",
 							method: "GET"
 						},
+						_resource: "lane",
+						_action: "self",
 						_links: {
 							self: {
 								href: "/test/api/board/100/lane/201",
@@ -529,6 +561,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/304",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/304",
@@ -556,6 +590,8 @@ describe( "with oldest version as default", function() {
 							href: "/test/api/board/100/lane/202",
 							method: "GET"
 						},
+						_resource: "lane",
+						_action: "self",
 						_links: {
 							self: {
 								href: "/test/api/board/100/lane/202",
@@ -576,6 +612,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/305",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/305",
@@ -600,6 +638,8 @@ describe( "with oldest version as default", function() {
 										href: "/test/api/card/306",
 										method: "GET"
 									},
+									_resource: "card",
+									_action: "self",
 									_links: {
 										self: {
 											href: "/test/api/card/306",
@@ -712,18 +752,20 @@ describe( "with oldest version as default", function() {
 			title: "Doing",
 			wip: 0,
 			_origin: {
+				href: "/test/api/board/100/lane/201",
+				method: "GET"
+			},
+			_resource: "lane",
+			_action: "self",
+			_links: {
+				self: {
 					href: "/test/api/board/100/lane/201",
 					method: "GET"
-			},
-			_links: {
-					self: {
-							href: "/test/api/board/100/lane/201",
-							method: "GET"
-					},
-					cards: {
-							href: "/test/api/board/100/lane/201/card",
-							method: "GET"
-					}
+				},
+				cards: {
+					href: "/test/api/board/100/lane/201/card",
+					method: "GET"
+				}
 			},
 			_embedded: {
 				cards: [
@@ -732,23 +774,25 @@ describe( "with oldest version as default", function() {
 						title: "Card 4",
 						description: "This is card 4",
 						_origin: {
+							href: "/test/api/card/304",
+							method: "GET"
+						},
+						_resource: "card",
+						_action: "self",
+						_links: {
+							self: {
 								href: "/test/api/card/304",
 								method: "GET"
-						},
-						_links: {
-								self: {
-										href: "/test/api/card/304",
-										method: "GET"
-								},
-								move: {
-										href: "/test/api/card/304/board/{boardId}/lane/{laneId}",
-										method: "PUT",
-										templated: true
-								},
-								block: {
-										href: "/test/api/card/304/block",
-										method: "PUT"
-								}
+							},
+							move: {
+								href: "/test/api/card/304/board/{boardId}/lane/{laneId}",
+								method: "PUT",
+								templated: true
+							},
+							block: {
+								href: "/test/api/card/304/block",
+								method: "PUT"
+							}
 						}
 					}
 				]
@@ -769,18 +813,20 @@ describe( "with oldest version as default", function() {
 
 		var body, contentType, elapsedMs;
 
-		var expected = { 
+		var expected = {
 			_origin: { href: "/test/api/board/100/card", method: "GET" },
-			cards: [ 
-				{ 
+			cards: [
+				{
 					id: 301,
 					title: "Card 1",
 					description: "This is card 1",
 					_origin: { href: "/test/api/card/301", method: "GET" },
-					_links: { 
+					_resource: "card",
+					_action: "self",
+					_links: {
 						self: { href: "/test/api/card/301", method: "GET" },
 						move: { href: "/test/api/card/301/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
-						block: { href: "/test/api/card/301/block", method: "PUT" } 
+						block: { href: "/test/api/card/301/block", method: "PUT" }
 					}
 				},
 				{
@@ -788,10 +834,12 @@ describe( "with oldest version as default", function() {
 					title: "Card 2",
 					description: "This is card 2",
 					_origin: { href: "/test/api/card/302", method: "GET" },
-					_links: { 
+					_resource: "card",
+					_action: "self",
+					_links: {
 						self: { href: "/test/api/card/302", method: "GET" },
 						move: { href: "/test/api/card/302/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
-						block: { href: "/test/api/card/302/block", method: "PUT" } 
+						block: { href: "/test/api/card/302/block", method: "PUT" }
 					}
 				},
 				{
@@ -799,10 +847,12 @@ describe( "with oldest version as default", function() {
 					title: "Card 3",
 					description: "This is card 3",
 					_origin: { href: "/test/api/card/303", method: "GET" },
-					_links: { 
+					_resource: "card",
+					_action: "self",
+					_links: {
 						self: { href: "/test/api/card/303", method: "GET" },
 						move: { href: "/test/api/card/303/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
-						block: { href: "/test/api/card/303/block", method: "PUT" } 
+						block: { href: "/test/api/card/303/block", method: "PUT" }
 					}
 				},
 				{
@@ -810,6 +860,8 @@ describe( "with oldest version as default", function() {
 					title: "Card 4",
 					description: "This is card 4",
 					_origin: { href: "/test/api/card/304", method: "GET" },
+					_resource: "card",
+					_action: "self",
 					_links: {
 						self: { href: "/test/api/card/304", method: "GET" },
 						move: { href: "/test/api/card/304/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
@@ -821,24 +873,28 @@ describe( "with oldest version as default", function() {
 					title: "Card 5",
 					description: "This is card 5",
 					_origin: { href: "/test/api/card/305", method: "GET" },
-					_links: { 
+					_resource: "card",
+					_action: "self",
+					_links: {
 						self: { href: "/test/api/card/305", method: "GET" },
 						move: { href: "/test/api/card/305/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
-						block: { href: "/test/api/card/305/block", method: "PUT" } 
-					} 
+						block: { href: "/test/api/card/305/block", method: "PUT" }
+					}
 				},
 				{
 					id: 306,
 					title: "Card 6",
 					description: "This is card 6",
 					_origin: { href: "/test/api/card/306", method: "GET" },
+					_resource: "card",
+					_action: "self",
 					_links: {
-							self: { href: "/test/api/card/306", method: "GET" },
-							move: { href: "/test/api/card/306/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
-							block: { href: "/test/api/card/306/block", method: "PUT" } 
-						} 
-					} 
-			] 
+						self: { href: "/test/api/card/306", method: "GET" },
+						move: { href: "/test/api/card/306/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
+						block: { href: "/test/api/card/306/block", method: "PUT" }
+					}
+				}
+			]
 		};
 
 		before( function( done ) {
@@ -866,30 +922,8 @@ describe( "with oldest version as default", function() {
 		var body, contentType, elapsedMs;
 
 		var expectedOptions = {
-			_links: 
-			 { 
-				"_autohost:api": { href: "/test/api/_autohost", method: "GET" },
-				"_autohost:resources": { href: "/test/api/_autohost/resource", method: "GET" },
-				"_autohost:actions": { href: "/test/api/_autohost/action", method: "GET" },
-				"_autohost:connected-sockets": { href: "/test/api/_autohost/sockets", method: "GET" },
-				"_autohost:list-users": { href: "/test/api/_autohost/user", method: "GET" },
-				"_autohost:list-roles": { href: "/test/api/_autohost/role", method: "GET" },
-				"_autohost:list-user-roles": { href: "/test/api/_autohost/user/{user}/role", method: "GET", templated: true },
-				"_autohost:list-action-roles": { href: "/test/api/_autohost/action/{action}/role", method: "GET", templated: true },
-				"_autohost:add-action-roles":  { href: "/test/api/_autohost/action/{action}/role", method: "PATCH", templated: true },
-				"_autohost:remove-action-roles": { href: "/test/api/_autohost/action/{action}/role", method: "DELETE", templated: true },
-				"_autohost:add-user-roles": { href: "/test/api/_autohost/user/{user}/role", method: "PATCH", templated: true },
-				"_autohost:remove-user-roles":  { href: "/test/api/_autohost/user/{user}/role", method: "DELETE", templated: true },
-				"_autohost:add-role": { href: "/test/api/_autohost/role/{role}", method: "POST", templated: true },
-				"_autohost:remove-role": { href: "/test/api/_autohost/role/{role}", method: "DELETE", templated: true },
-				"_autohost:create-user": { href: "/test/api/_autohost/user/{userName}", method: "POST", templated: true },
-				"_autohost:change-password": { href: "/test/api/_autohost/user/{userName}", method: "PATCH", templated: true },
-				"_autohost:create-token": { href: "/test/api/_autohost/token", method: "POST" },
-				"_autohost:destroy-token": { href: "/test/api/_autohost/token/{token}", method: "DELETE", templated: true },
-				"_autohost:list-tokens": { href: "/test/api/_autohost/token/", method: "GET" },
-				"_autohost:enable-user": { href: "/test/api/_autohost/user/{userName}", method: "PUT", templated: true },
-				"_autohost:disable-user": { href: "/test/api/_autohost/user/{userName}", method: "DELETE", templated: true },
-				"_autohost:metrics": { href: "/test/api/_autohost/metrics", method: "GET" },
+			_links:
+			{
 				"board:cards": { href: "/test/api/board/{id}/card", method: "GET", templated: true },
 				"board:self": { href: "/test/api/board/{id}", method: "GET", templated: true },
 				"card:self": { href: "/test/api/card/{id}", method: "GET", templated: true },
@@ -940,7 +974,7 @@ describe( "with newest version as default", function() {
 	} );
 
 	describe( "when requesting board with no media type", function() {
-		var expected = {"id":100,"title":"Test Board","description":"This is a board and stuff!","lanes":[{"id":200,"title":"To Do","wip":0,"cards":[{"id":301,"title":"Card 1","description":"This is card 1"},{"id":302,"title":"Card 2","description":"This is card 2"},{"id":303,"title":"Card 3","description":"This is card 3"}]},{"id":201,"title":"Doing","wip":0,"cards":[{"id":304,"title":"Card 4","description":"This is card 4"}]},{"id":202,"title":"Done","wip":0,"cards":[{"id":305,"title":"Card 5","description":"This is card 5"},{"id":306,"title":"Card 6","description":"This is card 6"}]}]};
+		var expected = { "id": 100, "title": "Test Board", "description": "This is a board and stuff!", "lanes": [ { "id": 200, "title": "To Do", "wip": 0, "cards": [ { "id": 301, "title": "Card 1", "description": "This is card 1" }, { "id": 302, "title": "Card 2", "description": "This is card 2" }, { "id": 303, "title": "Card 3", "description": "This is card 3" } ] }, { "id": 201, "title": "Doing", "wip": 0, "cards": [ { "id": 304, "title": "Card 4", "description": "This is card 4" } ] }, { "id": 202, "title": "Done", "wip": 0, "cards": [ { "id": 305, "title": "Card 5", "description": "This is card 5" }, { "id": 306, "title": "Card 6", "description": "This is card 6" } ] } ] };
 		var body, contentType;
 
 		before( function( done ) {

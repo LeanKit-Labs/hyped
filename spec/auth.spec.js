@@ -31,7 +31,9 @@ describe( "when filtering links by permission", function() {
 		_origin: { href: "/board/100", method: "GET" },
 		_links: {
 			self: { href: "/board/100", method: "GET" }
-		}
+		},
+		_resource: "board",
+		_action: "self"
 	};
 
 	var authCheck = function( actionName ) {

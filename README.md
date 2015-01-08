@@ -215,6 +215,8 @@ __HyperModel Structure__
 	// top level properties starting with a '_' are metadata
 	// all other properties are attached based on the resource definition
 	_origin: { href: "", method: "" },
+	_resource: "thing",
+	_action: "self",
 	_links: {
 		self: { href: "/thing/100", method: "get" },
 		child: { href: "/thing/100/child/:childId", method: "get", templated: true }
@@ -463,6 +465,26 @@ All actions will be returned under the top-level `_links` property. The action n
 Provides a data structure identical to the link that would be called to produce the response. This is especially useful within embedded resources as it allows the client to see what link action was used to produce the embedded resource included in the payload.
 
 We added this to make it easier for clients to know which representation they have in memory for the sake of both local caching and requesting updated versions. We recommend including etag or last-modified data along with resources to further improve efficiency.
+
+```javascript
+{
+	"id": 1,
+	"_origin": { "href": "/item/1", "method": "GET" }
+	...
+}
+```
+
+### Resource and Action
+We also expose the resource and action name as part of each resource (including embedded resources).
+
+```javascript
+{
+	"id": 1,
+	"_origin": { "href": "/item/1", "method": "GET" }
+	"_resource": "item",
+	"_action": "self"
+}
+```
 
 ### Links
 
