@@ -1,7 +1,7 @@
 var _ = require( "lodash" );
 
-var HyperResponse = require( "./HyperResponse.js" );
-var HyperResource = require( "./HyperResource.js" );
+var HyperResponse = require( "./hyperResponse.js" );
+var HyperResource = require( "./hyperResource.js" );
 var jsonEngine = require( "./jsonEngine.js" );
 var halEngine = require( "./halEngine.js" );
 var url = require( "./urlTemplate.js" );
@@ -17,13 +17,13 @@ var preferLatest = false;
 var excludeChildren;
 
 var getVersion = function( req ) {
-	if( !maxVersion ) {
+	if ( !maxVersion ) {
 		maxVersion = getMaxVersion();
 	}
 	var accept = req.headers.accept;
 	var match = /[.]v([0-9]*)/.exec( accept );
 	var version = preferLatest ? maxVersion : 1;
-	if( match && match.length > 0 ) {
+	if ( match && match.length > 0 ) {
 		version = parseInt( match[ 1 ] );
 	}
 	return version;
@@ -45,7 +45,7 @@ var wrapper = {
 };
 
 function addEngine( engine, mediaType ) { // jshint ignore:line
-	if( _.isArray( mediaType ) ) {
+	if ( _.isArray( mediaType ) ) {
 		_.each( mediaType, function( m ) {
 			engines[ m ] = engine;
 		} );
@@ -55,7 +55,7 @@ function addEngine( engine, mediaType ) { // jshint ignore:line
 }
 
 function addMiddleware( host, apiPrefix ) { // jshint ignore:line
-	if( host.use ) {
+	if ( host.use ) {
 		prefix = apiPrefix;
 		host.use( apiPrefix, optionsMiddleware );
 		host.use( apiPrefix, hyperMiddleware );
@@ -73,7 +73,7 @@ function addResource( resource, resourceName ) { // jshint ignore:line
 }
 
 function addResources( resources ) { // jshint ignore:line
-	if( _.isArray( resources ) ) {
+	if ( _.isArray( resources ) ) {
 		_.each( resources, function( resource ) {
 			addResource( resource, resource.name );
 		} );
@@ -84,7 +84,7 @@ function addResources( resources ) { // jshint ignore:line
 
 function getContentType( req ) { // jshint ignore:line
 	var mediaType = req.headers.accept;
-	if( !mediaType ) {
+	if ( !mediaType ) {
 		mediaType = "application/json";
 	}
 	return mediaType;
@@ -97,10 +97,10 @@ function getEngine( mediaType ) { // jshint ignore:line
 
 function getHyperModel( req ) { // jshint ignore:line
 	var version = 1;
-	if( req ) {
+	if ( req ) {
 		version = getVersion( req );
 	}
-	if( !hypermodels[ version ] ) {
+	if ( !hypermodels[ version ] ) {
 		hypermodels[ version ] = HyperResource.renderFn( resources, prefix, version ); // jshint ignore: line
 	}
 	return hypermodels[ version ];
@@ -108,10 +108,10 @@ function getHyperModel( req ) { // jshint ignore:line
 
 function getOptionModel( req ) {
 	var version = 1;
-	if( req ) {
+	if ( req ) {
 		version = getVersion( req );
 	}
-	if( !optionModels[ version ] ) {
+	if ( !optionModels[ version ] ) {
 		optionModels[ version ] = HyperResource.optionsFn( resources, prefix, version, excludeChildren )( engines );
 	}
 	return optionModels[ version ];
@@ -119,10 +119,10 @@ function getOptionModel( req ) {
 
 function getFullOptionModel( req ) {
 	var version = 1;
-	if( req ) {
+	if ( req ) {
 		version = getVersion( req );
 	}
-	if( !fullOptionModels[ version ] ) {
+	if ( !fullOptionModels[ version ] ) {
 		fullOptionModels[ version ] = HyperResource.optionsFn( resources, prefix, version, false )( engines );
 	}
 	return fullOptionModels[ version ];
@@ -136,7 +136,7 @@ function getMaxVersion() { // jshint ignore:line
 }
 
 function hyperMiddleware( req, res, next ) { // jshint ignore:line
-	if( !req.extendHttp ) {
+	if ( !req.extendHttp ) {
 		req.extendHttp = {};
 	}
 	var contentType = getContentType( req );
@@ -147,10 +147,10 @@ function hyperMiddleware( req, res, next ) { // jshint ignore:line
 }
 
 function optionsMiddleware( req, res, next ) { // jshint ignore:line
-	if( req.method === "OPTIONS" || req.method === "options" ) {
+	if ( req.method === "OPTIONS" || req.method === "options" ) {
 		var contentType = getContentType( req );
 		var engine = getEngine( contentType );
-		if( !engine ) {
+		if ( !engine ) {
 			contentType = "application/json";
 			engine = jsonEngine;
 		}
@@ -167,7 +167,7 @@ function setVersioningStrategy( fn ) { // jshint ignore:line
 }
 
 function urlStrategy( resourceName, actionName, action, resourceList ) { // jshint ignore:line
-	if( _.isEmpty( resources ) ) {
+	if ( _.isEmpty( resources ) ) {
 		resources = resourceList;
 	}
 	// will need to do this for all available versions at some point ...
@@ -176,7 +176,7 @@ function urlStrategy( resourceName, actionName, action, resourceList ) { // jshi
 }
 
 module.exports = function( resourceList, defaultToNewest, includeChildrenInOptions ) {
-	if( resourceList === true || resourceList === false ) {
+	if ( resourceList === true || resourceList === false ) {
 		preferLatest = resourceList;
 		excludeChildren = defaultToNewest === undefined ? true : !defaultToNewest;
 	} else {
