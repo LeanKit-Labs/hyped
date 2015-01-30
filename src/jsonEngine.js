@@ -1,7 +1,7 @@
 var _ = require( "lodash" );
 
 function handleEmbedded( target, model, preserveMetadata ) {
-	if( model._embedded ) {
+	if ( model._embedded ) {
 		_.each( model._embedded, function( embedded, property ) {
 			target[ property ] = _.isArray( embedded ) ? handleList( embedded, preserveMetadata ) : handleObject( embedded, preserveMetadata );
 		} );
@@ -25,7 +25,9 @@ function process( model, preserveMetadata ) {
 }
 
 function stripMetadata( model ) { // jshint ignore:line
-	return _.omit( model, function( val, key ) { return key.indexOf( "_" ) === 0; } );
+	return _.omit( model, function( val, key ) {
+		return key.indexOf( "_" ) === 0;
+	} );
 }
 
 module.exports = process;

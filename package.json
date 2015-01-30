@@ -1,12 +1,12 @@
 {
   "name": "hyped",
-  "version": "0.1.0-6",
+  "version": "0.1.0-7",
   "description": "Hypermedia response generation engine",
   "main": "src/index.js",
   "dependencies": {
     "lodash": "^2.4.1",
     "parseurl": "^1.2.0",
-    "plural": "^0.1.6",
+    "pluralize": "^1.1.2",
     "qs": "^1.0.0",
     "request": "^2.47.0",
     "when": "^3.4.2"
