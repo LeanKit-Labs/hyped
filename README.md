@@ -1,8 +1,6 @@
 ## hyped
 A simple approach to generating [HAL](http://stateless.co/hal_specification.html)-esque hypermedia responses based on resource definitions. Built to work best with [autohost](https://github.com/leankit-labs/autohost) but should work with most Node.JS HTTP stacks with a little extra effort.
 
-	This is alphaware!
-
 ## Concepts
 You can skip to the [Using](#Using) section but understanding the concepts behind should explain
 
@@ -235,7 +233,7 @@ __HyperModel Structure__
 
 	<dt>_links</dt>
 	<dd>The actions available for the given resource.</dd>
-	
+
 	<dt>_embedded</dt>
 	<dd>If a key in the <tt>embed</tt> section matches one on the data model provided, the resources contained will show up under the property matching the one on the data model. Each embedded resource will contain <tt>_origin</tt> and <tt>_links</tt> and may also include its own <tt>_embedded</tt> section.</dd>
 
@@ -245,7 +243,7 @@ __HyperModel Structure__
 Rendering engines are simply functions with the signature `function( hyperModel )`. These functions take the hyperModel and produce the correct response body for their given media type. The built in engine for "application/hal+json" looks like this:
 
 ```javascript
-function render( model ) { 
+function render( model ) {
 	return JSON.stringify( model );
 }
 ```
@@ -254,10 +252,20 @@ function render( model ) {
 
 
 ### Content negotiation
-The accept header is used to select an appropriate rendering engine (if one is available). If no engine matches the provided media type, hyped will respond to the client request with a 415 explaining that the requested media type is not supported. 
+The accept header is used to select an appropriate rendering engine (if one is available). If no engine matches the provided media type, hyped will respond to the client request with a 415 explaining that the requested media type is not supported.
+
+The default mediaTypes supported are:
+
+ * `application/json`
+ * `application/hal+json`
 
 ### Versioning
 New versions are implemented as diffs that get applied, in order, against the baseline. Each version provides new values for properties that replace parts of the metadata for the resource. This will hopefully make it easy to see the differences between versions of a resource and reduce the amount of copy/pasted code between versions of a resource definition.
+
+The default versioning strategy parses the version specifier out of the mediaType in the Accept header:
+
+ * `application/json.v2`
+ * `application/hal.v3+json`
 
 ### URLs
 hyped will attempt to replace path variables specified in two separate styles for two separate use cases:
@@ -336,24 +344,28 @@ hyped.setupMiddleware( autohost );
 __resource.js__
 ```javascript
 var databass = require( "myDAL" );
-module.exports = {
-	name: "something",
-	actions: {
-		self: {
-			method: "get",
-			url: "/something/:id",
-			exclude: [],
-			handle: function( envelope ) {
-				var model = databass.getSomethingById( id );
-				envelope.hyped( model ).status( 200 ).render();
+module.exports = function( host ) {
+	return {
+		name: "something",
+		actions: {
+			self: {
+				method: "get",
+				url: "/something/:id",
+				exclude: [],
+				handle: function( envelope ) {
+					var model = databass.getSomethingById( id );
+					envelope.hyped( model ).status( 200 ).render();
+				}
+			}
+		},
+		versions: {
+			2: {
+				self:
+					exclude: [ "weirdFieldWeShouldNotExpose" ]
+				}
 			}
 		}
-	},
-	versions: {
-		2: {
-			exlude: [ "weirdFieldWeShouldNotExpose" ]
-		}
-	}
+	};
 };
 ```
 
@@ -427,7 +439,7 @@ Keep in mind that normally, you will only use the `hyped`, `status` and `render`
 ```javascript
 	// within an autohost handler
 	envelope.hyped( myData ).status( 200 ).render();
-	
+
 	// within an express route
 	req.hyped( myData ).status( 200 ).render();
 ```
@@ -508,9 +520,9 @@ In those cases, we believe hypermedia should include metadata about the availabl
 ```javascript
 {
 	"_links": {
-		"self": { 
+		"self": {
 			"href": "/thing/100",
-			"method": "GET", 
+			"method": "GET",
 			"parameters": {
 				"arg1": {
 					"range": [ 0, 100 ]
