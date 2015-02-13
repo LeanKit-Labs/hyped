@@ -1,7 +1,7 @@
 var should = require( "should" ); // jshint ignore: line
 var HyperResource = require( "../src/hyperResource.js" );
 
-var limit = 2;
+var limit = 4;
 
 describe( "when filtering links by predicate", function() {
 	var resource = {
