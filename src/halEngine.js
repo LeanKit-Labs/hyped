@@ -1,4 +1,4 @@
-function render( model ) { 
+function render( model ) {
 	return JSON.stringify( model );
 }
 

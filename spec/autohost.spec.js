@@ -4,7 +4,7 @@ var model = require( "./model.js" );
 var request = require( "request" );
 
 var board1 = model.board1;
-var limit = 10;
+var limit = 15;
 
 describe( "with oldest version as default", function() {
 	var autohost = require( "autohost" );
@@ -949,6 +949,7 @@ describe( "with oldest version as default", function() {
 		it( "should get options", function() {
 			contentType.should.equal( "application/json" );
 			var json = JSON.parse( body );
+			delete json._links[ "ah:metrics" ];
 			json.should.eql( expectedOptions );
 		} );
 
