@@ -8,7 +8,7 @@ module.exports = function( host ) {
 			self: {
 				include: [ "id", "title" ],
 				method: "get",
-				url: "/board/:id",
+				url: "/:id",
 				embed: {
 					lanes: {
 						resource: "lane",
@@ -22,7 +22,7 @@ module.exports = function( host ) {
 			},
 			cards: {
 				method: "get",
-				url: "/board/:id/card",
+				url: "/:id/card",
 				render: { resource: "card", action: "self" },
 				handle: function( envelope ) {
 					var cards = _.reduce( model.board1.lanes, function( acc, lane ) {

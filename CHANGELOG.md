@@ -1,5 +1,8 @@
 ## 0.1.0
 
+### Current
+Auto-prefix resource URLs if resource name is missing (parity with Autohost's URL strategy).
+
 ### prerelease 6
 Fixed case on hyperResource and hyperResponse requires in index.js.
 

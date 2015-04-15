@@ -99,7 +99,9 @@ function getActionUrlCache( resources, prefix, version ) {
 	_.reduce( resources, function( rAcc, resource, resourceName ) {
 		resource = getVersion( resource, version );
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
-			var actionUrl = [ resource.urlPrefix, resource.actions[ actionName ].url ].join( "" );
+			var actionSegment = resource.actions[ actionName ].url;
+			var resourceSegment = getResourcePrefix( actionSegment, resource, resourceName );
+			var actionUrl = [ resource.urlPrefix, resourceSegment, actionSegment ].join( "" );
 			var templated = isTemplated( actionUrl );
 			var getActionUrl = function() {
 				return actionUrl;
@@ -386,11 +388,12 @@ function getParentUrlCache( resources, version ) {
 
 function getParentUrlFn( resources, prefix, version ) { // jshint ignore:line
 	var cache = getParentUrlCache( resources );
-
 	return function( resourceName, data ) {
 		var meta = cache[ resourceName ];
 		var tokens = _.clone( meta.tokens );
-		var parentUrl = [ prefix, meta.url ].join( "" );
+		var parent = resources[ resourceName ].parent;
+		var resourceSegment = getResourcePrefix( meta.url, resources[ parent ], parent );
+		var parentUrl = [ prefix, resourceSegment, meta.url ].join( "" );
 		var values = _.reduce( tokens, function( acc, token ) {
 			var val = url.readToken( resourceName, data, token );
 			acc[ token.property ] = acc[ token.camel ] = val;
@@ -503,6 +506,16 @@ function getResourcesFn( resources, prefix, version ) { // jshint ignore:line
 		return body;
 	};
 }
+
+function getResourcePrefix( url, resource, resourceName ) {
+	if ( !resource || resource.resourcePrefix === false ) {
+		return "";
+	} else {
+		var regex = new RegExp( "[\/]" + resourceName );
+		return regex.test( url ) ? "" : "/" + resourceName;
+	}
+}
+
 
 function getVersion( resource, version ) { // jshint ignore:line
 	if ( version === undefined ) {
