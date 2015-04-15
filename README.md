@@ -13,6 +13,7 @@ The resource definition provides the metadata necessary for hyped to generate hy
 	[resourceName]: the resource name (must be unique)
 	parent: (optional) the name of the resource that this "belongs" to
 	urlPrefix: (optional) a URL prefix for all actions in this resource
+	resourcePrefix: (optional) defaults to true - guarantees URLs begin with resource name
 	actions: {
 		[actionName]: {
 			method: the http method
