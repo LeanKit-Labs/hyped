@@ -1,85 +1,62 @@
 var _ = require( "lodash" );
-
 var HyperResponse = require( "./hyperResponse.js" );
 var HyperResource = require( "./hyperResource.js" );
 var jsonEngine = require( "./jsonEngine.js" );
 var halEngine = require( "./halEngine.js" );
 var url = require( "./urlTemplate.js" );
 
-var engines = {};
-var hypermodels = {};
-var resources = {};
-var optionModels = {};
-var fullOptionModels = {};
-var prefix;
-var maxVersion;
-var preferLatest = false;
-var excludeChildren;
-
-var getVersion = function( req ) {
-	if ( !maxVersion ) {
-		maxVersion = getMaxVersion();
-	}
-	var accept = req.headers.accept;
-	var match = /[.]v([0-9]*)/.exec( accept );
-	var version = preferLatest ? maxVersion : 1;
-	if ( match && match.length > 0 ) {
-		version = parseInt( match[ 1 ] );
-	}
-	return version;
-};
-
-var wrapper = {
-	addResource: addResource,
-	addResources: addResources,
-	getContentType: getContentType,
-	getEngine: getEngine,
-	getHyperModel: getHyperModel,
-	getVersion: getVersion,
-	hyperMiddleware: hyperMiddleware,
-	optionsMiddleware: optionsMiddleware,
-	registerEngine: addEngine,
-	setupMiddleware: addMiddleware,
-	urlStrategy: urlStrategy,
-	versionWith: setVersioningStrategy,
-};
-
-function addEngine( engine, mediaType ) { // jshint ignore:line
+function addEngine( state, engine, mediaType ) { // jshint ignore:line
 	if ( _.isArray( mediaType ) ) {
 		_.each( mediaType, function( m ) {
-			engines[ m ] = engine;
+			state.engines[ m ] = engine;
 		} );
 	} else {
-		engines[ mediaType ] = engine;
+		state.engines[ mediaType ] = engine;
 	}
 }
 
-function addMiddleware( host, apiPrefix ) { // jshint ignore:line
+function addMiddleware( state, host, apiPrefix ) { // jshint ignore:line
 	if ( host.use ) {
-		prefix = apiPrefix;
-		host.use( apiPrefix, optionsMiddleware );
-		host.use( apiPrefix, hyperMiddleware );
+		state.prefix = apiPrefix;
+		host.use( state.apiPrefix, state.optionsMiddleware );
+		host.use( state.apiPrefix, state.hyperMiddleware );
 	} else {
 		var urlPrefix = host.config.urlPrefix;
 		apiPrefix = host.config.apiPrefix || "/api";
-		prefix = [ urlPrefix, apiPrefix ].join( "" );
-		host.http.middleware( prefix, optionsMiddleware );
-		host.http.middleware( prefix, hyperMiddleware );
+		state.prefix = [ urlPrefix, apiPrefix ].join( "" );
+		host.http.middleware( state.prefix, state.optionsMiddleware );
+		host.http.middleware( state.prefix, state.hyperMiddleware );
 	}
 }
 
-function addResource( resource, resourceName ) { // jshint ignore:line
-	resources[ resourceName ] = resource;
+function addResource( state, resource, resourceName ) { // jshint ignore:line
+	state.resources[ resourceName ] = resource;
 }
 
-function addResources( resources ) { // jshint ignore:line
+function addResources( state, resources ) { // jshint ignore:line
 	if ( _.isArray( resources ) ) {
 		_.each( resources, function( resource ) {
-			addResource( resource, resource.name );
+			addResource( state, resource, resource.name );
 		} );
 	} else {
-		_.each( resources, addResource );
+		_.each( resources, addResource.bind( undefined, state ) );
 	}
+}
+
+function createHost( state, autohost, config, done ) {
+	config.noOptions = true;
+	config.urlStrategy = state.urlStrategy;
+	var host = autohost( config );
+	state.setupMiddleware( host );
+	var subscription;
+	subscription = host.onResources( function( resources ) {
+		state.addResources( resources );
+		subscription.unsubscribe();
+		if( done ) {
+			done();
+		}
+	} );
+	return host;
 }
 
 function getContentType( req ) { // jshint ignore:line
@@ -90,71 +67,87 @@ function getContentType( req ) { // jshint ignore:line
 	return mediaType;
 }
 
-function getEngine( mediaType ) { // jshint ignore:line
+function getEngine( state, mediaType ) { // jshint ignore:line
 	var filtered = mediaType.replace( /[.]v[0-9]*/, "" );
-	return engines[ filtered ];
+	return state.engines[ filtered ];
 }
 
-function getHyperModel( req ) { // jshint ignore:line
+function getHyperModel( state, req ) { // jshint ignore:line
+	var version = 1;
+	if ( req ) {
+		version = getVersion( state, req );
+	}
+	if ( !state.hypermodels[ version ] ) {
+		state.hypermodels[ version ] = HyperResource.renderFn( state.resources, state.prefix, version ); // jshint ignore: line
+	}
+	return state.hypermodels[ version ];
+}
+
+function getOptionModel( state, req ) {
+	var version = 1;
+	if ( req ) {
+		version = getVersion( state, req );
+	}
+	if ( !state.optionModels[ version ] ) {
+		state.optionModels[ version ] = HyperResource.optionsFn( state.resources, state.prefix, version, state.excludeChildren )( state.engines );
+	}
+	return state.optionModels[ version ];
+}
+
+function getFullOptionModel( state, req ) {
 	var version = 1;
 	if ( req ) {
 		version = getVersion( req );
 	}
-	if ( !hypermodels[ version ] ) {
-		hypermodels[ version ] = HyperResource.renderFn( resources, prefix, version ); // jshint ignore: line
+	if ( !state.fullOptionModels[ version ] ) {
+		state.fullOptionModels[ version ] = HyperResource.optionsFn( state.resources, state.prefix, version, false )( state.engines );
 	}
-	return hypermodels[ version ];
+	return state.fullOptionModels[ version ];
 }
 
-function getOptionModel( req ) {
-	var version = 1;
-	if ( req ) {
-		version = getVersion( req );
-	}
-	if ( !optionModels[ version ] ) {
-		optionModels[ version ] = HyperResource.optionsFn( resources, prefix, version, excludeChildren )( engines );
-	}
-	return optionModels[ version ];
-}
-
-function getFullOptionModel( req ) {
-	var version = 1;
-	if ( req ) {
-		version = getVersion( req );
-	}
-	if ( !fullOptionModels[ version ] ) {
-		fullOptionModels[ version ] = HyperResource.optionsFn( resources, prefix, version, false )( engines );
-	}
-	return fullOptionModels[ version ];
-}
-
-function getMaxVersion() { // jshint ignore:line
-	return _.reduce( resources, function( version, resource ) {
+function getMaxVersion( state ) { // jshint ignore:line
+	return _.reduce( state.resources, function( version, resource ) {
 		var max = _.max( _.keys( resource.versions ) );
 		return max > version ? max : version;
 	}, 1 );
 }
 
-function hyperMiddleware( req, res, next ) { // jshint ignore:line
+function getVersion( state, req ) {
+	if ( state.versionStrategy ) {
+		return state.versionStrategy( req );
+	}
+	if ( !state.maxVersion ) {
+		state.maxVersion = getMaxVersion( state );
+	}
+	var accept = req.headers.accept;
+	var match = /[.]v([0-9]*)/.exec( accept );
+	var version = state.preferLatest ? state.maxVersion : 1;
+	if ( match && match.length > 0 ) {
+		version = parseInt( match[ 1 ] );
+	}
+	return version;
+}
+
+function hyperMiddleware( state, req, res, next ) { // jshint ignore:line
 	if ( !req.extendHttp ) {
 		req.extendHttp = {};
 	}
 	var contentType = getContentType( req );
-	var engine = getEngine( contentType );
-	var hyperModel = getHyperModel( req );
+	var engine = getEngine( state, contentType );
+	var hyperModel = getHyperModel( state, req );
 	var response = new HyperResponse( req, res, engine, hyperModel, contentType ).origin( req.originalUrl, req.method ); // jshint ignore:line
 	next();
 }
 
-function optionsMiddleware( req, res, next ) { // jshint ignore:line
+function optionsMiddleware( state, req, res, next ) { // jshint ignore:line
 	if ( req.method === "OPTIONS" || req.method === "options" ) {
 		var contentType = getContentType( req );
-		var engine = getEngine( contentType );
+		var engine = state.getEngine( contentType );
 		if ( !engine ) {
 			contentType = "application/json";
 			engine = jsonEngine;
 		}
-		var optionModel = getOptionModel( req );
+		var optionModel = getOptionModel( state, req );
 		var body = engine( optionModel, true );
 		res.status( 200 ).set( "Content-Type", contentType ).send( body );
 	} else {
@@ -162,29 +155,57 @@ function optionsMiddleware( req, res, next ) { // jshint ignore:line
 	}
 }
 
-function setVersioningStrategy( fn ) { // jshint ignore:line
-	getVersion = fn;
+function setVersioningStrategy( state, fn ) { // jshint ignore:line
+	state.getVersion = fn;
 }
 
-function urlStrategy( resourceName, actionName, action, resourceList ) { // jshint ignore:line
-	if ( _.isEmpty( resources ) ) {
-		resources = resourceList;
+function urlStrategy( state, resourceName, actionName, action, resourceList ) { // jshint ignore:line
+	if ( _.isEmpty( state.resources ) ) {
+		state.resources = resourceList;
 	}
 	// will need to do this for all available versions at some point ...
-	var options = getFullOptionModel();
+	var options = getFullOptionModel( state );
 	return url.forExpress( options._links[ [ resourceName, actionName ].join( ":" ) ].href );
 }
 
 module.exports = function( resourceList, defaultToNewest, includeChildrenInOptions ) {
+	var state = {
+		engines: {},
+		hypermodels: {},
+		resources: {},
+		optionModels: {},
+		fullOptionModels: {},
+		prefix: undefined,
+		maxVersion: undefined,
+		preferLatest: false,
+		excludeChildren: undefined
+	};
+
+	_.merge( state, {
+		addResource: addResource.bind( undefined, state ),
+		addResources: addResources.bind( undefined, state ),
+		createHost: createHost.bind( undefined, state ),
+		getContentType: getContentType,
+		getEngine: getEngine.bind( undefined, state ),
+		getHyperModel: getHyperModel.bind( undefined, state ),
+		getVersion: getVersion.bind( undefined, state ),
+		hyperMiddleware: hyperMiddleware.bind( undefined, state ),
+		optionsMiddleware: optionsMiddleware.bind( undefined, state ),
+		registerEngine: addEngine.bind( undefined, state ),
+		setupMiddleware: addMiddleware.bind( undefined, state ),
+		urlStrategy: urlStrategy.bind( undefined, state ),
+		versionWith: setVersioningStrategy.bind( undefined, state ),
+	} );
+
 	if ( resourceList === true || resourceList === false ) {
-		preferLatest = resourceList;
-		excludeChildren = defaultToNewest === undefined ? true : !defaultToNewest;
+		state.preferLatest = resourceList;
+		state.excludeChildren = defaultToNewest === undefined ? true : !defaultToNewest;
 	} else {
-		addResources( resourceList );
-		preferLatest = defaultToNewest;
-		excludeChildren = includeChildrenInOptions === undefined ? true : !includeChildrenInOptions;
+		addResources( state, resourceList );
+		state.preferLatest = defaultToNewest;
+		state.excludeChildren = includeChildrenInOptions === undefined ? true : !includeChildrenInOptions;
 	}
-	addEngine( jsonEngine, "application/json" );
-	addEngine( halEngine, "application/hal+json" );
-	return wrapper;
+	addEngine( state, jsonEngine, "application/json" );
+	addEngine( state, halEngine, "application/hal+json" );
+	return state;
 };
