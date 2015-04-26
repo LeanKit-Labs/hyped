@@ -17,7 +17,7 @@ module.exports = function( host ) {
 					}
 				},
 				handle: function( envelope ) {
-					envelope.hyped( model.board1 ).render();
+					return model.board1;
 				}
 			},
 			cards: {
@@ -25,10 +25,9 @@ module.exports = function( host ) {
 				url: "/:id/card",
 				render: { resource: "card", action: "self" },
 				handle: function( envelope ) {
-					var cards = _.reduce( model.board1.lanes, function( acc, lane ) {
+					return _.reduce( model.board1.lanes, function( acc, lane ) {
 						return acc.concat( lane.cards );
 					}, [] );
-					envelope.hyped( cards ).render();
 				}
 			}
 		},
