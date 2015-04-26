@@ -1,6 +1,6 @@
-var should = require( "should" ); // jshint ignore: line
-var model = require( "./model.js" );
-var HyperResource = require( "../src/hyperResource.js" );
+require( "../setup" );
+var model = require( "../model.js" );
+var HyperResource = require( "../../src/hyperResource.js" );
 
 var board1 = model.board1;
 var limit = 5;
@@ -21,7 +21,7 @@ describe( "with static links", function() {
 						return "/board/:id?page=" + ( context.page + 1 ) + "&size=" + context.size;
 					},
 					"prev-page": function( data, context ) {
-						if( context.page && context.page > 1 ) {
+						if ( context.page && context.page > 1 ) {
 							return "/board/:id?page=" + ( context.page - 1 ) + "&size=" + context.size;
 						}
 					}
@@ -95,7 +95,7 @@ describe( "with resource prefix", function() {
 						return "/board/:id?page=" + ( context.page + 1 ) + "&size=" + context.size;
 					},
 					"prev-page": function( data, context ) {
-						if( context.page && context.page > 1 ) {
+						if ( context.page && context.page > 1 ) {
 							return "/board/:id?page=" + ( context.page - 1 ) + "&size=" + context.size;
 						}
 					}

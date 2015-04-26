@@ -1,6 +1,6 @@
-var should = require( "should" ); // jshint ignore: line
-var model = require( "./model.js" );
-var hyperResource = require( "../src/hyperResource.js" );
+require( "../setup" );
+var model = require( "../model.js" );
+var hyperResource = require( "../../src/hyperResource.js" );
 
 var board1 = model.board1;
 

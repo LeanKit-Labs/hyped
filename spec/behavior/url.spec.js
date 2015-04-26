@@ -1,5 +1,5 @@
-var should = require( "should" ); // jshint ignore:line
-var url = require( "../src/urlTemplate.js" );
+require( "../setup" );
+var url = require( "../../src/urlTemplate.js" );
 
 describe( "when replacing a token property with a model property", function() {
 	var template = "/this/is/{a.test}/of.stuff";
