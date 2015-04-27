@@ -1,0 +1,58 @@
+{
+  "id": 100,
+  "title": "Test Board",
+  "description": "This is a board and stuff!",
+  "lanes": [
+    {
+      "id": 200,
+      "title": "To Do",
+      "wip": 0,
+      "cards": [
+        {
+          "id": 301,
+          "title": "Card 1",
+          "description": "This is card 1"
+        },
+        {
+          "id": 302,
+          "title": "Card 2",
+          "description": "This is card 2"
+        },
+        {
+          "id": 303,
+          "title": "Card 3",
+          "description": "This is card 3"
+        }
+      ]
+    },
+    {
+      "id": 201,
+      "title": "Doing",
+      "wip": 0,
+      "cards": [
+        {
+          "id": 304,
+          "title": "Card 4",
+          "description": "This is card 4"
+        }
+      ]
+    },
+    {
+      "id": 202,
+      "title": "Done",
+      "wip": 0,
+      "cards": [
+        {
+          "id": 305,
+          "title": "Card 5",
+          "description": "This is card 5"
+        },
+        {
+          "id": 306,
+          "title": "Card 6",
+          "description": "This is card 6"
+        }
+      ]
+    }
+  ]
+}

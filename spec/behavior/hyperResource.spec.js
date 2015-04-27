@@ -1,7 +1,6 @@
-var should = require( "should" ); // jshint ignore: line
-var url = require( "../src/urlTemplate.js" );
-var HyperResource = require( "../src/hyperResource.js" );
-var _ = require( "lodash" );
+require( "../setup" );
+var url = require( "../../src/urlTemplate.js" );
+var HyperResource = require( "../../src/hyperResource.js" );
 
 var limit = 15;
 
@@ -143,11 +142,11 @@ describe( "Action links", function() {
 		} );
 
 		it( "should keep version changes separate from original", function() {
-			should( parentVersions[ 1 ].actions.self.include ).not.exist; // jshint ignore:line
+			expect( parentVersions[ 1 ].actions.self.include ).not.to.exist; // jshint ignore:line
 		} );
 
 		it( "should return a version hash with one entry for resources without a version hash", function() {
-			should( childVersions[ 1 ].actions.self ).exist; // jshint ignore:line
+			expect( childVersions[ 1 ].actions.self ).to.exist; // jshint ignore:line
 		} );
 	} );
 

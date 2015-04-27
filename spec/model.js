@@ -1,5 +1,4 @@
-var _ = require( "lodash" );
-var should = require( "should" );
+require( "./setup" );
 
 var card1 = { id: 301, title: "Card 1", description: "This is card 1" };
 var card2 = { id: 302, title: "Card 2", description: "This is card 2" };
@@ -36,16 +35,15 @@ function compare( a, b ) {
 
 function deepCompare( a, b, k, l ) {
 	l = l || [];
-	if( b === undefined ) {
+	if ( b === undefined ) {
 		l.push( k + ": " + a + "!==" + b );
-	}
-	else if( _.isObject( a ) || _.isArray( a ) ) {
+	} else if ( _.isObject( a ) || _.isArray( a ) ) {
 		_.each( a, function( v, k ) {
 			deepCompare( a[ k ], b[ k ], k, l );
 		} );
 	} else {
 		result = a == b; // jshint ignore:line
-		if( !result ) {
+		if ( !result ) {
 			l.push( k + ": " + a + "!==" + b );
 		}
 	}

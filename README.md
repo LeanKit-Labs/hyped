@@ -249,7 +249,7 @@ function render( model ) {
 }
 ```
 
-	Note: the engine for "application/json" is more complex since it has to effectively reduce and filter a more complex data structure to produce simple JSON.
+	Note: the engine for "application/json" is more complex since it has to effectively reduce and filter the hypermedia data structure to produce simple JSON.
 
 
 ### Content negotiation
@@ -322,24 +322,24 @@ When a URL contains path variables that could not be replaced by a value in the 
 ```
 
 ## Usage
-These examples show the bare minimum. You'll only get support for built in mediatypes - presently `application/json` and `application/hal+json`. This means if you don't provide your own engine for custom media types and a client sends an accept header for a media type hyped knows about, it will send back a 415 (unsupported media type) to the client rather than throwing an exception.
+These examples show the bare minimum. You'll only get support for built in mediatypes - presently `application/json` and `application/hal+json`. This means if you don't provide your own engine for custom media types and a client sends an accept header for a media type hyped doesn't have an engine for, it will send back a 415 (unsupported media type) to the client rather than throwing an exception.
 
 ### With Autohost
-This example will add an express middleware to `autohost` that extends the envelope with a fluent set of calls that can be used to construct and render a hypermedia response. The correct version, rendering engine, resource and action are all determined during the hyped middleware you add to autohost so that when rendering a response, the only things you must provide is the model.
+This example will add middleware to `autohost` that extends the envelope to integrate hyped's rendering. The correct version, rendering engine, resource and action are all determined during the hyped middleware you add to autohost so that when rendering a response, the only thing you must provide is the model.
 
-	Note: at this time autohost 0.3.0-3 or greater is required
+	Note: this approach only works with Autohost 0.4.0 or greater.
 
 __index.js__
 ```javascript
 var autohost = require( "autohost" );
 var hyped = require( "hyped" )();
-autohost
-	.init( {
-		noOptions: true, // turn off autohost's OPTIONS middleware
-		urlStrategy: hyped.urlStrategy // use hyped's URL strategy
-	} )
-	.then( hyped.addResources );
-hyped.setupMiddleware( autohost );
+var host = hyped.createHost( autohost, {
+		// regular autohost configuration goes here
+	},
+	function() {
+		// callback gets invoked once all resources are loaded
+		// this is largely to support test setups
+	} );
 ```
 
 __resource.js__
@@ -355,7 +355,10 @@ module.exports = function( host ) {
 				exclude: [],
 				handle: function( envelope ) {
 					var model = databass.getSomethingById( id );
-					envelope.hyped( model ).status( 200 ).render();
+					return {
+						status: 200, // default
+						data: model
+					};
 				}
 			}
 		},
@@ -386,7 +389,7 @@ app.get( "something/:id", function( req, res ) {
 
 ## API
 
-If you are using this library with Autohost, the only API you really need to know about is used for the initial setup and the response generation.
+If you are using this library with Autohost, the only API you really need to know about is used for the initial setup. The format of the object literal returned from the handlers is also explained below.
 
 ## Setup API
 
@@ -400,11 +403,19 @@ __includeChildrenInOptions__: include child resource actions in the OPTIONS resp
 Adds the metadata for a particular resource.
 
 ### addResources( resources )
-Adds multiple resources at once. Intended to make autohost setup simple.
+Adds multiple resources at once. Intended for internal use.
+
+### createHost( autohostLib, autohostConfiguration, [callback] )
+Creates an autohost instance with the configuration provided and returns it. The `callback` is invoked once all resources have been processed.
+
+> Note: the callback is most likely only needed during integration testing
 
 ```javascript
-autohost.init( { noOptions: true } )
-	.then( hyped.addResources );
+var autohost = require( "autohost" );
+var hyped = require( "hyped" )();
+var host = hyped.createHost( autohost, {
+		// regular autohost configuration goes here
+	} );
 ```
 
 ### registerEngine( mediaType, renderer )
@@ -418,6 +429,9 @@ hyped.registerEngine( "text/plain", function( model ) {
 ```
 
 ### setupMiddleware( server )
+
+> Note: this call should only be used with express. Use the new `createHost` call to setup autohost.
+
 This call can take either a reference to the autohost lib or express's app instance. It will register both the [`hypermediaMiddleware`](#hypermediaMiddleware) and the [`optionsMiddleware`](#optionsMiddleware) with the HTTP library in use.
 
 Refer to the [usage](#usage) examples above to see this call in use.
@@ -433,16 +447,36 @@ hyped.versionWith( req ) {
 ```
 
 ## Rendering API
-The hypermedia middleware extends autohost's envelope and the underlying request object with a set of fluent calls to help with the construction of a hypermedia response.
+
+>> Note: the rendering API is deprecated for use with autohost - see [response format](#response-format) for details.
+
+The hypermedia middleware extends the underlying request object with a set of fluent calls to help with the construction of a hypermedia response. The response object can then be used to send a response via express.
 
 Keep in mind that normally, you will only use the `hyped`, `status` and `render` calls. The middleware should correctly detect the version, mediatype, resource and action to be rendered.
 
 ```javascript
-	// within an autohost handler
-	envelope.hyped( myData ).status( 200 ).render();
+	// an approach to rendering the resulting response
+	function respond( res, response ) {
+		var code = response.status || 200;
+		if ( response.headers ) {
+			_.each( response.headers, function( v, k ) {
+				res.set( k, v );
+			} );
+		}
+		if ( response.cookies ) {
+			_.each( response.cookies, function( v, k ) {
+				res.cookie( k, v.value, v.options );
+			} );
+		}
+		res.status( code ).send( response.data );
+	}
 
-	// within an express route
-	req.hyped( myData ).status( 200 ).render();
+	...
+
+	// from within an express route
+	var response = req.hyped( myData ).status( 200 ).render();
+	respond( res, response );
+
 ```
 
 ### .hyped( model, [context] )
@@ -451,11 +485,37 @@ You provide the data model that the resource will render a response based on. Th
 ### .context( context )
 Another way to provide context to any link generators for this action.
 
+### cookies( cookies )
+Sets cookies on the response generated.
+
+### headers( headers )
+Sets headers on the response generated.
+
 ### .status( statusCode )
 If omitted, this is always 200. Be good to your API's consumers and use proper status codes.
 
 ### .render()
-Returns the response to the client.
+Returns the response object literal.
+
+## Response Format
+The response literal has the following structure:
+
+```javascript
+{
+	status: 200, // default
+	data: , // the data to pass to the rendering engine
+	headers: {}, // defaults to content-type header only
+	cookies: {}, // defaults to empty
+	resource: , // defaults to the resource that received the request
+	action: , // defaults to the action that received the request
+}
+```
+
+### With Autohost
+In an autohost handler, this literal will be processed by hyped first. The data property will be replaced by the output of the appropriate rendering engine. If only the data is returned from the handler, then that will be used to generate the data property of the literal with defaults used for all other properties.
+
+### With Express
+This literal format is what an express handle can expect to get back from the `render` call.
 
 ## Departures/Extensions To HAL
 I think HAL is pretty awesome. We"ve added a few minor extensions and may continue. This is where we"ll describe them.

@@ -10,9 +10,11 @@ module.exports = function( host ) {
 				url: "/card/:id",
 				method: "GET",
 				handle: function( envelope ) {
-					var cards = _.reduce( model.board1.lanes, function( acc, x ) { return acc.concat( x.cards ); } );
+					var cards = _.reduce( model.board1.lanes, function( acc, x ) {
+						return acc.concat( x.cards );
+					} );
 					var card = _.where( cards, { id: parseInt( envelope.data.cardId ) } )[ 0 ];
-					envelope.hyped( card ).render();
+					return card;
 				}
 			},
 			move: {

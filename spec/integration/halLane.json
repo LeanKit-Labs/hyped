@@ -1,0 +1,51 @@
+{
+	"id": 201,
+	"title": "Doing",
+	"wip": 0,
+	"_origin": {
+		"href": "/test/api/board/100/lane/201",
+		"method": "GET"
+	},
+	"_resource": "lane",
+	"_action": "self",
+	"_links": {
+		"self": {
+			"href": "/test/api/board/100/lane/201",
+			"method": "GET"
+		},
+		"cards": {
+			"href": "/test/api/board/100/lane/201/card",
+			"method": "GET"
+		}
+	},
+	"_embedded": {
+		"cards": [
+			{
+				"id": 304,
+				"title": "Card 4",
+				"description": "This is card 4",
+				"_origin": {
+					"href": "/test/api/card/304",
+					"method": "GET"
+				},
+				"_resource": "card",
+				"_action": "self",
+				"_links": {
+					"self": {
+						"href": "/test/api/card/304",
+						"method": "GET"
+					},
+					"move": {
+						"href": "/test/api/card/304/board/{boardId}/lane/{laneId}",
+						"method": "PUT",
+						"templated": true
+					},
+					"block": {
+						"href": "/test/api/card/304/block",
+						"method": "PUT"
+					}
+				}
+			}
+		]
+	}
+}

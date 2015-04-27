@@ -1,5 +1,5 @@
-var should = require( "should" ); // jshint ignore: line
-var HyperResource = require( "../src/hyperResource.js" );
+require( "../setup" );
+var HyperResource = require( "../../src/hyperResource.js" );
 
 var limit = 4;
 
