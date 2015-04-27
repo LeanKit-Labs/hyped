@@ -16,12 +16,13 @@
     "biggulp": "0.*.*",
     "chai": "^2.2.0",
     "chai-as-promised": "^5.0.0",
+    "gulp": "^3.8.11",
     "proxyquire": "^1.4.0",
     "sinon": "^1.14.1",
     "sinon-chai": "^2.7.0"
   },
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test-and-exit"
   },
   "repository": {
     "type": "git",
