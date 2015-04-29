@@ -1,6 +1,6 @@
-## 0.1.x
+## 0.2.x
 
-### 0.1.1
+### 0.2.0
  * Requires autohost 0.4.0
  * Support for new return-style handlers
  * Add support for headers and cookies
@@ -8,6 +8,8 @@
  * Use biggulp for tests
  * Re-org spec folder
  * Clean up integration tests
+
+## 0.1.x
 
 ### 0.1.0
 Auto-prefix resource URLs if resource name is missing (parity with Autohost's URL strategy).
