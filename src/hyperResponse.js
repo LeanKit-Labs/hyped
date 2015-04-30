@@ -25,7 +25,7 @@ var HyperResponse = function( req, res, engine, hyperResource, contentType ) {
 		var model = result.data ? result.data : result;
 		var context = result.context ? result.context : {};
 		setModel( self, model, context );
-		this._code = result.status || result.statusCode || self._code;
+		self._code = result.status || result.statusCode || self._code;
 		self._headers = result.headers || {};
 		self._cookies = result.cookies || {};
 		self._resource = result.resource || self._resource;
