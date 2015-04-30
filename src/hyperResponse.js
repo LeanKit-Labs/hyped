@@ -1,3 +1,5 @@
+var _ = require( "lodash" );
+
 function setModel( self, model, context ) {
 	self._model = model;
 	self._context = context;
@@ -30,7 +32,7 @@ var HyperResponse = function( req, res, engine, hyperResource, contentType ) {
 		self._cookies = result.cookies || {};
 		self._resource = result.resource || self._resource;
 		self._action = result.action || self._action;
-		return self.render();
+		return self.getResponse();
 	};
 };
 
@@ -81,7 +83,7 @@ HyperResponse.prototype.status = function( code ) {
 	return this;
 };
 
-HyperResponse.prototype.render = function() {
+HyperResponse.prototype.getResponse = function() {
 	if ( this._engine ) {
 		return this.createResponse();
 	} else {
@@ -93,6 +95,23 @@ HyperResponse.prototype.render = function() {
 			data: "The requested media type '" + this._contentType + "' is not supported. Please see the OPTIONS at the api root to get a list of supported types."
 		};
 	}
+};
+
+HyperResponse.prototype.render = function() {
+	var res = this._res;
+	var response = this.getResponse();
+	res.set( "Content-Type", this._contentType );
+	if ( response.headers ) {
+		_.each( response.headers, function( v, k ) {
+			res.set( k, v );
+		}.bind( this ) );
+	}
+	if ( response.cookies ) {
+		_.each( response.cookies, function( v, k ) {
+			res.cookie( k, v.value, v.options );
+		}.bind( this ) );
+	}
+	res.status( response.status ).send( response.data );
 };
 
 module.exports = HyperResponse;

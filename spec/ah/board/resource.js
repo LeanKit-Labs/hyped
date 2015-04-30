@@ -17,7 +17,7 @@ module.exports = function( host ) {
 					}
 				},
 				handle: function( envelope ) {
-					return model.board1;
+					envelope.hyped( model.board1 ).status( 200 ).render();
 				}
 			},
 			cards: {

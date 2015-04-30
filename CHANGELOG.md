@@ -1,7 +1,8 @@
 ## 0.2.x
 
 ### 0.2.1
-Bug fix - status code was not being set correctly using new object literal syntax.
+ * Bug fix - status code was not being set correctly using new object literal syntax.
+ * Add support back for original render approach.
 
 ### 0.2.0
  * Requires autohost 0.4.0
