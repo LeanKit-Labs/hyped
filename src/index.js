@@ -24,8 +24,8 @@ function addMiddleware( state, host, apiPrefix ) { // jshint ignore:line
 		var urlPrefix = host.config.urlPrefix;
 		apiPrefix = host.config.apiPrefix || "/api";
 		state.prefix = [ urlPrefix, apiPrefix ].join( "" );
-		host.http.middleware( state.prefix, state.optionsMiddleware );
-		host.http.middleware( state.prefix, state.hyperMiddleware );
+		host.http.middleware( state.prefix, state.optionsMiddleware, "options" );
+		host.http.middleware( state.prefix, state.hyperMiddleware, "hyped" );
 	}
 }
 
@@ -52,7 +52,7 @@ function createHost( state, autohost, config, done ) {
 	subscription = host.onResources( function( resources ) {
 		state.addResources( resources );
 		subscription.unsubscribe();
-		if( done ) {
+		if ( done ) {
 			done();
 		}
 	} );

@@ -14,6 +14,7 @@ describe( "Autohost Integration", function() {
 				urlPrefix: "/test",
 				resources: "./spec/ah"
 			}, function() {
+					host.start();
 					done();
 				} );
 		} );
@@ -117,8 +118,8 @@ describe( "Autohost Integration", function() {
 			} );
 
 			it( "should get 415", function() {
-				contentType.should.equal( "text/html" );
 				status.should.equal( 415 );
+				contentType.should.equal( "text/html" );
 				body.should.equal( "The requested media type 'application/vnd.baconated+json' is not supported. Please see the OPTIONS at the api root to get a list of supported types." );
 			} );
 		} );
@@ -231,6 +232,7 @@ describe( "Autohost Integration", function() {
 			host = hyped.createHost( autohost, {
 				resources: "./spec/ah"
 			}, function() {
+					host.start();
 					done();
 				} );
 		} );
