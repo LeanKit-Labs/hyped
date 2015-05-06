@@ -2,8 +2,6 @@ require( "../setup" );
 var url = require( "../../src/urlTemplate.js" );
 var HyperResource = require( "../../src/hyperResource.js" );
 
-var limit = 15;
-
 var resources = require( "./resources.js" );
 
 describe( "Action links", function() {
@@ -403,23 +401,16 @@ describe( "Action links", function() {
 				title: "child",
 				grandChildren: [ { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 } ]
 			};
-			var elapsed;
 
 			before( function() {
 				var fn1 = HyperResource.resourceFn( resources, "/test/api" );
-
-				var start = Date.now();
 				response = fn1( "child", "self", data );
-				elapsed = Date.now() - start;
 			} );
 
 			it( "should return the correct response", function() {
 				response.should.eql( expected );
 			} );
 
-			it( "new should be 'quick'", function() {
-				elapsed.should.be.below( limit );
-			} );
 		} );
 	} );
 
@@ -527,23 +518,16 @@ describe( "Action links", function() {
 				children: [ {} ]
 			}
 		];
-		var elapsed;
 
 		before( function() {
 			var fn1 = HyperResource.resourcesFn( resources );
-
-			var start = Date.now();
 			response = fn1( "parent", "self", data, "", undefined, "/parent", "GET" );
-			elapsed = Date.now() - start;
 		} );
 
 		it( "should return the correct response", function() {
 			response.should.eql( expected );
 		} );
 
-		it( "new should be 'quick'", function() {
-			elapsed.should.be.below( limit );
-		} );
 	} );
 
 	describe( "when rendering a list of resources from another resource", function() {
@@ -591,47 +575,34 @@ describe( "Action links", function() {
 				description: "the second item"
 			}
 		];
-		var elapsed;
 
 		before( function() {
 			var fn1 = HyperResource.resourcesFn( resources );
-			var start = Date.now();
 			response = fn1( "child", "self", data, "", undefined, "/parent/1/child", "GET" );
-			elapsed = Date.now() - start;
 		} );
 
 		it( "should return the correct response", function() {
 			response.should.eql( expected );
 		} );
 
-		it( "new should be 'quick'", function() {
-			elapsed.should.be.below( limit );
-		} );
 	} );
 
 	describe( "Timing token replacement", function() {
 		var testUrl = "/parent/:id/child/:child.id";
 
 		describe( "Replacing 2 tokens 1000 times with regex", function() {
-			var elapsed;
 			var urls = [];
 			before( function() {
-				var start = Date.now();
 				var tokens = url.getTokens( testUrl );
 				var halUrl = url.forHal( testUrl );
 				for (var i = 0; i < 1000; i++) {
 
 					urls.push( url.process( _.clone( tokens ), halUrl, { id: 1, childId: 2 }, "parent" ) );
 				}
-				elapsed = Date.now() - start;
 			} );
 
 			it( "should produce a valid URL", function() {
 				urls[ 1 ].should.equal( "/parent/1/child/2" );
-			} );
-
-			it( "should be 'quick'", function() {
-				elapsed.should.be.below( 40 );
 			} );
 		} );
 	} );

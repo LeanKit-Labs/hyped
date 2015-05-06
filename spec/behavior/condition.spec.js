@@ -1,8 +1,6 @@
 require( "../setup" );
 var HyperResource = require( "../../src/hyperResource.js" );
 
-var limit = 4;
-
 describe( "when filtering links by predicate", function() {
 	var resource = {
 		name: "account",
@@ -73,20 +71,12 @@ describe( "when filtering links by predicate", function() {
 	var newAccount, withMoney, noMoney, elapsed1, elapsed2, elapsed3, elapsed4;
 
 	before( function() {
-		var start = Date.now();
 		var fn = HyperResource.renderFn( { account: resource } );
-		elapsed1 = ( Date.now() - start );
-		start = Date.now();
 		newAccount = fn( "account", "self", acct );
-		elapsed2 = ( Date.now() - start );
 		acct.balance = 100;
-		start = Date.now();
 		withMoney = fn( "account", "self", acct );
-		elapsed3 = ( Date.now() - start );
 		acct.balance = 0;
-		start = Date.now();
 		noMoney = fn( "account", "self", acct );
-		elapsed4 = ( Date.now() - start );
 	} );
 
 	it( "should only show withdrawal if balance is greater than 0", function() {
@@ -95,10 +85,4 @@ describe( "when filtering links by predicate", function() {
 		noMoney.should.eql( expected3 );
 	} );
 
-	it( "should be 'quick'", function() {
-		elapsed1.should.be.below( limit );
-		elapsed2.should.be.below( limit );
-		elapsed3.should.be.below( limit );
-		elapsed4.should.be.below( limit );
-	} );
 } );
