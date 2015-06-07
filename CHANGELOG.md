@@ -1,5 +1,9 @@
 ## 0.2.x
 
+### 0.2.2
+ * Improvement - support empty or undefined apiPrefix
+ * Bug fix - on apiPrefix of '/', '', or undefined, do not produce routes with empty segments
+
 ### 0.2.1
  * Bug fix - status code was not being set correctly using new object literal syntax.
  * Add support back for original render approach.

@@ -22,8 +22,12 @@ function addMiddleware( state, host, apiPrefix ) { // jshint ignore:line
 		host.use( state.apiPrefix, state.hyperMiddleware );
 	} else {
 		var urlPrefix = host.config.urlPrefix;
-		apiPrefix = host.config.apiPrefix || "/api";
-		state.prefix = [ urlPrefix, apiPrefix ].join( "" );
+		if( _.has( host.config, "apiPrefix" ) ) {
+			apiPrefix = host.config.apiPrefix === undefined ? "/" : host.config.apiPrefix;
+		} else {
+			apiPrefix = "/api";
+		}
+		state.prefix = [ urlPrefix, apiPrefix ].join( "" ).replace( "//", "/" );
 		host.http.middleware( state.prefix, state.optionsMiddleware, "options" );
 		host.http.middleware( state.prefix, state.hyperMiddleware, "hyped" );
 	}
