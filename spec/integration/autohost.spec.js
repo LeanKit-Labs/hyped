@@ -261,4 +261,124 @@ describe( "Autohost Integration", function() {
 		} );
 	} );
 
+	describe( "with undefined api prefix", function() {
+		var hyped, host;
+		before( function( done ) {
+			hyped = require( "../../src/index.js" )( true, true );
+			host = hyped.createHost( autohost, {
+				resources: "./spec/ah",
+				apiPrefix: undefined
+			}, function() {
+					host.start();
+					done();
+				} );
+		} );
+
+		describe( "when requesting board with no media type", function() {
+			var expected = require( "./board2.json" );
+			var body, contentType;
+
+			before( function( done ) {
+				request( "http://localhost:8800/board/100", function( err, res ) {
+					body = JSON.parse( res.body );
+					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+					done();
+				} );
+			} );
+
+			it( "should get JSON version 2", function() {
+				contentType.should.equal( "application/json" );
+				body.should.eql( expected );
+			} );
+
+		} );
+
+		describe( "when hitting root with options verb", function() {
+			var body, contentType, elapsedMs;
+
+			var expectedOptions = require( "./halOptionsNoPrefix.json" );
+
+			before( function( done ) {
+				var start = Date.now();
+				elapsedMs = ( Date.now() - start );
+				request( { method: "OPTIONS", url: "http://localhost:8800" }, function( err, res ) {
+					body = res.body;
+					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+					done();
+				} );
+			} );
+
+			it( "should get options", function() {
+				contentType.should.equal( "application/json" );
+				var json = JSON.parse( body );
+				delete json._links[ "ah:metrics" ];
+				json.should.eql( expectedOptions );
+			} );
+		} );
+
+		after( function() {
+			host.stop();
+		} );
+	} );
+
+	describe( "with empty api prefix", function() {
+		var hyped, host;
+		before( function( done ) {
+			hyped = require( "../../src/index.js" )( true, true );
+			host = hyped.createHost( autohost, {
+				resources: "./spec/ah",
+				apiPrefix: ""
+			}, function() {
+					host.start();
+					done();
+				} );
+		} );
+
+		describe( "when requesting board with no media type", function() {
+			var expected = require( "./board2.json" );
+			var body, contentType;
+
+			before( function( done ) {
+				request( "http://localhost:8800/board/100", function( err, res ) {
+					body = JSON.parse( res.body );
+					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+					done();
+				} );
+			} );
+
+			it( "should get JSON version 2", function() {
+				contentType.should.equal( "application/json" );
+				body.should.eql( expected );
+			} );
+
+		} );
+
+		describe( "when hitting root with options verb", function() {
+			var body, contentType, elapsedMs;
+
+			var expectedOptions = require( "./halOptionsNoPrefix.json" );
+
+			before( function( done ) {
+				var start = Date.now();
+				elapsedMs = ( Date.now() - start );
+				request( { method: "OPTIONS", url: "http://localhost:8800" }, function( err, res ) {
+					body = res.body;
+					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+					done();
+				} );
+			} );
+
+			it( "should get options", function() {
+				contentType.should.equal( "application/json" );
+				var json = JSON.parse( body );
+				delete json._links[ "ah:metrics" ];
+				json.should.eql( expectedOptions );
+			} );
+		} );
+
+		after( function() {
+			host.stop();
+		} );
+	} );
+
 } );

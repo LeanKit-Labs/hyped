@@ -336,66 +336,7 @@ describe( "Action links", function() {
 		} );
 
 		describe( "when rendering action with embedded resources", function() {
-			var expected = {
-				id: 2,
-				parentId: 1,
-				title: "child",
-				_origin: { href: "/test/api/parent/1/child/2", method: "GET" },
-				_resource: "child",
-				_action: "self",
-				_links: {
-					self: { href: "/test/api/parent/1/child/2", method: "GET" }
-				},
-				_embedded: {
-					grandChildren: [
-						{ id: 1,
-							_origin: { href: "/test/api/parent/1/child/2/grand/1", method: "GET" },
-							_resource: "grandChild",
-							_action: "self",
-							_links: {
-								self: { href: "/test/api/parent/1/child/2/grand/1", method: "GET" },
-								create: { href: "/test/api/parent/1/child/2/grand", method: "POST" }
-							}
-						},
-						{ id: 2,
-							_origin: { href: "/test/api/parent/1/child/2/grand/2", method: "GET" },
-							_resource: "grandChild",
-							_action: "self",
-							_links: {
-								self: { href: "/test/api/parent/1/child/2/grand/2", method: "GET" },
-								create: { href: "/test/api/parent/1/child/2/grand", method: "POST" }
-							}
-						},
-						{ id: 3,
-							_origin: { href: "/test/api/parent/1/child/2/grand/3", method: "GET" },
-							_resource: "grandChild",
-							_action: "self",
-							_links: {
-								self: { href: "/test/api/parent/1/child/2/grand/3", method: "GET" },
-								create: { href: "/test/api/parent/1/child/2/grand", method: "POST" }
-							}
-						},
-						{ id: 4,
-							_origin: { href: "/test/api/parent/1/child/2/grand/4", method: "GET" },
-							_resource: "grandChild",
-							_action: "self",
-							_links: {
-								self: { href: "/test/api/parent/1/child/2/grand/4", method: "GET" },
-								create: { href: "/test/api/parent/1/child/2/grand", method: "POST" }
-							}
-						},
-						{ id: 5,
-							_origin: { href: "/test/api/parent/1/child/2/grand/5", method: "GET" },
-							_resource: "grandChild",
-							_action: "self",
-							_links: {
-								self: { href: "/test/api/parent/1/child/2/grand/5", method: "GET" },
-								create: { href: "/test/api/parent/1/child/2/grand", method: "POST" }
-							}
-						}
-					]
-				}
-			};
+			var expected = require( "./actionWithEmbeddedResources.js" );
 			var response;
 			var data = {
 				id: 2,
@@ -476,42 +417,7 @@ describe( "Action links", function() {
 	} );
 
 	describe( "when rendering a list of top-level resources", function() {
-		var parameters = {
-			size: { range: [ 1, 100 ] }
-		};
-		var expected = {
-			_origin: { href: "/parent", method: "GET" },
-			parents: [
-				{
-					id: 1,
-					title: "one",
-					children: [ {} ],
-					description: "the first item",
-					_origin: { href: "/parent/1", method: "GET" },
-					_resource: "parent",
-					_action: "self",
-					_links: {
-						self: { href: "/parent/1", method: "GET" },
-						list: { href: "/parent", method: "GET" },
-						children: { href: "/parent/1/child", method: "GET", parameters: parameters }
-					}
-				},
-				{
-					id: 2,
-					title: "two",
-					children: [ {} ],
-					description: "the second item",
-					_origin: { href: "/parent/2", method: "GET" },
-					_resource: "parent",
-					_action: "self",
-					_links: {
-						self: { href: "/parent/2", method: "GET" },
-						list: { href: "/parent", method: "GET" },
-						children: { href: "/parent/2/child", method: "GET", parameters: parameters }
-					}
-				}
-			]
-		};
+		var expected = require( "./topLevelResources.js" );
 		var response;
 		var data = [
 			{
@@ -547,35 +453,7 @@ describe( "Action links", function() {
 	} );
 
 	describe( "when rendering a list of resources from another resource", function() {
-		var expected = {
-			_origin: { href: "/parent/1/child", method: "GET" },
-			children: [
-				{
-					id: 1,
-					parentId: 1,
-					title: "one",
-					description: "the first item",
-					_resource: "child",
-					_action: "self",
-					_origin: { href: "/parent/1/child/1", method: "GET" },
-					_links: {
-						self: { href: "/parent/1/child/1", method: "GET" },
-					}
-				},
-				{
-					id: 2,
-					parentId: 1,
-					title: "two",
-					description: "the second item",
-					_resource: "child",
-					_action: "self",
-					_origin: { href: "/parent/1/child/2", method: "GET" },
-					_links: {
-						self: { href: "/parent/1/child/2", method: "GET" },
-					}
-				}
-			]
-		};
+		var expected = require( "./listFromOtherResource.js" );
 		var response;
 		var data = [
 			{

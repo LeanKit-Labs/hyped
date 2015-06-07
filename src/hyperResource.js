@@ -101,7 +101,7 @@ function getActionUrlCache( resources, prefix, version ) {
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
 			var actionSegment = resource.actions[ actionName ].url;
 			var resourceSegment = getResourcePrefix( actionSegment, resource, resourceName );
-			var actionUrl = [ resource.urlPrefix, resourceSegment, actionSegment ].join( "" );
+			var actionUrl = [ resource.urlPrefix, resourceSegment, actionSegment ].join( "" ).replace( "//", "/" );
 			var templated = isTemplated( actionUrl );
 			var getActionUrl = function() {
 				return actionUrl;
@@ -123,7 +123,7 @@ function getActionUrlCache( resources, prefix, version ) {
 				var href = [
 					getPrefix( parentUrl, data ),
 					getActionUrl( data )
-				].join( "" );
+				].join( "" ).replace( "//", "/" );
 				return href;
 			};
 
@@ -133,7 +133,7 @@ function getActionUrlCache( resources, prefix, version ) {
 					var href = [
 						getPrefix( parentUrl, data ),
 						linkFn( data, context )
-					].join( "" );
+					].join( "" ).replace( "//", "/" );
 					return href;
 				};
 			} );
@@ -249,7 +249,7 @@ function getLinkFn( link, resource, resourceName ) { // jshint ignore:line
 		return function( data, context ) {
 			var linkUrl = link( data, context );
 			if ( linkUrl ) {
-				linkUrl = [ resource.urlPrefix, linkUrl ].join( "" );
+				linkUrl = [ resource.urlPrefix, linkUrl ].join( "" ).replace( "//", "/" );
 				return isTemplated( linkUrl ) ?
 					url.create( linkUrl, data, resourceName ) :
 					linkUrl;
@@ -258,7 +258,7 @@ function getLinkFn( link, resource, resourceName ) { // jshint ignore:line
 			}
 		};
 	} else {
-		var halUrl = url.forHal( [ resource.urlPrefix, link ].join( "" ) );
+		var halUrl = url.forHal( [ resource.urlPrefix, link ].join( "" ).replace( "//", "/" ) );
 		var templated = isTemplated( halUrl );
 		if ( templated ) {
 			var tokens = url.getTokens( halUrl );
@@ -375,7 +375,7 @@ function getParentUrlCache( resources, version ) {
 		var meta = visitParent( k );
 		var segments = meta.segments;
 		var tokens = meta.tokens;
-		var joined = segments.join( "" );
+		var joined = segments.join( "" ).replace( "//", "/" );
 		acc[ k ] = {
 			url: joined,
 			tokens: tokens
@@ -393,7 +393,7 @@ function getParentUrlFn( resources, prefix, version ) { // jshint ignore:line
 		var tokens = _.clone( meta.tokens );
 		var parent = resources[ resourceName ].parent;
 		var resourceSegment = getResourcePrefix( meta.url, resources[ parent ], parent );
-		var parentUrl = [ prefix, resourceSegment, meta.url ].join( "" );
+		var parentUrl = [ prefix, resourceSegment, meta.url ].join( "" ).replace( "//", "/" );
 		var values = _.reduce( tokens, function( acc, token ) {
 			var val = url.readToken( resourceName, data, token );
 			acc[ token.property ] = acc[ token.camel ] = val;
