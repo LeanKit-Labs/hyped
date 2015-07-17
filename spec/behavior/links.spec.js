@@ -3,10 +3,8 @@ var model = require( "../model.js" );
 var HyperResource = require( "../../src/hyperResource.js" );
 
 var board1 = model.board1;
-var limit = 5;
 
 describe( "with static links", function() {
-	var elapsedMs;
 	var resource = {
 		name: "board",
 		actions: {
@@ -61,11 +59,9 @@ describe( "with static links", function() {
 	};
 
 	before( function() {
-		var start = Date.now();
 		var fn = HyperResource.renderFn( { board: resource } );
 		self1 = fn( "board", "self", board1, "", { page: 1, size: 10 } );
 		self2 = fn( "board", "self", board1, "", { page: 2, size: 10 } );
-		elapsedMs = Date.now() - start;
 	} );
 
 	it( "should generate links correctly", function() {
@@ -73,13 +69,9 @@ describe( "with static links", function() {
 		self2.should.eql( expectedSelf2 );
 	} );
 
-	it( "should be 'quick'", function() {
-		elapsedMs.should.be.below( limit );
-	} );
 } );
 
 describe( "with resource prefix", function() {
-	var elapsedMs;
 	var resource = {
 		name: "board",
 		urlPrefix: "/prefix",
@@ -135,11 +127,9 @@ describe( "with resource prefix", function() {
 	};
 
 	before( function() {
-		var start = Date.now();
 		var fn = HyperResource.renderFn( { board: resource } );
 		self1 = fn( "board", "self", board1, "", { page: 1, size: 10 } );
 		self2 = fn( "board", "self", board1, "", { page: 2, size: 10 } );
-		elapsedMs = Date.now() - start;
 	} );
 
 	it( "should generate links correctly", function() {
@@ -147,7 +137,4 @@ describe( "with resource prefix", function() {
 		self2.should.eql( expectedSelf2 );
 	} );
 
-	it( "should be 'quick'", function() {
-		elapsedMs.should.be.below( limit );
-	} );
 } );
