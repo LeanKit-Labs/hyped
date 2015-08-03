@@ -1,6 +1,6 @@
 {
   "name": "hyped",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Hypermedia response generation engine",
   "main": "src/index.js",
   "dependencies": {
@@ -12,8 +12,8 @@
     "when": "^3.x"
   },
   "devDependencies": {
-    "autohost": "git://github.com/arobson/autohost.git#next",
-    "biggulp": "0.*.*",
+    "autohost": "0.4.x",
+    "biggulp": "0.2.x",
     "chai": "^2.2.0",
     "chai-as-promised": "^5.0.0",
     "gulp": "^3.8.11",
@@ -33,8 +33,17 @@
     "autohost",
     "express"
   ],
-  "author": "Alex Robson",
-  "license": "MIT License - http://opensource.org/licenses/MIT",
+  "author": "LeanKit",
+  "contributors": [
+    {
+      "name": "Alex Robson",
+      "url": "http://nerdventure.io"
+    }
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/LeanKit-Labs/hyped/issues"
   },

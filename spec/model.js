@@ -27,12 +27,6 @@ var board2 = {
 	lanes: []
 };
 
-function compare( a, b ) {
-	var diff = [];
-	deepCompare( a, b, undefined, diff );
-	diff.should.eql( [] );
-}
-
 function deepCompare( a, b, k, l ) {
 	l = l || [];
 	if ( b === undefined ) {
@@ -42,12 +36,18 @@ function deepCompare( a, b, k, l ) {
 			deepCompare( a[ k ], b[ k ], k, l );
 		} );
 	} else {
-		result = a == b; // jshint ignore:line
+		var result = a == b; // jshint ignore:line
 		if ( !result ) {
 			l.push( k + ": " + a + "!==" + b );
 		}
 	}
 	return l;
+}
+
+function compare( a, b ) {
+	var diff = [];
+	deepCompare( a, b, undefined, diff );
+	diff.should.eql( [] );
 }
 
 module.exports = {

@@ -393,11 +393,26 @@ If you are using this library with Autohost, the only API you really need to kno
 
 ## Setup API
 
-### require( "hyped" )( [resourceList], [defaultToNewest], [includeChildrenInOptions] )
-You can skip passing resource list at all and provide the two booleans in the order specified.
+### require( "hyped" )( [resourceList], [config] )
+You can skip passing resource list at all and provide the optional configuration to change default behavior.
 
-__defaultToNewest__: causes hyped to default to the newest available version when one isn't specified
-__includeChildrenInOptions__: include child resource actions in the OPTIONS response
+The configuration hash can have the following properties:
+
+ * __defaultContentType__: which rendering engine to use if the client passes "*/*" in the accept header
+ * __defaultToNewest__: causes hyped to default to the newest available version when one isn't specified
+ * __includeChildrenInOptions__: include child resource actions in the OPTIONS response
+
+Here's an example of the config block with defaults shown:
+
+```json
+{
+	"defaultContentType": "application/json",
+	"defaultToNewest": false,
+	"includeChildrenInOptions": false
+}
+```
+
+> Note: the defaults in place were selected so that consumers unaware of hypermedia or your APIs versioning strategy can use your API like any other HTTP API they have likely encountered.
 
 ### addResource( resource, resourceName )
 Adds the metadata for a particular resource.

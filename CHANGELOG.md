@@ -1,5 +1,13 @@
 ## 0.2.x
 
+### 0.2.3
+
+> Note: API change is non-breaking as original call format still works - older version is no longer documented in README.
+
+ * Bug fix - hyped should include route level url and api prefix settings
+ * Improvement - allow specification of default content-type if accept header is "*/*"
+ * Changed content-type for errors to "text/plain"
+
 ### 0.2.2
  * Improvement - support empty or undefined apiPrefix
  * Bug fix - on apiPrefix of '/', '', or undefined, do not produce routes with empty segments

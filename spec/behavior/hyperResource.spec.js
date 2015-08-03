@@ -7,7 +7,6 @@ var limit = 15;
 var resources = require( "./resources.js" );
 
 describe( "Action links", function() {
-
 	describe( "With an inheritence hierarchy greater than 2", function() {
 		describe( "when creating parentUrls", function() {
 			var parent, child, grandChild, urlCache;
@@ -18,8 +17,8 @@ describe( "Action links", function() {
 					childId: 2,
 					id: 3
 				};
-				var fn = HyperResource.parentFn( resources );
-				urlCache = HyperResource.urlCache( resources );
+				var fn = HyperResource.parentFn( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
+				urlCache = HyperResource.urlCache( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
 				parent = fn( "parent", model );
 				child = fn( "child", model );
 				grandChild = fn( "grandChild", model );
@@ -98,7 +97,7 @@ describe( "Action links", function() {
 					childId: 2,
 					id: 3
 				};
-				var fn = HyperResource.urlFn( resources, "/test/api" );
+				var fn = HyperResource.urlFn( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
 				parent = fn( "parent", "self", { id: 1 } );
 				children = fn( "parent", "children", { id: 1 } );
 				next = fn( "parent", "next-child-page", { id: 1 }, undefined, { page: 1, size: 5 } );
@@ -129,7 +128,6 @@ describe( "Action links", function() {
 	} );
 
 	describe( "When getting versions", function() {
-
 		var parentVersions, childVersions;
 
 		before( function() {
@@ -151,8 +149,7 @@ describe( "Action links", function() {
 	} );
 
 	describe( "When rendering links from different actions", function() {
-
-		describe( "when rendering an 'plain' action", function() {
+		describe( "when rendering an \"plain\" action", function() {
 			var expected = { self: { href: "/parent/1", method: "GET" } };
 			var links;
 
@@ -235,7 +232,7 @@ describe( "Action links", function() {
 			};
 			var expected = {
 				children: { href: "/parent/1/child", method: "GET", parameters: parameters },
-				"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters },
+				"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters }
 			};
 			var links;
 
@@ -268,7 +265,7 @@ describe( "Action links", function() {
 					self: { href: "/parent/1", method: "GET" },
 					list: { href: "/parent", method: "GET" },
 					children: { href: "/parent/1/child", method: "GET", parameters: parameters },
-					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters },
+					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters }
 				}
 			};
 			var response;
@@ -310,7 +307,7 @@ describe( "Action links", function() {
 					self: { href: "/parent/1", method: "GET" },
 					list: { href: "/parent", method: "GET" },
 					children: { href: "/parent/1/child", method: "GET", parameters: parameters },
-					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters },
+					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters }
 				}
 			};
 			var response;
@@ -347,7 +344,7 @@ describe( "Action links", function() {
 			var elapsed;
 
 			before( function() {
-				var fn1 = HyperResource.resourceFn( resources, "/test/api" );
+				var fn1 = HyperResource.resourceFn( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
 
 				var start = Date.now();
 				response = fn1( "child", "self", data );
@@ -358,7 +355,7 @@ describe( "Action links", function() {
 				response.should.eql( expected );
 			} );
 
-			it( "new should be 'quick'", function() {
+			it( "new should be \"quick\"", function() {
 				elapsed.should.be.below( limit );
 			} );
 		} );
@@ -447,7 +444,7 @@ describe( "Action links", function() {
 			response.should.eql( expected );
 		} );
 
-		it( "new should be 'quick'", function() {
+		it( "new should be \"quick\"", function() {
 			elapsed.should.be.below( limit );
 		} );
 	} );
@@ -482,7 +479,7 @@ describe( "Action links", function() {
 			response.should.eql( expected );
 		} );
 
-		it( "new should be 'quick'", function() {
+		it( "new should be \"quick\"", function() {
 			elapsed.should.be.below( limit );
 		} );
 	} );
@@ -497,8 +494,7 @@ describe( "Action links", function() {
 				var start = Date.now();
 				var tokens = url.getTokens( testUrl );
 				var halUrl = url.forHal( testUrl );
-				for (var i = 0; i < 1000; i++) {
-
+				for ( var i = 0; i < 1000; i++ ) {
 					urls.push( url.process( _.clone( tokens ), halUrl, { id: 1, childId: 2 }, "parent" ) );
 				}
 				elapsed = Date.now() - start;
@@ -508,7 +504,7 @@ describe( "Action links", function() {
 				urls[ 1 ].should.equal( "/parent/1/child/2" );
 			} );
 
-			it( "should be 'quick'", function() {
+			it( "should be \"quick\"", function() {
 				elapsed.should.be.below( 40 );
 			} );
 		} );

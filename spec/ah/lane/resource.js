@@ -1,5 +1,4 @@
 var model = require( "../../model.js" );
-var _ = require( "lodash" );
 
 module.exports = function( host ) {
 	return {
