@@ -46,7 +46,6 @@ describe( "when replacing a token with a model property", function() {
 	} );
 } );
 
-
 describe( "when a token has no corresponding model property", function() {
 	var template = "/this/is/{derp}/of.stuff";
 	var model = { test: "atest" };

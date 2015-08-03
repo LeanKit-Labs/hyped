@@ -5,7 +5,6 @@ var autohost = require( "autohost" );
 var board1 = model.board1;
 
 describe( "Autohost Integration", function() {
-
 	describe( "with oldest version as default", function() {
 		var hyped, host;
 		before( function( done ) {
@@ -19,28 +18,25 @@ describe( "Autohost Integration", function() {
 				} );
 		} );
 
-		describe( "when requesting board with no media type", function() {
-
+		describe( "when requesting board with any media type", function() {
 			var body, contentType;
 
 			before( function( done ) {
-				request( "http://localhost:8800/test/api/board/100", function( err, res ) {
+				request( "http://localhost:8800/test/api/board/100", { headers: { accept: "*/*" } }, function( err, res ) {
 					body = JSON.parse( res.body );
 					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
 					done();
 				} );
 			} );
 
-			it( "should get JSON version 1", function() {
+			it( "should get JSON version 1 (default content type and version)", function() {
 				contentType.should.equal( "application/json" );
-				body.should.eql( { "id": 100, "title": "Test Board", "lanes": [ { "id": 200, "title": "To Do", "wip": 0, "cards": [ { "id": 301, "title": "Card 1", "description": "This is card 1" }, { "id": 302, "title": "Card 2", "description": "This is card 2" }, { "id": 303, "title": "Card 3", "description": "This is card 3" } ] }, { "id": 201, "title": "Doing", "wip": 0, "cards": [ { "id": 304, "title": "Card 4", "description": "This is card 4" } ] }, { "id": 202, "title": "Done", "wip": 0, "cards": [ { "id": 305, "title": "Card 5", "description": "This is card 5" }, { "id": 306, "title": "Card 6", "description": "This is card 6" } ] } ] } );
+				body.should.eql( { id: 100, title: "Test Board", lanes: [ { id: 200, title: "To Do", wip: 0, cards: [ { id: 301, title: "Card 1", description: "This is card 1" }, { id: 302, title: "Card 2", description: "This is card 2" }, { id: 303, title: "Card 3", description: "This is card 3" } ] }, { id: 201, title: "Doing", wip: 0, cards: [ { id: 304, title: "Card 4", description: "This is card 4" } ] }, { id: 202, title: "Done", wip: 0, cards: [ { id: 305, title: "Card 5", description: "This is card 5" }, { id: 306, title: "Card 6", description: "This is card 6" } ] } ] } );
 			} );
 		} );
 
 		describe( "when requesting board hal version 2", function() {
-
 			var body, contentType, elapsedMs;
-
 			var expectedJson = require( "./halBoard2.json" );
 
 			before( function( done ) {
@@ -81,9 +77,7 @@ describe( "Autohost Integration", function() {
 		} );
 
 		describe( "when requesting board hal with no version specifier", function() {
-
 			var body, contentType, elapsedMs;
-
 			var expectedJson = require( "./halBoard.json" );
 
 			before( function( done ) {
@@ -119,7 +113,7 @@ describe( "Autohost Integration", function() {
 
 			it( "should get 415", function() {
 				status.should.equal( 415 );
-				contentType.should.equal( "text/html" );
+				contentType.should.equal( "text/plain" );
 				body.should.equal( "The requested media type 'application/vnd.baconated+json' is not supported. Please see the OPTIONS at the api root to get a list of supported types." );
 			} );
 		} );
@@ -175,9 +169,7 @@ describe( "Autohost Integration", function() {
 		} );
 
 		describe( "when rendering related list of resources as hal", function() {
-
 			var body, contentType, elapsedMs;
-
 			var expected = require( "./halCards.json" );
 
 			before( function( done ) {
@@ -199,7 +191,6 @@ describe( "Autohost Integration", function() {
 
 		describe( "when hitting root with options verb", function() {
 			var body, contentType, elapsedMs;
-
 			var expectedOptions = require( "./halOptions.json" );
 
 			before( function( done ) {
@@ -253,7 +244,65 @@ describe( "Autohost Integration", function() {
 				contentType.should.equal( "application/json" );
 				body.should.eql( expected );
 			} );
+		} );
 
+		after( function() {
+			host.stop();
+		} );
+	} );
+
+	describe( "with hal as default content type", function() {
+		var hyped, host;
+		before( function( done ) {
+			hyped = require( "../../src/index.js" )( {
+				defaultContentType: "application/hal+json"
+			} );
+			host = hyped.createHost( autohost, {
+				urlPrefix: "/test",
+				resources: "./spec/ah"
+			}, function() {
+					host.start();
+					done();
+				} );
+		} );
+
+		describe( "when requesting board with any media type", function() {
+			var body, contentType;
+			var expectedJson = require( "./halBoard.json" );
+
+			before( function( done ) {
+				request( "http://localhost:8800/test/api/board/100", { headers: { accept: "*/*" } }, function( err, res ) {
+					body = JSON.parse( res.body );
+					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+					done();
+				} );
+			} );
+
+			it( "should get HAL version 1 (default content type and version)", function() {
+				contentType.should.equal( "application/hal+json" );
+				body.should.eql( expectedJson );
+			} );
+		} );
+
+		describe( "when requesting an unsupported media type", function() {
+			var body, contentType, elapsedMs, status;
+
+			before( function( done ) {
+				var start = Date.now();
+				elapsedMs = ( Date.now() - start );
+				request.get( "http://localhost:8800/test/api/board/100", { headers: { accept: "application/vnd.baconated+json" } }, function( err, res ) {
+					body = res.body;
+					status = res.statusCode;
+					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+					done();
+				} );
+			} );
+
+			it( "should get 415", function() {
+				status.should.equal( 415 );
+				contentType.should.equal( "text/plain" );
+				body.should.equal( "The requested media type 'application/vnd.baconated+json' is not supported. Please see the OPTIONS at the api root to get a list of supported types." );
+			} );
 		} );
 
 		after( function() {
@@ -290,7 +339,6 @@ describe( "Autohost Integration", function() {
 				contentType.should.equal( "application/json" );
 				body.should.eql( expected );
 			} );
-
 		} );
 
 		describe( "when hitting root with options verb", function() {
@@ -350,7 +398,6 @@ describe( "Autohost Integration", function() {
 				contentType.should.equal( "application/json" );
 				body.should.eql( expected );
 			} );
-
 		} );
 
 		describe( "when hitting root with options verb", function() {
@@ -380,5 +427,4 @@ describe( "Autohost Integration", function() {
 			host.stop();
 		} );
 	} );
-
 } );

@@ -90,7 +90,7 @@ HyperResponse.prototype.getResponse = function() {
 		return {
 			status: 415,
 			headers: {
-				"Content-Type": "text/html"
+				"Content-Type": "text/plain"
 			},
 			data: "The requested media type '" + this._contentType + "' is not supported. Please see the OPTIONS at the api root to get a list of supported types."
 		};

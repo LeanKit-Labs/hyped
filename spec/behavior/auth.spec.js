@@ -18,7 +18,7 @@ describe( "when filtering links by permission", function() {
 				url: "/board/:id?embed=lanes,cards,classOfService",
 				include: [ "id", "title", "description" ],
 				links: {
-					"shouldGetOmitted": "/board/:id?WAT"
+					shouldGetOmitted: "/board/:id?WAT"
 				}
 			}
 		}

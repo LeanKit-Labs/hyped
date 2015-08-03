@@ -58,6 +58,34 @@ function getMap( map, unit ) {
 	} : unit;
 }
 
+function getPrefix( resources, prefix, resource ) {
+	var urlPrefix = prefix ? prefix.urlPrefix : "";
+	var apiPrefix = prefix ? prefix.apiPrefix : "";
+	var parentPrefix = {};
+
+	if ( resource.parent ) {
+		var parentResource = resources[ resource.parent ];
+		parentPrefix = getPrefix( resources, prefix, parentResource );
+	}
+
+	if ( resource.urlPrefix === undefined ) {
+		urlPrefix = parentPrefix.urlPrefix === undefined ? urlPrefix : parentPrefix.urlPrefix;
+	} else {
+		urlPrefix = resource.urlPrefix;
+	}
+
+	if ( resource.apiPrefix === undefined ) {
+		apiPrefix = parentPrefix.apiPrefix === undefined ? apiPrefix : parentPrefix.apiPrefix;
+	} else {
+		apiPrefix = resource.apiPrefix;
+	}
+
+	return {
+		urlPrefix: urlPrefix,
+		apiPrefix: apiPrefix
+	};
+}
+
 function buildParametersFn( action ) {
 	// get static parameters
 	var parameters = _.reduce(
@@ -94,14 +122,15 @@ function isTemplated( url ) { // jshint ignore:line
 
 function getActionUrlCache( resources, prefix, version ) {
 	var cache = {};
-	var parentUrlFn = getParentUrlFn( resources, prefix, version );
+	var parentUrlFn = getParentUrlFn( resources, version );
+	var prefixFn = getPrefix.bind( undefined, resources, prefix );
 
 	_.reduce( resources, function( rAcc, resource, resourceName ) {
 		resource = getVersion( resource, version );
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
 			var actionSegment = resource.actions[ actionName ].url;
 			var resourceSegment = getResourcePrefix( actionSegment, resource, resourceName );
-			var actionUrl = [ resource.urlPrefix, resourceSegment, actionSegment ].join( "" ).replace( "//", "/" );
+			var actionUrl = [ resourceSegment, actionSegment ].join( "" ).replace( "//", "/" );
 			var templated = isTemplated( actionUrl );
 			var getActionUrl = function() {
 				return actionUrl;
@@ -115,13 +144,17 @@ function getActionUrlCache( resources, prefix, version ) {
 				};
 			}
 
-			function getPrefix( parentUrl, data ) {
-				return ( parentUrl || parentUrlFn( resourceName, data ) ) || prefix;
+			function getParentUrl( parentUrl, data ) {
+				return ( parentUrl || parentUrlFn( resourceName, data ) ) || "";
 			}
+
+			var resourcePrefix = prefixFn( resource );
 
 			acc[ actionName ] = function( data, parentUrl ) {
 				var href = [
-					getPrefix( parentUrl, data ),
+					resourcePrefix.urlPrefix,
+					resourcePrefix.apiPrefix,
+					getParentUrl( parentUrl, data ),
 					getActionUrl( data )
 				].join( "" ).replace( "//", "/" );
 				return href;
@@ -130,11 +163,18 @@ function getActionUrlCache( resources, prefix, version ) {
 			_.each( action.links, function( link, linkName ) {
 				var linkFn = getLinkFn( link, resource, resourceName );
 				acc[ linkName ] = function( data, parentUrl, context ) {
-					var href = [
-						getPrefix( parentUrl, data ),
-						linkFn( data, context )
-					].join( "" ).replace( "//", "/" );
-					return href;
+					var linkUrl = linkFn( data, context );
+					if ( linkUrl ) {
+						var href = [
+							resourcePrefix.urlPrefix,
+							resourcePrefix.apiPrefix,
+							getParentUrl( parentUrl, data ),
+							linkFn( data, context )
+						].join( "" ).replace( "//", "/" );
+						return href;
+					} else {
+						return "";
+					}
 				};
 			} );
 
@@ -249,7 +289,7 @@ function getLinkFn( link, resource, resourceName ) { // jshint ignore:line
 		return function( data, context ) {
 			var linkUrl = link( data, context );
 			if ( linkUrl ) {
-				linkUrl = [ resource.urlPrefix, linkUrl ].join( "" ).replace( "//", "/" );
+				linkUrl = linkUrl.replace( "//", "/" );
 				return isTemplated( linkUrl ) ?
 					url.create( linkUrl, data, resourceName ) :
 					linkUrl;
@@ -258,7 +298,7 @@ function getLinkFn( link, resource, resourceName ) { // jshint ignore:line
 			}
 		};
 	} else {
-		var halUrl = url.forHal( [ resource.urlPrefix, link ].join( "" ).replace( "//", "/" ) );
+		var halUrl = url.forHal( link.replace( "//", "/" ) );
 		var templated = isTemplated( halUrl );
 		if ( templated ) {
 			var tokens = url.getTokens( halUrl );
@@ -312,7 +352,7 @@ function getOriginCache( resources, prefix, version ) {
 		resource = getVersion( resource, version );
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
 			var method = action.method.toUpperCase();
-			acc[ actionName ] = function( data, parentUrl, context, auth ) {
+			acc[ actionName ] = function( data, parentUrl, context /*, auth */ ) {
 				var actionUrl = urlFn( resourceName, actionName, data, parentUrl, context );
 				return { href: actionUrl, method: method };
 			};
@@ -349,8 +389,8 @@ function getParentUrlCache( resources, version ) {
 
 	function visitParent( name ) {
 		var parentName = resources[ name ].parent;
-		var tokens = [],
-			segments = [];
+		var tokens = [];
+		var segments = [];
 		if ( parentName ) {
 			var parent = resources[ parentName ];
 			var parentUrl = url.forHal( parent.actions.self.url );
@@ -386,14 +426,14 @@ function getParentUrlCache( resources, version ) {
 	return cache;
 }
 
-function getParentUrlFn( resources, prefix, version ) { // jshint ignore:line
+function getParentUrlFn( resources, version ) { // jshint ignore:line
 	var cache = getParentUrlCache( resources );
 	return function( resourceName, data ) {
 		var meta = cache[ resourceName ];
 		var tokens = _.clone( meta.tokens );
 		var parent = resources[ resourceName ].parent;
 		var resourceSegment = getResourcePrefix( meta.url, resources[ parent ], parent );
-		var parentUrl = [ prefix, resourceSegment, meta.url ].join( "" ).replace( "//", "/" );
+		var parentUrl = [ resourceSegment, meta.url ].join( "" ).replace( "//", "/" );
 		var values = _.reduce( tokens, function( acc, token ) {
 			var val = url.readToken( resourceName, data, token );
 			acc[ token.property ] = acc[ token.camel ] = val;
@@ -420,9 +460,15 @@ function getResourceCache( resources, prefix, version ) {
 	var cache = {};
 	var renderFn = getBodyFn( resources, prefix, version );
 	var linkFn = getLinksFn( resources, prefix, version );
+	var prefixFn = getPrefix.bind( undefined, resources, prefix );
 
 	_.reduce( resources, function( rAcc, resource, resourceName ) {
 		resource = getVersion( resource, version );
+		var prefixes = prefixFn( resource );
+		var urlPrefix = [
+				prefixes.urlPrefix,
+				prefixes.apiPrefix
+			].join( "" ).replace( "//", "/" );
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
 			acc[ actionName ] = function( data, parentUrl, context, originUrl, originMethod, auth ) {
 				var body = renderFn( resourceName, actionName, data );
@@ -442,6 +488,7 @@ function getResourceCache( resources, prefix, version ) {
 					var childVal = data[ childName ];
 					var embed;
 					var inheritedUrl = resources[ child.resource ].parent ? body._links.self.href : "";
+					inheritedUrl = inheritedUrl.replace( urlPrefix, "" );
 					if ( _.isArray( childVal ) ) {
 						embed = _.map( childVal, function( x ) {
 							var item = childFn( x, inheritedUrl, context );
@@ -485,7 +532,7 @@ function getResourcesFn( resources, prefix, version ) { // jshint ignore:line
 	var resourceCache = getResourceCache( resources, prefix, version );
 	var originFn = getOriginFn( resources, prefix, version );
 
-	return function( resourceName, actionName, data, parentUrl, context, originUrl, originMethod, auth ) {
+	return function( resourceName, actionName, data, parentUrl, context, originUrl, originMethod /*, auth */ ) {
 		var body = {};
 		var resource = getVersion( resources[ resourceName ], version );
 		var render = resource.actions[ actionName ].render;
@@ -515,7 +562,6 @@ function getResourcePrefix( url, resource, resourceName ) {
 		return regex.test( url ) ? "" : "/" + resourceName;
 	}
 }
-
 
 function getVersion( resource, version ) { // jshint ignore:line
 	if ( version === undefined ) {
@@ -559,7 +605,9 @@ function shouldRenderFn( action, actionName, resourceName, forOptions ) { // jsh
 	}
 	var authName = [ resourceName, actionName ].join( ":" );
 	return function( data, context, auth ) {
-		return ( canRender( data, context ) && auth( authName, data, context ) );
+		var can = canRender( data, context );
+		var should = auth( authName, data, context );
+		return ( can && should );
 	};
 }
 
