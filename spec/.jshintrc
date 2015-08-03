@@ -24,7 +24,7 @@
 	"quotmark"  : true,   //enforces the consistency of quotation marks used throughout your code
 	"regexp"    : false,  //prohibits the use of unsafe `.` in regular expressions
 	"undef"     : true,   //prohibits the use of explicitly undeclared variables
-	"unused"    : true,   //warns when you define and never use your variables
+	"unused"    : false,   //warns when you define and never use your variables
 	"strict"    : false,  //requires all functions to run in EcmaScript 5's strict mode
 	"trailing"  : false,  //makes it an error to leave a trailing whitespace in your code
 	// "maxparams":      0,      //set the max number of formal parameters allowed per function,
@@ -44,14 +44,14 @@
 	"es5"          : false,  //your code uses ECMAScript 5 specific features such as getters and setters
 	"esnext"       : false,  //your code uses ES.next specific features such as const
 	"evil"         : false,  //suppresses warnings about the use of eval
-	"expr"         : false,  //suppresses warnings about the use of expressions where normally you would expect to see assignments or function calls
+	"expr"         : true,  //suppresses warnings about the use of expressions where normally you would expect to see assignments or function calls
 	"funcscope"    : false,  //suppresses warnings about declaring variables inside of control structures while accessing them later from the outside
 	"globalstrict" : false,  //suppresses warnings about the use of global strict mode
 	"iterator"     : false,  //suppresses warnings about the `__iterator__` property
 	"lastsemic"    : false,  //suppresses warnings about missing semicolons, but only when the semicolon is omitted for the last statement in a one-line block
 	"laxbreak"     : true,  //suppresses most of the warnings about possibly unsafe line breakings in your code
 	"laxcomma"     : false,  //suppresses warnings about comma-first coding style
-	"loopfunc"     : false,  //suppresses warnings about functions inside of loops
+	"loopfunc"     : true,  //suppresses warnings about functions inside of loops
 	"multistr"     : false,  //suppresses warnings about multi-line strings
 	"onecase"      : false,  //suppresses warnings about switches with just one case
 	"proto"        : false,  //suppresses warnings about the `__proto__` property
@@ -91,7 +91,20 @@
 		"after",
 		"afterEach",
 		"it",
-		"require"
+		"require",
+		"expect",
+		"should",
+		"_",
+		"when",
+		"seq",
+		"fs",
+		"harness",
+		"sinon",
+		"proxyquire",
+		"transformResponse",
+		"onError",
+		"setupLog",
+		"logAdapter"
 	],
 
 	// LEGACY

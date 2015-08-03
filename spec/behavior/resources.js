@@ -1,5 +1,5 @@
 var resources = {
-	"parent": {
+	parent: {
 		actions: {
 			self: {
 				method: "get",
@@ -19,22 +19,19 @@ var resources = {
 				links: {
 					"next-child-page": function( data, context ) {
 						if ( context && context.page ) {
-							return "/parent/:id/child?page=" +
-									( context.page + 1 ) +
-								"&size=" +
-									( context.size );
+							return "/parent/:id/child?page=" + ( context.page + 1 ) + "&size=" + ( context.size );
 						}
 					}
 				},
 				parameters: {
-					"page": function( data, context ) {
+					page: function( data, context ) {
 						var limit = 1;
 						if ( data && data.children && context ) {
 							limit = data.children.length / context.size;
 							return { range: [ 1, limit ] };
 						}
 					},
-					"size": { range: [ 1, 100 ] }
+					size: { range: [ 1, 100 ] }
 				}
 			}
 		},
@@ -46,14 +43,14 @@ var resources = {
 			}
 		}
 	},
-	"child": {
+	child: {
 		parent: "parent",
 		actions: {
 			self: {
 				method: "get",
 				url: "/child/:child.id",
 				embed: {
-					"grandChildren": {
+					grandChildren: {
 						resource: "grandChild",
 						render: "self",
 						actions: [ "self", "create" ]
@@ -62,7 +59,7 @@ var resources = {
 			}
 		}
 	},
-	"grandChild": {
+	grandChild: {
 		parent: "child",
 		resourcePrefix: false,
 		actions: {

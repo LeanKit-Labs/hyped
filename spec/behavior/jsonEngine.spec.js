@@ -30,7 +30,7 @@ describe( "when rendering json", function() {
 								_links: {
 									self: { href: "/card/301", method: "GET" },
 									move: { href: "/card/301/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
-									block: { href: "/card/301/block", method: "PUT" },
+									block: { href: "/card/301/block", method: "PUT" }
 								}
 							},
 							{ id: 302, title: "Card 2", description: "This is card 2",
@@ -38,7 +38,7 @@ describe( "when rendering json", function() {
 								_links: {
 									self: { href: "/card/302", method: "GET" },
 									move: { href: "/card/302/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
-									block: { href: "/card/302/block", method: "PUT" },
+									block: { href: "/card/302/block", method: "PUT" }
 								}
 							},
 							{ id: 303, title: "Card 3", description: "This is card 3",
@@ -46,7 +46,7 @@ describe( "when rendering json", function() {
 								_links: {
 									self: { href: "/card/303", method: "GET" },
 									move: { href: "/card/303/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
-									block: { href: "/card/303/block", method: "PUT" },
+									block: { href: "/card/303/block", method: "PUT" }
 								}
 							}
 						]
@@ -66,7 +66,7 @@ describe( "when rendering json", function() {
 								_links: {
 									self: { href: "/card/304", method: "GET" },
 									move: { href: "/card/304/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
-									block: { href: "/card/304/block", method: "PUT" },
+									block: { href: "/card/304/block", method: "PUT" }
 								}
 							}
 						]
@@ -86,7 +86,7 @@ describe( "when rendering json", function() {
 								_links: {
 									self: { href: "/card/305", method: "GET" },
 									move: { href: "/card/305/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
-									block: { href: "/card/305/block", method: "PUT" },
+									block: { href: "/card/305/block", method: "PUT" }
 								}
 							},
 							{ id: 306, title: "Card 6", description: "This is card 6",
@@ -94,7 +94,7 @@ describe( "when rendering json", function() {
 								_links: {
 									self: { href: "/card/306", method: "GET" },
 									move: { href: "/card/306/board/{boardId}/lane/{laneId}", method: "PUT", templated: true },
-									block: { href: "/card/306/block", method: "PUT" },
+									block: { href: "/card/306/block", method: "PUT" }
 								}
 							}
 						]

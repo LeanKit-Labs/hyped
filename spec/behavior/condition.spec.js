@@ -95,7 +95,7 @@ describe( "when filtering links by predicate", function() {
 		noMoney.should.eql( expected3 );
 	} );
 
-	it( "should be 'quick'", function() {
+	it( "should be \"quick\"", function() {
 		elapsed1.should.be.below( limit );
 		elapsed2.should.be.below( limit );
 		elapsed3.should.be.below( limit );

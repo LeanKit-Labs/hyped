@@ -30,7 +30,7 @@ function createUrl( url, data, resource ) {
 function expressStylePathVarialbes( url ) {
 	var match;
 	var expressUrl = url;
-	while (( match = braceFind.exec( url ) )) {
+	while ( ( match = braceFind.exec( url ) ) ) {
 		expressUrl = expressUrl.replace( match[ 0 ], ":" + match[ 1 ] );
 	}
 	return expressUrl;
@@ -39,7 +39,7 @@ function expressStylePathVarialbes( url ) {
 function halStylePathVariables( url ) { // jshint ignore:line
 	var match;
 	var expressUrl = url;
-	while (( match = expressFind.exec( url ) )) {
+	while ( ( match = expressFind.exec( url ) ) ) {
 		expressUrl = expressUrl.replace( match[ 0 ], "{" + match[ 1 ] + "}" );
 	}
 	return expressUrl;
@@ -49,7 +49,7 @@ function getTokens( url ) { // jshint ignore:line
 	var tokens = [];
 	var match, tokenName;
 	var pattern = isExpressStyle( url ) ? expressFind : braceFind;
-	while (( match = pattern.exec( url ) )) {
+	while ( ( match = pattern.exec( url ) ) ) {
 		tokenName = match[ 1 ];
 		tokens.push( parseToken( tokenName ) );
 	}
@@ -82,9 +82,9 @@ function readDataByToken( resource, data, token ) {
 	var value;
 	var camel = camelCase( token );
 	if ( data ) {
-		value = data[ camel ]
-		|| ( data[ token.resource ] ? data[ token.resource ][ token.property ] : undefined )
-		|| ( resource === token.resource ? data[ token.property ] : undefined );
+		value = data[ camel ] ||
+		( data[ token.resource ] ? data[ token.resource ][ token.property ] : undefined ) ||
+		( resource === token.resource ? data[ token.property ] : undefined );
 	}
 	var empty = value === undefined || value === {};
 	var backup = !token.isChild && token.resource && token.resource === resource ? token.property : camel;

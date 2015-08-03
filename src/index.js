@@ -17,19 +17,26 @@ function addEngine( state, engine, mediaType ) { // jshint ignore:line
 
 function addMiddleware( state, host, apiPrefix ) { // jshint ignore:line
 	if ( host.use ) {
-		state.prefix = apiPrefix;
-		host.use( state.apiPrefix, state.optionsMiddleware );
-		host.use( state.apiPrefix, state.hyperMiddleware );
+		state.prefix = { urlPrefix: "", apiPrefix: apiPrefix };
+		host.use( apiPrefix, state.optionsMiddleware );
+		host.use( apiPrefix, state.hyperMiddleware );
 	} else {
 		var urlPrefix = host.config.urlPrefix;
-		if( _.has( host.config, "apiPrefix" ) ) {
+		if ( _.has( host.config, "apiPrefix" ) ) {
 			apiPrefix = host.config.apiPrefix === undefined ? "/" : host.config.apiPrefix;
 		} else {
 			apiPrefix = "/api";
 		}
-		state.prefix = [ urlPrefix, apiPrefix ].join( "" ).replace( "//", "/" );
-		host.http.middleware( state.prefix, state.optionsMiddleware, "options" );
-		host.http.middleware( state.prefix, state.hyperMiddleware, "hyped" );
+		state.prefix = {
+			urlPrefix: urlPrefix,
+			apiPrefix: apiPrefix
+		};
+		var prefixUrl = [
+			urlPrefix,
+			apiPrefix
+		].join( "" ).replace( "//", "/" );
+		host.http.middleware( prefixUrl, state.optionsMiddleware, "options" );
+		host.http.middleware( prefixUrl, state.hyperMiddleware, "hyped" );
 	}
 }
 
@@ -137,6 +144,9 @@ function hyperMiddleware( state, req, res, next ) { // jshint ignore:line
 		req.extendHttp = {};
 	}
 	var contentType = getContentType( req );
+	if ( contentType === "*/*" || contentType === undefined ) {
+		contentType = state.defaultContentType;
+	}
 	var engine = getEngine( state, contentType );
 	var hyperModel = getHyperModel( state, req );
 	var response = new HyperResponse( req, res, engine, hyperModel, contentType ).origin( req.originalUrl, req.method ); // jshint ignore:line
@@ -182,7 +192,8 @@ module.exports = function( resourceList, defaultToNewest, includeChildrenInOptio
 		prefix: undefined,
 		maxVersion: undefined,
 		preferLatest: false,
-		excludeChildren: undefined
+		excludeChildren: undefined,
+		defaultContentType: "application/json"
 	};
 
 	_.merge( state, {
@@ -198,17 +209,31 @@ module.exports = function( resourceList, defaultToNewest, includeChildrenInOptio
 		registerEngine: addEngine.bind( undefined, state ),
 		setupMiddleware: addMiddleware.bind( undefined, state ),
 		urlStrategy: urlStrategy.bind( undefined, state ),
-		versionWith: setVersioningStrategy.bind( undefined, state ),
+		versionWith: setVersioningStrategy.bind( undefined, state )
 	} );
 
-	if ( resourceList === true || resourceList === false ) {
+	var config;
+	if ( _.isBoolean( resourceList ) ) {
 		state.preferLatest = resourceList;
 		state.excludeChildren = defaultToNewest === undefined ? true : !defaultToNewest;
+	} else if ( !_.isArray( resourceList ) ) {
+		config = resourceList;
 	} else {
 		addResources( state, resourceList );
-		state.preferLatest = defaultToNewest;
-		state.excludeChildren = includeChildrenInOptions === undefined ? true : !includeChildrenInOptions;
+		if ( _.isBoolean( defaultToNewest ) ) {
+			state.preferLatest = defaultToNewest;
+			state.excludeChildren = includeChildrenInOptions === undefined ? true : !includeChildrenInOptions;
+		} else {
+			config = defaultToNewest;
+		}
 	}
+
+	if ( config ) {
+		state.preferLatest = config.defaultToNewest === undefined ? false : config.defaultToNewest;
+		state.excludeChildren = config.includeChildrenInOptions === undefined ? true : !config.includeChildrenInOptions;
+		state.defaultContentType = config.defaultContentType || "application/json";
+	}
+
 	addEngine( state, jsonEngine, "application/json" );
 	addEngine( state, halEngine, "application/hal+json" );
 	return state;
