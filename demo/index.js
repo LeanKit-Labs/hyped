@@ -8,6 +8,7 @@ if ( cluster.isMaster ) {
 } else {
 	var hyped = require( "../src/index.js" )();
 	var autohost = require( "autohost" );
-	var host = hyped.createHost( autohost, {} ); // just roll with the defaults...
-	host.start();
+	var host = hyped.createHost( autohost, {}, function() {
+		host.start();
+	} ); // just roll with the defaults...
 }

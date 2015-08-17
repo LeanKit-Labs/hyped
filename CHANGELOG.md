@@ -1,5 +1,8 @@
 ## 0.2.x
 
+### 0.2.4
+Bug fix - resources with custom urlPrefixes did not get hypermedia middleware
+
 ### 0.2.3
 
 > Note: API change is non-breaking as original call format still works - older version is no longer documented in README.
