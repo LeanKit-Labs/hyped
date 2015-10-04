@@ -338,7 +338,8 @@ var host = hyped.createHost( autohost, {
 	},
 	function() {
 		// callback gets invoked once all resources are loaded
-		// this is largely to support test setups
+		// this is where you should call start on the host variable
+		host.start();
 	} );
 ```
 

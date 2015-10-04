@@ -35,9 +35,21 @@ function addMiddleware( state, host, apiPrefix ) { // jshint ignore:line
 			urlPrefix,
 			apiPrefix
 		].join( "" ).replace( "//", "/" );
+
 		host.http.middleware( prefixUrl, state.optionsMiddleware, "options" );
 		host.http.middleware( prefixUrl, state.hyperMiddleware, "hyped" );
 	}
+}
+
+function addResourceMiddleware( state, host ) {
+	var resourcePrefixes = _.filter( _.unique( _.pluck( _.values( state.resources ), "urlPrefix" ) ) );
+	_.each( resourcePrefixes, function( resourcePrefix ) {
+		var resourcePrefixUrl = [
+			resourcePrefix,
+			state.prefix.apiPrefix
+		].join( "" ).replace( "//", "/" );
+		host.http.middleware( resourcePrefixUrl, state.hyperMiddleware, "hyped" );
+	} );
 }
 
 function addResource( state, resource, resourceName ) { // jshint ignore:line
@@ -62,6 +74,7 @@ function createHost( state, autohost, config, done ) {
 	var subscription;
 	subscription = host.onResources( function( resources ) {
 		state.addResources( resources );
+		addResourceMiddleware( state, host );
 		subscription.unsubscribe();
 		if ( done ) {
 			done();
