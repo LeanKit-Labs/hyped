@@ -16,7 +16,7 @@ var HyperResponse = function( req, res, engine, hyperResource, contentType ) {
 	this._req = req;
 	this._res = res;
 	this._contentType = contentType;
-	this._context = {};
+	this._context = req.context;
 	this._headers = {};
 	this._cookies = {};
 
@@ -25,7 +25,7 @@ var HyperResponse = function( req, res, engine, hyperResource, contentType ) {
 
 	req.extendHttp.render = req.render = function( host, resource, action, result ) {
 		var model = result.data ? result.data : result;
-		var context = result.context ? result.context : {};
+		var context = result.context ? result.context : self._context;
 		setModel( self, model, context );
 		self._code = result.status || result.statusCode || self._code;
 		self._headers = result.headers || {};
@@ -100,7 +100,6 @@ HyperResponse.prototype.getResponse = function() {
 HyperResponse.prototype.render = function() {
 	var res = this._res;
 	var response = this.getResponse();
-	res.set( "Content-Type", this._contentType );
 	if ( response.headers ) {
 		_.each( response.headers, function( v, k ) {
 			res.set( k, v );
