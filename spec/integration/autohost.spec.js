@@ -13,9 +13,34 @@ describe( "Autohost Integration", function() {
 				urlPrefix: "/test",
 				resources: "./spec/ah"
 			}, function() {
+					host.http.middleware( "/", function context( req, res, next ) {
+						req.context.test = {
+							message: "I came from middleware!"
+						};
+						next();
+					} );
 					host.start();
 					done();
 				} );
+		} );
+
+		describe( "when altering context", function() {
+			var body, contentType;
+
+			before( function( done ) {
+				request( "http://localhost:8800/test/api/test", { headers: { accept: "*/*" } }, function( err, res ) {
+					body = JSON.parse( res.body );
+					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+					done();
+				} );
+			} );
+
+			it( "should get JSON representation of context", function() {
+				contentType.should.equal( "application/json" );
+				body.should.eql( {
+					test: { message: "I came from middleware!" }
+				} );
+			} );
 		} );
 
 		describe( "when requesting board with any media type", function() {
