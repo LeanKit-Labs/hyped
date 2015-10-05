@@ -2,7 +2,8 @@ require( "../setup" );
 var model = require( "../model.js" );
 var jsonEngine = require( "../../src/jsonEngine.js" );
 
-describe( "when rendering json", function() {
+describe( "JSON Engine", function() {
+	describe( "when rendering json", function() {
 	var json;
 
 	var hypermodel = {
@@ -113,4 +114,5 @@ describe( "when rendering json", function() {
 	it( "should render simple json", function() {
 		json.should.eql( expected );
 	} );
+} );
 } );
