@@ -1,6 +1,6 @@
 ## 0.2.x
 
-### Next
+### 0.2.5
  * Bug fix - defect in hyperResponse resulting in undefined context for conditional predicate on actions
  * Add better top level describes to each spec module
  * Add autohost integration test to ensure context is present in handle
