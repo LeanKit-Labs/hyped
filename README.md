@@ -18,6 +18,7 @@ The resource definition provides the metadata necessary for hyped to generate hy
 		[actionName]: {
 			method: the http method
 			url: the URL for this action
+			authorize: a predicate to determine user access
 			render: override the resource/action that gets rendered from this action
 			include: property names array to include in the rendered response
 			exclude: property names array to exclude from rendered response
@@ -89,6 +90,8 @@ The resource definition provides the metadata necessary for hyped to generate hy
 	<dd>The HTTP method used to activate this action.</dd>
 	<dt>url</dt>
 	<dd>The URL segment for this action. If there is no parent resource, this will be the URL for this action. If a parent resource has been specified, the parent's <tt>self</tt> URL will get pre-pended to the URL provided here.</dd>
+	<dt>authorize</dt>
+	<dd>A predicate that determines whether the requesting user can perform the action. The predicate takes `envelope` and either the response model _or_ the request's context. The second argument should always provide any data necessary to determine the user's permissions.</dd>
 	<dt>include</dt>
 	<dd>A list of properties to include from the raw data model in the response.</dd>
 	<dt>exclude</dt>
@@ -98,7 +101,7 @@ The resource definition provides the metadata necessary for hyped to generate hy
 	<dt>transform</dt>
 	<dd>A way to perform a map function against the model to produce the response body.</dd>
 	<dt>condition</dt>
-	<dd>A predicate used to determine if this action should be included in the link list when rendering a response.</dd>
+	<dd>A predicate used to determine if this action should be included in the link list when rendering a response. The arguments passed are the incoming request envelope and the `data` property of the response. These two values should give you access to any information necessary to make the determination.</dd>
 	<dt><h3>embed</h3></dt>
 	<dd>This section defines whether or not other resources can/should be included in the action's response. It effectively allows the server to provide pre-fetched, related resources to the client.</dd>
 	<dt>propertyName</dt>
@@ -119,9 +122,15 @@ The resource definition provides the metadata necessary for hyped to generate hy
 	<dt>generator</dt>
 	<dd>A function that takes the data model and a context hash and optionally returns a url string. Returning an empty string or undefined will exclude the link from rendered results. See <a href="#rendering-api">Rendering API</a> for how the context is specified.
 	<div class="highlight highlight-javascript">	<pre>
-	"next-page": function( data, context ) {
-		// results in a url like "/thing?page=1&amp;size=10"
-		return "/thing?page=" + ( context.page + 1 ) + "&amp;size=" + context.size;
+	"next-page": function( envelope, data ) {
+		// the envelope includes all incoming request information
+		// including query parameters which get merged onto the data property
+		var size = envelope.data.size;
+		var page = envelope.data.page;
+		if( page &amp;&amp; size ) {
+			// results in a url like "/thing?page=1&amp;size=10"
+			return "/thing?page=" + ( page + 1 ) + "&amp;size=" + size;
+		}
 	}
 	</pre>
 	</div>
@@ -172,7 +181,7 @@ The resource definition provides the metadata necessary for hyped to generate hy
 		withdraw: {
 			method: "POST",
 			url: "/account/:id/withdrawal",
-			condition: function( account ) {
+			condition: function( envelope, account ) {
 				return account.balance > 0;
 			},
 			include: [ "id", "accountId", "amount", "balance", "newBalance" ]

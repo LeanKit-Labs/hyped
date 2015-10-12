@@ -1,7 +1,7 @@
 require( "../setup" );
 var HyperResource = require( "../../src/hyperResource.js" );
 
-var limit = 4;
+var limit = 8;
 
 describe( "Conditions", function() {
 	describe( "when filtering links by predicate", function() {
@@ -16,7 +16,7 @@ describe( "Conditions", function() {
 				withdraw: {
 					method: "POST",
 					url: "/account/:id/withdrawal",
-					condition: function( account ) {
+					condition: function( envelope, account ) {
 						return account.balance > 0;
 					},
 					include: [ "id", "accountId", "amount", "balance", "newBalance" ]
@@ -78,15 +78,15 @@ describe( "Conditions", function() {
 			var fn = HyperResource.renderFn( { account: resource } );
 			elapsed1 = ( Date.now() - start );
 			start = Date.now();
-			newAccount = fn( "account", "self", acct );
+			newAccount = fn( "account", "self", {}, acct );
 			elapsed2 = ( Date.now() - start );
 			acct.balance = 100;
 			start = Date.now();
-			withMoney = fn( "account", "self", acct );
+			withMoney = fn( "account", "self", {}, acct );
 			elapsed3 = ( Date.now() - start );
 			acct.balance = 0;
 			start = Date.now();
-			noMoney = fn( "account", "self", acct );
+			noMoney = fn( "account", "self", {}, acct );
 			elapsed4 = ( Date.now() - start );
 		} );
 

@@ -6,19 +6,20 @@ function setModel( self, model, context ) {
 	return self;
 }
 
-var HyperResponse = function( req, res, engine, hyperResource, contentType ) {
-	this._authCheck = req._checkPermission || function() {
-		return true;
-	};
+var HyperResponse = function( envelope, engine, hyperResource, contentType ) {
 	this._code = 200;
+	this._envelope = envelope;
 	this._engine = engine;
 	this._hyperResource = hyperResource;
-	this._req = req;
-	this._res = res;
+	var req = this._req = envelope._original.req;
+	this._res = envelope._original.res;
 	this._contentType = contentType;
 	this._context = req.context;
 	this._headers = {};
 	this._cookies = {};
+	this._authCheck = req._checkPermission || function() {
+		return true;
+	};
 
 	var self = this;
 	req.extendHttp.hyped = req.hyped = setModel.bind( undefined, self );
@@ -52,9 +53,9 @@ HyperResponse.prototype.createResponse = function() {
 	var hypermedia = this._hyperResource(
 		this._resource || resource,
 		this._action || action,
+		this._envelope,
 		this._model,
 		"",
-		this._context,
 		this._originUrl,
 		this._originMethod
 	);
