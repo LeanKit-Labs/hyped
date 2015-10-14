@@ -28,6 +28,16 @@ module.exports = function( host ) {
 						return acc.concat( lane.cards );
 					}, [] );
 				}
+			},
+			hidden: {
+				method: "get",
+				url: "/:id/hidden",
+				authorize: function() {
+					return false;
+				},
+				handle: function( envelope ) {
+					return { data: "this should never be visible" };
+				}
 			}
 		},
 		versions: {

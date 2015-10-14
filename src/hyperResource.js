@@ -19,6 +19,36 @@ function applyVersion( resource, version ) {
 	return target;
 }
 
+function buildParametersFn( action ) {
+	// get static parameters
+	var parameters = _.reduce(
+		_.omit( action.parameters, function( v ) {
+			return _.isFunction( v );
+		} ), function( acc, v, k ) {
+			acc[ k ] = v;
+			return acc;
+		},
+		{}
+	);
+
+	// get dynamic parameters
+	var generators = _.omit( action.parameters, function( v ) {
+		return !_.isFunction( v );
+	} );
+
+	// return a function that will add dynamic parameters to the
+	// static at render time
+	return function getParameters( data, envelope ) {
+		return _.reduce( generators, function( acc, fn, key ) {
+			var param = fn( envelope, data );
+			if ( param ) {
+				acc[ key ] = param;
+			}
+			return acc;
+		}, parameters );
+	};
+}
+
 function deepMerge( target, source ) { // jshint ignore:line
 	_.each( source, function( val, key ) {
 		var original = target[ key ];
@@ -86,40 +116,6 @@ function getPrefix( resources, prefix, resource ) {
 	};
 }
 
-function buildParametersFn( action ) {
-	// get static parameters
-	var parameters = _.reduce(
-		_.omit( action.parameters, function( v ) {
-			return _.isFunction( v );
-		} ), function( acc, v, k ) {
-			acc[ k ] = v;
-			return acc;
-		},
-		{}
-	);
-
-	// get dynamic parameters
-	var generators = _.omit( action.parameters, function( v ) {
-		return !_.isFunction( v );
-	} );
-
-	// return a function that will add dynamic parameters to the
-	// static at render time
-	return function getParameters( data, context ) {
-		return _.reduce( generators, function( acc, fn, key ) {
-			var param = fn( data, context );
-			if ( param ) {
-				acc[ key ] = param;
-			}
-			return acc;
-		}, parameters );
-	};
-}
-
-function isTemplated( url ) { // jshint ignore:line
-	return url.indexOf( "{" ) > 0 || url.indexOf( ":" ) > 0;
-}
-
 function getActionUrlCache( resources, prefix, version ) {
 	var cache = {};
 	var parentUrlFn = getParentUrlFn( resources, version );
@@ -162,14 +158,14 @@ function getActionUrlCache( resources, prefix, version ) {
 
 			_.each( action.links, function( link, linkName ) {
 				var linkFn = getLinkFn( link, resource, resourceName );
-				acc[ linkName ] = function( data, parentUrl, context ) {
-					var linkUrl = linkFn( data, context );
+				acc[ linkName ] = function( data, parentUrl, envelope ) {
+					var linkUrl = linkFn( data, envelope );
 					if ( linkUrl ) {
 						var href = [
 							resourcePrefix.urlPrefix,
 							resourcePrefix.apiPrefix,
 							getParentUrl( parentUrl, data ),
-							linkFn( data, context )
+							linkFn( data, envelope )
 						].join( "" ).replace( "//", "/" );
 						return href;
 					} else {
@@ -223,7 +219,7 @@ function getBodyFn( resources, prefix, version ) {
 	};
 }
 
-function getLinksCache( resources, prefix, version, forOptions ) {
+function getLinksCache( resources, prefix, version, forOptions, skipAuthCheck ) {
 	var cache = {};
 	var urlFn = getUrlFn( resources, prefix, version );
 
@@ -232,14 +228,21 @@ function getLinksCache( resources, prefix, version, forOptions ) {
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
 			var parameterFn = buildParametersFn( action );
 			var method = action.method.toUpperCase();
-			var render = shouldRenderFn( action, actionName, resourceName, forOptions );
-			acc[ actionName ] = function( data, parentUrl, context, auth ) {
+			var render;
+			if ( skipAuthCheck ) {
+				render = function() {
+					return true;
+				};
+			} else {
+				render = shouldRenderFn( action, actionName, resourceName, forOptions );
+			}
+			acc[ actionName ] = function( envelope, data, parentUrl, auth ) {
 				var links = {};
-				if ( render( data, context, auth ) ) {
-					var actionUrl = urlFn( resourceName, actionName, data, parentUrl, context );
-					var parameters = parameterFn( data, context );
+				if ( render( envelope, data, auth ) ) {
+					var actionUrl = urlFn( resourceName, actionName, data, parentUrl, envelope );
+					var parameters = parameterFn( data, envelope );
 					_.each( action.links, function( _link, linkName ) {
-						var linkUrl = urlFn( resourceName, linkName, data, parentUrl, context );
+						var linkUrl = urlFn( resourceName, linkName, data, parentUrl, envelope );
 						if ( linkUrl ) {
 							var link = {
 								href: linkUrl,
@@ -274,20 +277,20 @@ function getLinksCache( resources, prefix, version, forOptions ) {
 	return cache;
 }
 
-function getLinksFn( resources, prefix, version, forOptions ) {
-	var linkCache = getLinksCache( resources, prefix, version, forOptions );
-	return function( resourceName, actionName, data, parentUrl, context, auth ) {
+function getLinksFn( resources, prefix, version, forOptions, skipAuthCheck ) {
+	var linkCache = getLinksCache( resources, prefix, version, forOptions, skipAuthCheck );
+	return function( resourceName, actionName, envelope, data, parentUrl, auth ) {
 		auth = auth || function() {
 			return true;
 		};
-		return linkCache[ resourceName ][ actionName ]( data, parentUrl, context, auth );
+		return linkCache[ resourceName ][ actionName ]( envelope, data, parentUrl, auth );
 	};
 }
 
 function getLinkFn( link, resource, resourceName ) { // jshint ignore:line
 	if ( _.isFunction( link ) ) {
-		return function( data, context ) {
-			var linkUrl = link( data, context );
+		return function( data, envelope ) {
+			var linkUrl = link( envelope, data );
 			if ( linkUrl ) {
 				linkUrl = linkUrl.replace( "//", "/" );
 				return isTemplated( linkUrl ) ?
@@ -309,8 +312,8 @@ function getLinkFn( link, resource, resourceName ) { // jshint ignore:line
 	}
 }
 
-function getOptionCache( resources, prefix, version, excludeChildren ) {
-	var linkFn = getLinksFn( resources, prefix, version, true );
+function getOptionCache( resources, prefix, version, excludeChildren, auth, skipAuthCheck ) {
+	var linkFn = getLinksFn( resources, prefix, version, true, skipAuthCheck );
 	var options = { _links: {} };
 	var versions = [ "1" ];
 	_.reduce( resources, function( rAcc, resource, resourceName ) {
@@ -318,12 +321,12 @@ function getOptionCache( resources, prefix, version, excludeChildren ) {
 		resource = getVersion( resource, version );
 		_.each( resource.actions, function( action, actionName ) {
 			if ( ( excludeChildren && !resource.parent ) || !excludeChildren ) {
-				var main = linkFn( resourceName, actionName, undefined, undefined, undefined );
+				var main = linkFn( resourceName, actionName, {}, {}, undefined, undefined, auth );
 				if ( !_.isEmpty( main ) ) {
 					options._links[ [ resourceName, actionName ].join( ":" ) ] = _.values( main )[ 0 ];
 				}
 				_.each( resource.actions, function( link, linkName ) {
-					var additional = _.values( linkFn( resourceName, linkName, undefined, undefined, undefined ) )[ 0 ];
+					var additional = _.values( linkFn( resourceName, linkName, {}, {}, undefined, undefined, auth ) )[ 0 ];
 					if ( !_.isEmpty( additional ) ) {
 						options._links[ [ resourceName, linkName ].join( ":" ) ] = additional;
 					}
@@ -336,10 +339,10 @@ function getOptionCache( resources, prefix, version, excludeChildren ) {
 	return options;
 }
 
-function getOptionsFn( resources, prefix, version, excludeChildren ) {
-	var options = getOptionCache( resources, prefix, version, excludeChildren );
-	return function( data ) {
-		options._mediaTypes = _.keys( data );
+function getOptionsFn( resources, prefix, version, excludeChildren, auth, skipAuthCheck ) {
+	var options = getOptionCache( resources, prefix, version, excludeChildren, auth, skipAuthCheck );
+	return function( types ) {
+		options._mediaTypes = _.keys( types );
 		return options;
 	};
 }
@@ -352,8 +355,8 @@ function getOriginCache( resources, prefix, version ) {
 		resource = getVersion( resource, version );
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
 			var method = action.method.toUpperCase();
-			acc[ actionName ] = function( data, parentUrl, context /*, auth */ ) {
-				var actionUrl = urlFn( resourceName, actionName, data, parentUrl, context );
+			acc[ actionName ] = function( parentUrl /*, auth */ ) {
+				var actionUrl = urlFn( resourceName, actionName, {}, parentUrl, {} );
 				return { href: actionUrl, method: method };
 			};
 			return acc;
@@ -365,8 +368,8 @@ function getOriginCache( resources, prefix, version ) {
 
 function getOriginFn( resources, prefix, version ) {
 	var originCache = getOriginCache( resources, prefix, version );
-	return function( resourceName, actionName, data, parentUrl ) {
-		return originCache[ resourceName ][ actionName ]( data, parentUrl );
+	return function( resourceName, actionName, envelope, parentUrl ) {
+		return originCache[ resourceName ][ actionName ]( envelope.data, parentUrl );
 	};
 }
 
@@ -447,11 +450,11 @@ function getRenderFn( resources, prefix, version ) {
 	var resourceFn = getResourceFn( resources, prefix, version );
 	var resourcesFn = getResourcesFn( resources, prefix, version );
 
-	return function( resourceName, actionName, data, parentUrl, context, originUrl, originMethod, authCheck ) {
+	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, authCheck ) {
 		if ( _.isArray( data ) ) {
-			return resourcesFn( resourceName, actionName, data, parentUrl, context, originUrl, originMethod, authCheck );
+			return resourcesFn( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, authCheck );
 		} else {
-			return resourceFn( resourceName, actionName, data, parentUrl, context, originUrl, originMethod, authCheck );
+			return resourceFn( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, authCheck );
 		}
 	};
 }
@@ -470,14 +473,14 @@ function getResourceCache( resources, prefix, version ) {
 				prefixes.apiPrefix
 			].join( "" ).replace( "//", "/" );
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
-			acc[ actionName ] = function( data, parentUrl, context, originUrl, originMethod, auth ) {
+			acc[ actionName ] = function( envelope, data, parentUrl, originUrl, originMethod, auth ) {
 				var body = renderFn( resourceName, actionName, data );
-				var main = linkFn( resourceName, actionName, data, parentUrl, context, auth );
+				var main = linkFn( resourceName, actionName, envelope, data, parentUrl, auth );
 				var origin = ( originUrl && originMethod ) ?
 					{ href: originUrl, method: originMethod } :
 					main[ actionName ];
 				_.each( resource.actions, function( link, linkName ) {
-					_.defaults( main, linkFn( resourceName, linkName, data, parentUrl, context, auth ) );
+					_.defaults( main, linkFn( resourceName, linkName, envelope, data, parentUrl, auth ) );
 				} );
 				body._links = main;
 				body._origin = origin;
@@ -485,20 +488,20 @@ function getResourceCache( resources, prefix, version ) {
 				body._action = actionName;
 				var embedded = _.reduce( action.embed, function( eAcc, child, childName ) {
 					var childFn = cache[ child.resource ][ child.render ];
-					var childVal = data[ childName ];
+					var childItem = data[ childName ];
 					var embed;
 					var inheritedUrl = resources[ child.resource ].parent ? body._links.self.href : "";
 					inheritedUrl = inheritedUrl.replace( urlPrefix, "" );
-					if ( _.isArray( childVal ) ) {
-						embed = _.map( childVal, function( x ) {
-							var item = childFn( x, inheritedUrl, context );
+					if ( _.isArray( childItem ) ) {
+						embed = _.map( childItem, function( child ) {
+							var item = childFn( envelope, child, inheritedUrl, undefined, undefined, auth );
 							if ( child.actions ) {
 								item._links = _.pick( item._links, child.actions );
 							}
 							return item;
 						} );
-					} else if ( childVal ) {
-						embed = childFn( childVal, inheritedUrl, context );
+					} else if ( childItem ) {
+						embed = childFn( envelope, child, inheritedUrl, undefined, undefined, auth );
 						if ( child.actions ) {
 							embed._links = _.pick( embed._links, child.actions );
 						}
@@ -523,8 +526,8 @@ function getResourceCache( resources, prefix, version ) {
 
 function getResourceFn( resources, prefix, version ) { // jshint ignore:line
 	var resourceCache = getResourceCache( resources, prefix, version );
-	return function( resourceName, actionName, data, parentUrl, context, originUrl, originMethod, auth ) {
-		return resourceCache[ resourceName ][ actionName ]( data, parentUrl, context, originUrl, originMethod, auth );
+	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, auth ) {
+		return resourceCache[ resourceName ][ actionName ]( envelope, data, parentUrl, originUrl, originMethod, auth );
 	};
 }
 
@@ -532,16 +535,17 @@ function getResourcesFn( resources, prefix, version ) { // jshint ignore:line
 	var resourceCache = getResourceCache( resources, prefix, version );
 	var originFn = getOriginFn( resources, prefix, version );
 
-	return function( resourceName, actionName, data, parentUrl, context, originUrl, originMethod /*, auth */ ) {
+	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, auth ) {
 		var body = {};
 		var resource = getVersion( resources[ resourceName ], version );
 		var render = resource.actions[ actionName ].render;
 		var items = render ? pluralize.plural( render.resource ) : pluralize.plural( resourceName );
-		var list = _.map( data, function( item ) {
+		var list = _.map( data, function( item, childProp ) {
+			var child = data[ childProp ];
 			if ( render ) {
-				return resourceCache[ render.resource ][ render.action ]( item, parentUrl );
+				return resourceCache[ render.resource ][ render.action ]( envelope, child, parentUrl, undefined, undefined, auth );
 			} else {
-				return resourceCache[ resourceName ][ actionName ]( item, parentUrl );
+				return resourceCache[ resourceName ][ actionName ]( envelope, child, parentUrl, undefined, undefined, auth );
 			}
 		} );
 		if ( originUrl && originMethod ) {
@@ -581,9 +585,13 @@ function getVersions( resource ) { // jshint ignore:line
 
 function getUrlFn( resources, prefix, version ) { // jshint ignore:line
 	var cache = getActionUrlCache( resources, prefix, version );
-	return function( resourceName, actionName, data, parentUrl, context ) {
-		return cache[ resourceName ][ actionName ]( data, parentUrl, context );
+	return function( resourceName, actionName, data, parentUrl, envelope ) {
+		return cache[ resourceName ][ actionName ]( data, parentUrl, envelope );
 	};
+}
+
+function isTemplated( url ) { // jshint ignore:line
+	return url.indexOf( "{" ) > 0 || url.indexOf( ":" ) > 0;
 }
 
 function removeEmbedded( embedded, unit ) { // jshint ignore:line
@@ -593,20 +601,23 @@ function removeEmbedded( embedded, unit ) { // jshint ignore:line
 }
 
 function shouldRenderFn( action, actionName, resourceName, forOptions ) { // jshint ignore:line
-	var canRender;
+	var canRender, allowRender;
 	if ( action.condition && !forOptions ) {
-		canRender = function canRender( data, context ) {
-			return action.condition( data || {}, context );
+		canRender = function canRender( data, envelope ) {
+			return action.condition( envelope, data || {} );
 		};
 	} else {
 		canRender = function canRender() {
 			return true;
 		};
 	}
+	if ( action.authorize ) {
+		allowRender = action.authorize;
+	}
 	var authName = [ resourceName, actionName ].join( ":" );
-	return function( data, context, auth ) {
-		var can = canRender( data, context );
-		var should = auth( authName, data, context );
+	return function( envelope, data, auth ) {
+		var can = canRender( data, envelope );
+		var should = allowRender ? allowRender( envelope, data || envelope.context ) : auth( authName, data, envelope.context );
 		return ( can && should );
 	};
 }

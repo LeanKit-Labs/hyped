@@ -9,26 +9,39 @@ var resources = {
 				method: "get",
 				url: "/parent"
 			},
+			// this will only display when fullOptions are requested (authorize is skipped)
+			bogus: {
+				method: "get",
+				url: "/bogus",
+				authorize: function( envelope ) {
+					return false;
+				}
+			},
 			children: {
 				method: "get",
 				url: "/parent/:id/child",
 				render: { resource: "child", action: "self" },
-				condition: function( data ) {
+				condition: function( envelope, data ) {
 					return data.children && data.children.length > 0;
 				},
 				links: {
-					"next-child-page": function( data, context ) {
-						if ( context && context.page ) {
-							return "/parent/:id/child?page=" + ( context.page + 1 ) + "&size=" + ( context.size );
+					"next-child-page": function( envelope, data ) {
+						if ( envelope.data ) {
+							var page = envelope.data.page || undefined;
+							var size = envelope.data.size || undefined;
+							if ( page && size ) {
+								return "/parent/:id/child?page=" + ( page + 1 ) + "&size=" + ( size );
+							}
 						}
 					}
 				},
 				parameters: {
-					page: function( data, context ) {
+					page: function( envelope, data ) {
 						var limit = 1;
-						if ( data && data.children && context ) {
-							limit = data.children.length / context.size;
-							return { range: [ 1, limit ] };
+						var size = envelope.data ? envelope.data.size : 0;
+						if ( data && data.children && size ) {
+							var count = data.children.length;
+							return { range: [ 1, count / size ] };
 						}
 					},
 					size: { range: [ 1, 100 ] }
@@ -54,6 +67,22 @@ var resources = {
 						resource: "grandChild",
 						render: "self",
 						actions: [ "self", "create" ]
+					}
+				}
+			},
+			change: {
+				method: "put",
+				url: "/child/:child.id",
+				authorize: function( envelope, data ) {
+					var userName = envelope.user ? envelope.user.name : "nobody";
+					if ( userName === "Evenly" ) {
+						console.log( "    WTF", data.id );
+						return data.id % 2 === 0;
+					} else if ( userName === "Oddly" ) {
+						console.log( "    WTF", data.id );
+						return data.id % 2 === 1;
+					} else {
+						return false;
 					}
 				}
 			}

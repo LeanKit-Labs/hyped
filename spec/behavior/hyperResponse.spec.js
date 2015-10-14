@@ -1,7 +1,6 @@
 require( "../setup" );
 
 var HyperResponse = require( "../../src/hyperResponse" );
-
 // CAUTION - this particular class synthesizes a lot of various
 // inputs to create the hypermedia response. Trying to follow it may
 // or may not (but definitely will) give you a headache.
@@ -67,6 +66,15 @@ describe( "Hyper Response", function() {
 				.once()
 				.withArgs( model );
 
+			// an envelope mock
+			var envelope = {
+				_original: {
+					res: res,
+					req: req
+				},
+				middlewareData: "secret"
+			};
+
 			// engine just returns the data passed to it
 			var engine = function( x ) {
 				return x;
@@ -75,21 +83,20 @@ describe( "Hyper Response", function() {
 
 			// just mock the hyper resource
 			var hyperResource = sinon.mock();
+
 			hyperResource.withArgs(
 				"test",
 				"self",
+				envelope,
 				model,
 				"",
-				{
-					middlewareData: "secret"
-				},
 				"/test",
 				"GET"
 			)
 			.twice() // twice because we call it, then render calls it
 			.returns( model );
 
-			var response = new HyperResponse( req, res, engine, hyperResource, contentType );
+			var response = new HyperResponse( envelope, engine, hyperResource, contentType );
 			response.origin( "/test", "GET" );
 			result = req.extendHttp.render( {}, undefined, undefined, handleResult );
 			response.render();

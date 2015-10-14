@@ -18,12 +18,20 @@ describe( "Additional Links", function() {
 					links: {
 						favstarred: "/board/:id?favstarred=true",
 						worstever: "/board/:id?h8=true",
-						"next-page": function( data, context ) {
-							return "/board/:id?page=" + ( context.page + 1 ) + "&size=" + context.size;
+						"next-page": function( envelope, data ) {
+							if ( envelope.data.page && envelope.data.size ) {
+								var page = envelope.data.page;
+								var size = envelope.data.size;
+								return "/board/:id?page=" + ( page + 1 ) + "&size=" + size;
+							}
 						},
-						"prev-page": function( data, context ) {
-							if ( context.page && context.page > 1 ) {
-								return "/board/:id?page=" + ( context.page - 1 ) + "&size=" + context.size;
+						"prev-page": function( envelope, data ) {
+							if ( envelope.data.page && envelope.data.size ) {
+								var page = envelope.data.page;
+								var size = envelope.data.size;
+								if ( page > 1 ) {
+									return "/board/:id?page=" + ( page - 1 ) + "&size=" + size;
+								}
 							}
 						}
 					}
@@ -64,8 +72,8 @@ describe( "Additional Links", function() {
 		before( function() {
 			var start = Date.now();
 			var fn = HyperResource.renderFn( { board: resource } );
-			self1 = fn( "board", "self", board1, "", { page: 1, size: 10 } );
-			self2 = fn( "board", "self", board1, "", { page: 2, size: 10 } );
+			self1 = fn( "board", "self", { data: { page: 1, size: 10 } }, board1 );
+			self2 = fn( "board", "self", { data: { page: 2, size: 10 } }, board1 );
 			elapsedMs = Date.now() - start;
 		} );
 
@@ -93,12 +101,20 @@ describe( "Additional Links", function() {
 					links: {
 						favstarred: "/board/:id?favstarred=true",
 						worstever: "/board/:id?h8=true",
-						"next-page": function( data, context ) {
-							return "/board/:id?page=" + ( context.page + 1 ) + "&size=" + context.size;
+						"next-page": function( envelope, data ) {
+							if ( envelope.data.page && envelope.data.size ) {
+								var page = envelope.data.page;
+								var size = envelope.data.size;
+								return "/board/:id?page=" + ( page + 1 ) + "&size=" + size;
+							}
 						},
-						"prev-page": function( data, context ) {
-							if ( context.page && context.page > 1 ) {
-								return "/board/:id?page=" + ( context.page - 1 ) + "&size=" + context.size;
+						"prev-page": function( envelope, data ) {
+							if ( envelope.data.page && envelope.data.size ) {
+								var page = envelope.data.page;
+								var size = envelope.data.size;
+								if ( page > 1 ) {
+									return "/board/:id?page=" + ( page - 1 ) + "&size=" + size;
+								}
 							}
 						}
 					}
@@ -139,8 +155,8 @@ describe( "Additional Links", function() {
 		before( function() {
 			var fn = HyperResource.renderFn( { board: resource }, { urlPrefix: "/badUrl", apiPrefix: "/badUrl" } );
 			var start = Date.now();
-			self1 = fn( "board", "self", board1, "", { page: 1, size: 10 } );
-			self2 = fn( "board", "self", board1, "", { page: 2, size: 10 } );
+			self1 = fn( "board", "self", { data: { page: 1, size: 10 } }, board1 );
+			self2 = fn( "board", "self", { data: { page: 2, size: 10 } }, board1 );
 			elapsedMs = Date.now() - start;
 		} );
 

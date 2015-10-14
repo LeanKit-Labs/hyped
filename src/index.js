@@ -3,6 +3,7 @@ var HyperResponse = require( "./hyperResponse.js" );
 var HyperResource = require( "./hyperResource.js" );
 var jsonEngine = require( "./jsonEngine.js" );
 var halEngine = require( "./halEngine.js" );
+var HttpEnvelope = require( "./httpEnvelope" );
 var url = require( "./urlTemplate.js" );
 
 function addEngine( state, engine, mediaType ) { // jshint ignore:line
@@ -96,10 +97,14 @@ function getEngine( state, mediaType ) { // jshint ignore:line
 	return state.engines[ filtered ];
 }
 
-function getHyperModel( state, req ) { // jshint ignore:line
+function getEnvelope( req, res ) {
+	return new HttpEnvelope( req, res );
+}
+
+function getHyperModel( state, envelope ) { // jshint ignore:line
 	var version = 1;
-	if ( req ) {
-		version = getVersion( state, req );
+	if ( envelope ) {
+		version = getVersion( state, envelope );
 	}
 	if ( !state.hypermodels[ version ] ) {
 		state.hypermodels[ version ] = HyperResource.renderFn( state.resources, state.prefix, version ); // jshint ignore: line
@@ -107,24 +112,26 @@ function getHyperModel( state, req ) { // jshint ignore:line
 	return state.hypermodels[ version ];
 }
 
-function getOptionModel( state, req ) {
+function getOptionModel( state, envelope ) {
 	var version = 1;
-	if ( req ) {
-		version = getVersion( state, req );
+	if ( envelope ) {
+		version = getVersion( state, envelope );
 	}
 	if ( !state.optionModels[ version ] ) {
-		state.optionModels[ version ] = HyperResource.optionsFn( state.resources, state.prefix, version, state.excludeChildren )( state.engines );
+		state.optionModels[ version ] = HyperResource.optionsFn( state.resources, state.prefix, version, state.excludeChildren, envelope )( state.engines );
 	}
 	return state.optionModels[ version ];
 }
 
-function getFullOptionModel( state, req ) {
+function getFullOptionModel( state, envelope ) {
 	var version = 1;
-	if ( req ) {
-		version = getVersion( req );
+	if ( envelope ) {
+		version = getVersion( envelope );
+	} else {
+		envelope = {};
 	}
 	if ( !state.fullOptionModels[ version ] ) {
-		state.fullOptionModels[ version ] = HyperResource.optionsFn( state.resources, state.prefix, version, false )( state.engines );
+		state.fullOptionModels[ version ] = HyperResource.optionsFn( state.resources, state.prefix, version, false, envelope, true )( state.engines );
 	}
 	return state.fullOptionModels[ version ];
 }
@@ -136,14 +143,14 @@ function getMaxVersion( state ) { // jshint ignore:line
 	}, 1 );
 }
 
-function getVersion( state, req ) {
+function getVersion( state, envelope ) {
 	if ( state.versionStrategy ) {
-		return state.versionStrategy( req );
+		return state.versionStrategy( envelope._original.req );
 	}
 	if ( !state.maxVersion ) {
 		state.maxVersion = getMaxVersion( state );
 	}
-	var accept = req.headers.accept;
+	var accept = envelope.headers.accept;
 	var match = /[.]v([0-9]*)/.exec( accept );
 	var version = state.preferLatest ? state.maxVersion : 1;
 	if ( match && match.length > 0 ) {
@@ -162,7 +169,8 @@ function hyperMiddleware( state, req, res, next ) { // jshint ignore:line
 	}
 	var engine = getEngine( state, contentType );
 	var hyperModel = getHyperModel( state, req );
-	var response = new HyperResponse( req, res, engine, hyperModel, contentType ).origin( req.originalUrl, req.method ); // jshint ignore:line
+	var envelope = getEnvelope( req, res );
+	var response = new HyperResponse( envelope, engine, hyperModel, contentType ).origin( req.originalUrl, req.method ); // jshint ignore:line
 	next();
 }
 
@@ -174,7 +182,8 @@ function optionsMiddleware( state, req, res, next ) { // jshint ignore:line
 			contentType = "application/json";
 			engine = jsonEngine;
 		}
-		var optionModel = getOptionModel( state, req );
+		var envelope = getEnvelope( req, res );
+		var optionModel = getOptionModel( state, envelope );
 		var body = engine( optionModel, true );
 		res.status( 200 ).set( "Content-Type", contentType ).send( body );
 	} else {
@@ -192,7 +201,8 @@ function urlStrategy( state, resourceName, actionName, action, resourceList ) { 
 	}
 	// will need to do this for all available versions at some point ...
 	var options = getFullOptionModel( state );
-	return url.forExpress( options._links[ [ resourceName, actionName ].join( ":" ) ].href );
+	var link = options._links[ [ resourceName, actionName ].join( ":" ) ];
+	return link ? url.forExpress( link.href ) : "";
 }
 
 module.exports = function( resourceList, defaultToNewest, includeChildrenInOptions ) {

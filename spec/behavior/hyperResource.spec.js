@@ -62,7 +62,7 @@ describe( "Action links", function() {
 				var fn = HyperResource.urlFn( resources );
 				parent = fn( "parent", "self", { id: 1 } );
 				children = fn( "parent", "children", { id: 1 } );
-				next = fn( "parent", "next-child-page", { id: 1 }, undefined, { page: 1, size: 5 } );
+				next = fn( "parent", "next-child-page", { id: 1 }, undefined, { data: { page: 1, size: 5 } } );
 				child = fn( "child", "self", model );
 				grandChild = fn( "grandChild", "self", model );
 			} );
@@ -100,7 +100,7 @@ describe( "Action links", function() {
 				var fn = HyperResource.urlFn( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
 				parent = fn( "parent", "self", { id: 1 } );
 				children = fn( "parent", "children", { id: 1 } );
-				next = fn( "parent", "next-child-page", { id: 1 }, undefined, { page: 1, size: 5 } );
+				next = fn( "parent", "next-child-page", { id: 1 }, undefined, { data: { page: 1, size: 5 } } );
 				child = fn( "child", "self", model );
 				grandChild = fn( "grandChild", "self", model );
 			} );
@@ -158,7 +158,7 @@ describe( "Action links", function() {
 					id: 1
 				};
 				var fn = HyperResource.linkFn( resources );
-				links = fn( "parent", "self", model );
+				links = fn( "parent", "self", {}, model );
 			} );
 
 			it( "should produce expected links", function() {
@@ -175,7 +175,7 @@ describe( "Action links", function() {
 					id: 1
 				};
 				var fn = HyperResource.linkFn( resources );
-				links = fn( "parent", "children", model );
+				links = fn( "parent", "children", {}, model );
 			} );
 
 			it( "should produce expected links", function() {
@@ -192,7 +192,7 @@ describe( "Action links", function() {
 					id: 1
 				};
 				var fn = HyperResource.linkFn( resources );
-				links = fn( "parent", "children", model, "", undefined, function() {
+				links = fn( "parent", "children", {}, model, "", function() {
 					return false;
 				} );
 			} );
@@ -202,7 +202,7 @@ describe( "Action links", function() {
 			} );
 		} );
 
-		describe( "when rendering action with passed condition and no context", function() {
+		describe( "when rendering action with passed condition and no page size specified", function() {
 			var parameters = {
 				size: { range: [ 1, 100 ] }
 			};
@@ -217,7 +217,7 @@ describe( "Action links", function() {
 					children: [ {} ]
 				};
 				var fn = HyperResource.linkFn( resources );
-				links = fn( "parent", "children", model );
+				links = fn( "parent", "children", { data: { page: 1 } }, model );
 			} );
 
 			it( "should produce expected links", function() {
@@ -242,7 +242,7 @@ describe( "Action links", function() {
 					children: [ {}, {}, {}, {}, {}, {}, {}, {}, {}, {} ]
 				};
 				var fn = HyperResource.linkFn( resources );
-				links = fn( "parent", "children", model, "", { page: 1, size: 5 } );
+				links = fn( "parent", "children", { data: { page: 1, size: 5 } }, model, "" );
 			} );
 
 			it( "should produce expected links", function() {
@@ -275,14 +275,14 @@ describe( "Action links", function() {
 				description: "this is a test",
 				children: [ {}, {}, {}, {}, {} ]
 			};
-			var context = {
+			var requestData = {
 				page: 1,
 				size: 5
 			};
 
 			before( function() {
 				var fn = HyperResource.resourceFn( resources, "", 2 );
-				response = fn( "parent", "self", data, "", context );
+				response = fn( "parent", "self", { data: requestData }, data, "" );
 			} );
 
 			it( "should return the correct response", function() {
@@ -317,14 +317,14 @@ describe( "Action links", function() {
 				description: "this is a test",
 				children: [ {}, {}, {}, {}, {} ]
 			};
-			var context = {
+			var requestData = {
 				page: 1,
 				size: 5
 			};
 
 			before( function() {
 				var fn = HyperResource.resourceFn( resources );
-				response = fn( "parent", "self", data, "", context );
+				response = fn( "parent", "self", { data: requestData }, data, "" );
 			} );
 
 			it( "should return the correct response", function() {
@@ -332,7 +332,7 @@ describe( "Action links", function() {
 			} );
 		} );
 
-		describe( "when rendering action with embedded resources", function() {
+		describe( "when rendering action with embedded resources including parent id in result", function() {
 			var expected = require( "./actionWithEmbeddedResources.js" );
 			var response;
 			var data = {
@@ -342,12 +342,16 @@ describe( "Action links", function() {
 				grandChildren: [ { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 } ]
 			};
 			var elapsed;
-
+			var envelope = {
+				user: {
+					name: "Evenly"
+				}
+			};
 			before( function() {
 				var fn1 = HyperResource.resourceFn( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
 
 				var start = Date.now();
-				response = fn1( "child", "self", data );
+				response = fn1( "child", "self", envelope, data );
 				elapsed = Date.now() - start;
 			} );
 
@@ -371,7 +375,9 @@ describe( "Action links", function() {
 				"parent:children": { href: "/parent/{id}/child", method: "GET", templated: true, parameters: {
 						size: { range: [ 1, 100 ] }
 					} },
+				"parent:bogus": { href: "/parent/bogus", method: "GET" },
 				"child:self": { href: "/parent/{parentId}/child/{id}", method: "GET", templated: true },
+				"child:change": { href: "/parent/{parentId}/child/{id}", method: "PUT", templated: true },
 				"grandChild:self": { href: "/parent/{parentId}/child/{childId}/grand/{id}", method: "GET", templated: true },
 				"grandChild:create": { href: "/parent/{parentId}/child/{childId}/grand", method: "POST", templated: true },
 				"grandChild:delete": { href: "/parent/{parentId}/child/{childId}/grand/{id}", method: "DELETE", templated: true }
@@ -380,8 +386,8 @@ describe( "Action links", function() {
 		var options;
 
 		before( function() {
-			var fn = HyperResource.optionsFn( resources );
-			options = fn();
+			var fn = HyperResource.optionsFn( resources, undefined, undefined, undefined, undefined, true );
+			options = fn( {}, {} );
 		} );
 
 		it( "should render options correctly", function() {
@@ -436,7 +442,7 @@ describe( "Action links", function() {
 			var fn1 = HyperResource.resourcesFn( resources );
 
 			var start = Date.now();
-			response = fn1( "parent", "self", data, "", undefined, "/parent", "GET" );
+			response = fn1( "parent", "self", {}, data, "", "/parent", "GET" );
 			elapsed = Date.now() - start;
 		} );
 
@@ -464,6 +470,12 @@ describe( "Action links", function() {
 				parentId: 1,
 				title: "two",
 				description: "the second item"
+			},
+			{
+				id: 3,
+				parentId: 1,
+				title: "three",
+				description: "the third item"
 			}
 		];
 		var elapsed;
@@ -471,7 +483,12 @@ describe( "Action links", function() {
 		before( function() {
 			var fn1 = HyperResource.resourcesFn( resources );
 			var start = Date.now();
-			response = fn1( "child", "self", data, "", undefined, "/parent/1/child", "GET" );
+			var envelope = {
+				user: {
+					name: "Oddly"
+				}
+			};
+			response = fn1( "child", "self", envelope, data, "", "/parent/1/child", "GET" );
 			elapsed = Date.now() - start;
 		} );
 

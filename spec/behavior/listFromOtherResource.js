@@ -10,7 +10,8 @@ module.exports = {
 			_action: "self",
 			_origin: { href: "/parent/1/child/1", method: "GET" },
 			_links: {
-				self: { href: "/parent/1/child/1", method: "GET" }
+				self: { href: "/parent/1/child/1", method: "GET" },
+				change: { href: "/parent/1/child/1", method: "PUT" }
 			}
 		},
 		{
@@ -23,6 +24,19 @@ module.exports = {
 			_origin: { href: "/parent/1/child/2", method: "GET" },
 			_links: {
 				self: { href: "/parent/1/child/2", method: "GET" }
+			}
+		},
+		{
+			id: 3,
+			parentId: 1,
+			title: "three",
+			description: "the third item",
+			_resource: "child",
+			_action: "self",
+			_origin: { href: "/parent/1/child/3", method: "GET" },
+			_links: {
+				self: { href: "/parent/1/child/3", method: "GET" },
+				change: { href: "/parent/1/child/3", method: "PUT" }
 			}
 		}
 	]

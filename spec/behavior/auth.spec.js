@@ -43,7 +43,7 @@ describe( "Authorization", function() {
 
 		before( function() {
 			var fn = HyperResource.renderFn( { board: resource } );
-			self = fn( "board", "self", board1, "", undefined, undefined, undefined, authCheck );
+			self = fn( "board", "self", {}, board1, "", undefined, undefined, authCheck );
 		} );
 
 		it( "should generate self hypermedia object model", function() {
