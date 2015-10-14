@@ -1,6 +1,6 @@
 ## 0.3.x
 
-### 0.3.0
+### 0.3.1
  * Breaking API changes to support authorize predicate in determining link visibility automatically
  * Broader use of envelope abstraction throughout library to improve availability of request across features
 
