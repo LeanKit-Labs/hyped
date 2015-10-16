@@ -1,5 +1,13 @@
 ## 0.3.x
 
+### Next
+ * Allow authorize to return a promise
+ * Add `hidden` feature to exclude actions from OPTIONS hyperlinks
+ * Add `actions` property to control which actions are included in hyperlinks
+ * Fill out URL parameters in action links from incoming request data
+ * Refactor hyperResource into multiple modules
+ * Rework tests to reflect new module separation
+
 ### 0.3.1
  * Breaking API changes to support authorize predicate in determining link visibility automatically
  * Broader use of envelope abstraction throughout library to improve availability of request across features

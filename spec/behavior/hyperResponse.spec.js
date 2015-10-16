@@ -94,7 +94,7 @@ describe( "Hyper Response", function() {
 				"GET"
 			)
 			.twice() // twice because we call it, then render calls it
-			.returns( model );
+			.resolves( model );
 
 			var response = new HyperResponse( envelope, engine, hyperResource, contentType );
 			response.origin( "/test", "GET" );
@@ -103,7 +103,7 @@ describe( "Hyper Response", function() {
 		} );
 
 		it( "should produce the exepcted result", function() {
-			result.should.eql( {
+			result.should.eventually.eql( {
 				status: 200,
 				headers: {
 					"Content-Type": "application/json",

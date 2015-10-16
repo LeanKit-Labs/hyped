@@ -3,11 +3,9 @@ var model = require( "../model.js" );
 var HyperResource = require( "../../src/hyperResource.js" );
 
 var board1 = model.board1;
-var limit = 5;
 
 describe( "Additional Links", function() {
 	describe( "with static links", function() {
-		var elapsedMs;
 		var resource = {
 			name: "board",
 			actions: {
@@ -70,25 +68,21 @@ describe( "Additional Links", function() {
 		};
 
 		before( function() {
-			var start = Date.now();
-			var fn = HyperResource.renderFn( { board: resource } );
+			var fn = HyperResource.renderGenerator( { board: resource } );
 			self1 = fn( "board", "self", { data: { page: 1, size: 10 } }, board1 );
 			self2 = fn( "board", "self", { data: { page: 2, size: 10 } }, board1 );
-			elapsedMs = Date.now() - start;
 		} );
 
-		it( "should generate links correctly", function() {
-			self1.should.eql( expectedSelf1 );
-			self2.should.eql( expectedSelf2 );
+		it( "should include next-page in links for page 1", function() {
+			return self1.should.eventually.eql( expectedSelf1 );
 		} );
 
-		it( "should be \"quick\"", function() {
-			elapsedMs.should.be.below( limit );
+		it( "should include next-page and prev-page in links for page 2", function() {
+			return self2.should.eventually.eql( expectedSelf2 );
 		} );
 	} );
 
 	describe( "with resource prefixes", function() {
-		var elapsedMs;
 		var resource = {
 			name: "board",
 			urlPrefix: "/prefix1",
@@ -153,23 +147,17 @@ describe( "Additional Links", function() {
 		};
 
 		before( function() {
-			var fn = HyperResource.renderFn( { board: resource }, { urlPrefix: "/badUrl", apiPrefix: "/badUrl" } );
-			var start = Date.now();
+			var fn = HyperResource.renderGenerator( { board: resource }, { urlPrefix: "/badUrl", apiPrefix: "/badUrl" } );
 			self1 = fn( "board", "self", { data: { page: 1, size: 10 } }, board1 );
 			self2 = fn( "board", "self", { data: { page: 2, size: 10 } }, board1 );
-			elapsedMs = Date.now() - start;
 		} );
 
-		it( "should generate links correctly for page 1", function() {
-			self1.should.eql( expectedSelf1 );
+		it( "should include next-page in links for page 1", function() {
+			return self1.should.eventually.eql( expectedSelf1 );
 		} );
 
-		it( "should generate links correctly for page 2", function() {
-			self2.should.eql( expectedSelf2 );
-		} );
-
-		it( "should be \"quick\"", function() {
-			elapsedMs.should.be.below( limit );
+		it( "should include next-page and prev-page in links for page 2", function() {
+			return self2.should.eventually.eql( expectedSelf2 );
 		} );
 	} );
 } );

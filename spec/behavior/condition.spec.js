@@ -1,8 +1,6 @@
 require( "../setup" );
 var HyperResource = require( "../../src/hyperResource.js" );
 
-var limit = 8;
-
 describe( "Conditions", function() {
 	describe( "when filtering links by predicate", function() {
 		var resource = {
@@ -70,37 +68,26 @@ describe( "Conditions", function() {
 				deposit: { href: "/account/100100/deposit", method: "POST" }
 			}
 		};
-
-		var newAccount, withMoney, noMoney, elapsed1, elapsed2, elapsed3, elapsed4;
-
+		var render;
 		before( function() {
-			var start = Date.now();
-			var fn = HyperResource.renderFn( { account: resource } );
-			elapsed1 = ( Date.now() - start );
-			start = Date.now();
-			newAccount = fn( "account", "self", {}, acct );
-			elapsed2 = ( Date.now() - start );
+			render = HyperResource.renderGenerator( { account: resource } );
+		} );
+
+		it( "should not show withdraw on a new account", function() {
+			return render( "account", "self", {}, acct )
+				.should.eventually.eql( expected1 );
+		} );
+
+		it( "should show withdraw since balance is greater than 0", function() {
 			acct.balance = 100;
-			start = Date.now();
-			withMoney = fn( "account", "self", {}, acct );
-			elapsed3 = ( Date.now() - start );
+			return render( "account", "self", {}, acct )
+				.should.eventually.eql( expected2 );
+		} );
+
+		it( "should not show withdraw on an empty account", function() {
 			acct.balance = 0;
-			start = Date.now();
-			noMoney = fn( "account", "self", {}, acct );
-			elapsed4 = ( Date.now() - start );
-		} );
-
-		it( "should only show withdrawal if balance is greater than 0", function() {
-			newAccount.should.eql( expected1 );
-			withMoney.should.eql( expected2 );
-			noMoney.should.eql( expected3 );
-		} );
-
-		it( "should be \"quick\"", function() {
-			elapsed1.should.be.below( limit );
-			elapsed2.should.be.below( limit );
-			elapsed3.should.be.below( limit );
-			elapsed4.should.be.below( limit );
+			return render( "account", "self", {}, acct )
+				.should.eventually.eql( expected3 );
 		} );
 	} );
 } );

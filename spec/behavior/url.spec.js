@@ -9,7 +9,7 @@ describe( "URL Template", function() {
 		var href;
 
 		before( function() {
-			href = url.create( template, model, "a" );
+			href = url.create( template, model, {}, "a" );
 		} );
 
 		it( "should replace the token with the matching model property", function() {
@@ -24,7 +24,7 @@ describe( "URL Template", function() {
 		var href;
 
 		before( function() {
-			href = url.create( template, model, "grandChild" );
+			href = url.create( template, model, {}, "grandChild" );
 		} );
 
 		it( "should replace all tokens correctly", function() {
@@ -39,7 +39,7 @@ describe( "URL Template", function() {
 		var href;
 
 		before( function() {
-			href = url.create( template, model, "a" );
+			href = url.create( template, model, {}, "a" );
 		} );
 
 		it( "should replace the token with the matching model property", function() {
@@ -54,7 +54,7 @@ describe( "URL Template", function() {
 		var href;
 
 		before( function() {
-			href = url.create( template, model, "a" );
+			href = url.create( template, model, {}, "a" );
 		} );
 
 		it( "should keep token in place", function() {
@@ -69,7 +69,7 @@ describe( "URL Template", function() {
 		var href;
 
 		before( function() {
-			href = url.create( template, model, "a" );
+			href = url.create( template, model, {}, "a" );
 		} );
 
 		it( "should create a camel cased token name", function() {

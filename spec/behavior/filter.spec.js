@@ -34,12 +34,12 @@ describe( "Property Filtering", function() {
 		};
 
 		before( function() {
-			var fn = hyperResource.renderFn( { board: resource } );
+			var fn = hyperResource.renderGenerator( { board: resource } );
 			self = fn( "board", "self", {}, board1 );
 		} );
 
 		it( "should generate hypermedia without `lanes` or `hidden` fields", function() {
-			self.should.eql( expectedSelf );
+			return self.should.eventually.eql( expectedSelf );
 		} );
 	} );
 } );

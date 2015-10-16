@@ -42,12 +42,12 @@ describe( "Authorization", function() {
 		};
 
 		before( function() {
-			var fn = HyperResource.renderFn( { board: resource } );
+			var fn = HyperResource.renderGenerator( { board: resource } );
 			self = fn( "board", "self", {}, board1, "", undefined, undefined, authCheck );
 		} );
 
 		it( "should generate self hypermedia object model", function() {
-			self.should.eql( expectedSelf );
+			return self.should.eventually.eql( expectedSelf );
 		} );
 	} );
 } );

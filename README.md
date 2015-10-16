@@ -28,6 +28,8 @@ The resource definition provides the metadata necessary for hyped to generate hy
 			embed: defines which model properties are embedded resources and how to render them
 			links: provides alternate/compatible urls for activating this action
 			parameters: provide metadata to describe available query parameters for this action
+			hidden: a boolean indicating that this action should not be included in options
+			actions: allows control of which actions are shown in the hypermedia
 		}
 	},
 	versions: {
@@ -157,6 +159,10 @@ The resource definition provides the metadata necessary for hyped to generate hy
 	<dd>The name of the resource that is being rendered.</dd>
 	<dt>action</dt>
 	<dd>The name of the action to use in rendering the resource.</dd>
+	<dt><h3>hidden</h3></dt>
+	<dd>Setting this property to true will exclude this action from hyperlinks when rendering options.</dd>
+	<dt><h3>actions</h3></dt>
+	<dd>Allows control of which actions appear as hyperlinks when rendering this action.</dd>
 </dl>
 
 #### Example
@@ -290,7 +296,7 @@ __Brace style variables__
 
 Either style is valid when specifying the URL in the action, hyped will make sure that the correct form is used (Express style gets used server side for assigning routes while brace style is returned in all client responses).
 
-The first form will be used to attempt to read a property directly on the model. The second will attempt to read a nested property _or_ a property name that combines the two in camel-case fahsion (i.e. `propertyChildProperty`). In either case, if no match is found, the variable will be left in tact. In the second case, the period is removed and the variable becomes camel-case.
+The first form will be used to attempt to read a property directly from the returned model or incoming request. The second will attempt to read a nested property _or_ a property name that combines the two in camel-case fahsion (i.e. `propertyChildProperty`). In either case, if no match is found, the variable will be left in tact. In the second case, the period is removed and the variable becomes camel-case.
 
 Example:
 ```javascript
@@ -305,7 +311,7 @@ Example:
 }
 ```
 
-If the user model in question had a name property of `"leroyJenkins"`, the response body would look like this:
+If the user model returned or envelope.data had a name property of `"leroyJenkins"`, the response body would look like this:
 
 ```javascript
 {

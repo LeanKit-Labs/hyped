@@ -18,7 +18,7 @@ module.exports = function( host ) {
 			},
 			move: {
 				include: [ "id", "laneId" ],
-				url: "/card/:id/board/:board.id/lane/:lane.id",
+				url: "/card/:id/board/:targetBoardId/lane/:targetLaneId",
 				method: "PUT"
 			},
 			block: {
