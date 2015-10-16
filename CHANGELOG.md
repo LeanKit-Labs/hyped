@@ -1,6 +1,6 @@
-## 0.3.x
+## 0.4.x
 
-### Next
+### 0.4.0
  * Allow authorize to return a promise
  * Add `hidden` feature to exclude actions from OPTIONS hyperlinks
  * Add `actions` property to control which actions are included in hyperlinks
