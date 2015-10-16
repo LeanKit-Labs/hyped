@@ -1,10 +1,13 @@
 var _ = require( "lodash" );
+var format = require( "util" ).format;
 
 var expressFind = /[:]([^:\/?]*)/g;
 var expressReplace = /[:]replace/g; // jshint ignore:line
 
 var braceFind = /[{]([^}]*)[}]/g;
 var braceReplace = /[{]replace[}]/g;
+
+var twoPartTemplate = "(%s|%s)";
 
 function camelCase( token ) {
 	return camelize( token.resource, token.property );
@@ -16,13 +19,13 @@ function camelize( resource, property ) { // jshint ignore:line
 		resource + property[ 0 ].toUpperCase() + property.slice( 1 );
 }
 
-function createUrl( url, data, resource ) {
+function createUrl( url, data, envelope, resource ) {
 	if ( isExpressStyle( url ) ) {
 		url = halStylePathVariables( url );
 	}
 	var tokens = getTokens( url );
 	if ( tokens.length > 0 ) {
-		url = processTokens( tokens, url, data, resource );
+		url = processTokens( tokens, url, data, envelope, resource );
 	}
 	return url;
 }
@@ -78,13 +81,17 @@ function parseToken( token ) { // jshint ignore:line
 	};
 }
 
-function readDataByToken( resource, data, token ) {
+function readDataByToken( resource, data, envelope, token ) {
 	var value;
+	var params = envelope && envelope.data ? envelope.data : {};
 	var camel = camelCase( token );
 	if ( data ) {
 		value = data[ camel ] ||
 		( data[ token.resource ] ? data[ token.resource ][ token.property ] : undefined ) ||
 		( resource === token.resource ? data[ token.property ] : undefined );
+	}
+	if ( !value ) {
+		value = resource === token.resource ? params[ token.original ] || params[ camel ] : params[ camel ] || params[ token.property ];
 	}
 	var empty = value === undefined || value === {};
 	var backup = !token.isChild && token.resource && token.resource === resource ? token.property : camel;
@@ -92,14 +99,17 @@ function readDataByToken( resource, data, token ) {
 	return empty ? result : value;
 }
 
-function processTokens( tokens, url, data, resource ) { // jshint ignore:line
+function processTokens( tokens, url, data, envelope, resource ) { // jshint ignore:line
 	var token = tokens.pop();
 	if ( token ) {
-		var replacement = readDataByToken( resource, data, token );
-		var stringified = ( braceReplace.toString() ).replace( /replace/, token.original );
+		var target = token.resource === resource ?
+			format( twoPartTemplate, token.property, token.original ) :
+			format( twoPartTemplate, camelCase( token ), token.original );
+		var replacement = readDataByToken( resource, data, envelope, token );
+		var stringified = ( braceReplace.toString() ).replace( /replace/, target );
 		var replacer = parseRegex( stringified );
 		var newUrl = url.replace( replacer, replacement );
-		return processTokens( tokens, newUrl, data, resource );
+		return processTokens( tokens, newUrl, data, envelope, resource );
 	}
 	return url;
 }

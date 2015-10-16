@@ -11,7 +11,6 @@ module.exports = {
 			_action: "self",
 			_links: {
 				self: { href: "/parent/1", method: "GET" },
-				list: { href: "/parent", method: "GET" },
 				children: { href: "/parent/1/child", method: "GET",
 					parameters: {
 						size: { range: [ 1, 100 ] }
@@ -29,7 +28,6 @@ module.exports = {
 			_action: "self",
 			_links: {
 				self: { href: "/parent/2", method: "GET" },
-				list: { href: "/parent", method: "GET" },
 				children: { href: "/parent/2/child", method: "GET",
 					parameters: {
 						size: { range: [ 1, 100 ] }

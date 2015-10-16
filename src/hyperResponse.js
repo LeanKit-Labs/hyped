@@ -1,4 +1,5 @@
 var _ = require( "lodash" );
+var when = require( "when" );
 
 function setModel( self, model, context ) {
 	self._model = model;
@@ -23,7 +24,7 @@ var HyperResponse = function( envelope, engine, hyperResource, contentType ) {
 
 	var self = this;
 	req.extendHttp.hyped = req.hyped = setModel.bind( undefined, self );
-
+	req.extendHttp.reply = this.render.bind( this );
 	req.extendHttp.render = req.render = function( host, resource, action, result ) {
 		var model = result.data ? result.data : result;
 		var context = result.context ? result.context : self._context;
@@ -50,7 +51,8 @@ HyperResponse.prototype.cookies = function( cookies ) {
 HyperResponse.prototype.createResponse = function() {
 	var resource = this._req._resource;
 	var action = this._req._action;
-	var hypermedia = this._hyperResource(
+	this._headers[ "Content-Type" ] = this._contentType;
+	return this._hyperResource(
 		this._resource || resource,
 		this._action || action,
 		this._envelope,
@@ -58,14 +60,14 @@ HyperResponse.prototype.createResponse = function() {
 		"",
 		this._originUrl,
 		this._originMethod
-	);
-	this._headers[ "Content-Type" ] = this._contentType;
-	return {
-		status: this._code,
-		headers: this._headers,
-		cookies: this._cookies,
-		data: this._engine( hypermedia )
-	};
+	).then( function( hypermedia ) {
+		return {
+			status: this._code,
+			headers: this._headers,
+			cookies: this._cookies,
+			data: this._engine( hypermedia )
+		};
+	}.bind( this ) );
 };
 
 HyperResponse.prototype.headers = function( headers ) {
@@ -88,30 +90,32 @@ HyperResponse.prototype.getResponse = function() {
 	if ( this._engine ) {
 		return this.createResponse();
 	} else {
-		return {
+		return when( {
 			status: 415,
 			headers: {
 				"Content-Type": "text/plain"
 			},
 			data: "The requested media type '" + this._contentType + "' is not supported. Please see the OPTIONS at the api root to get a list of supported types."
-		};
+		} );
 	}
 };
 
 HyperResponse.prototype.render = function() {
 	var res = this._res;
-	var response = this.getResponse();
-	if ( response.headers ) {
-		_.each( response.headers, function( v, k ) {
-			res.set( k, v );
-		}.bind( this ) );
-	}
-	if ( response.cookies ) {
-		_.each( response.cookies, function( v, k ) {
-			res.cookie( k, v.value, v.options );
-		}.bind( this ) );
-	}
-	res.status( response.status ).send( response.data );
+	this.getResponse()
+		.then( function( response ) {
+			if ( response.headers ) {
+				_.each( response.headers, function( v, k ) {
+					res.set( k, v );
+				} );
+			}
+			if ( response.cookies ) {
+				_.each( response.cookies, function( v, k ) {
+					res.cookie( k, v.value, v.options );
+				} );
+			}
+			res.status( response.status ).send( response.data );
+		} );
 };
 
 module.exports = HyperResponse;

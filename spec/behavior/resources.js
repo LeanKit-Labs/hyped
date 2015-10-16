@@ -3,7 +3,8 @@ var resources = {
 		actions: {
 			self: {
 				method: "get",
-				url: "/parent/:id"
+				url: "/parent/:id",
+				actions: [ "self", "children", "next-child-page" ]
 			},
 			list: {
 				method: "get",
@@ -16,6 +17,11 @@ var resources = {
 				authorize: function( envelope ) {
 					return false;
 				}
+			},
+			exclude: {
+				method: "get",
+				url: "/exclude",
+				hidden: true
 			},
 			children: {
 				method: "get",
@@ -76,10 +82,8 @@ var resources = {
 				authorize: function( envelope, data ) {
 					var userName = envelope.user ? envelope.user.name : "nobody";
 					if ( userName === "Evenly" ) {
-						console.log( "    WTF", data.id );
 						return data.id % 2 === 0;
 					} else if ( userName === "Oddly" ) {
-						console.log( "    WTF", data.id );
 						return data.id % 2 === 1;
 					} else {
 						return false;

@@ -58,7 +58,7 @@
 									"method": "GET"
 								},
 								"move": {
-									"href": "/test/api/card/301/board/{boardId}/lane/{laneId}",
+									"href": "/test/api/card/301/board/{targetBoardId}/lane/{targetLaneId}",
 									"method": "PUT",
 									"templated": true
 								},
@@ -84,7 +84,7 @@
 									"method": "GET"
 								},
 								"move": {
-									"href": "/test/api/card/302/board/{boardId}/lane/{laneId}",
+									"href": "/test/api/card/302/board/{targetBoardId}/lane/{targetLaneId}",
 									"method": "PUT",
 									"templated": true
 								},
@@ -110,7 +110,7 @@
 									"method": "GET"
 								},
 								"move": {
-									"href": "/test/api/card/303/board/{boardId}/lane/{laneId}",
+									"href": "/test/api/card/303/board/{targetBoardId}/lane/{targetLaneId}",
 									"method": "PUT",
 									"templated": true
 								},
@@ -161,7 +161,7 @@
 									"method": "GET"
 								},
 								"move": {
-									"href": "/test/api/card/304/board/{boardId}/lane/{laneId}",
+									"href": "/test/api/card/304/board/{targetBoardId}/lane/{targetLaneId}",
 									"method": "PUT",
 									"templated": true
 								},
@@ -212,7 +212,7 @@
 									"method": "GET"
 								},
 								"move": {
-									"href": "/test/api/card/305/board/{boardId}/lane/{laneId}",
+									"href": "/test/api/card/305/board/{targetBoardId}/lane/{targetLaneId}",
 									"method": "PUT",
 									"templated": true
 								},
@@ -238,7 +238,7 @@
 									"method": "GET"
 								},
 								"move": {
-									"href": "/test/api/card/306/board/{boardId}/lane/{laneId}",
+									"href": "/test/api/card/306/board/{targetBoardId}/lane/{targetLaneId}",
 									"method": "PUT",
 									"templated": true
 								},

@@ -2,254 +2,10 @@ require( "../setup" );
 var url = require( "../../src/urlTemplate.js" );
 var HyperResource = require( "../../src/hyperResource.js" );
 
-var limit = 15;
-
 var resources = require( "./resources.js" );
 
-describe( "Action links", function() {
-	describe( "With an inheritence hierarchy greater than 2", function() {
-		describe( "when creating parentUrls", function() {
-			var parent, child, grandChild, urlCache;
-
-			before( function() {
-				var model = {
-					parentId: 1,
-					childId: 2,
-					id: 3
-				};
-				var fn = HyperResource.parentFn( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
-				urlCache = HyperResource.urlCache( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
-				parent = fn( "parent", model );
-				child = fn( "child", model );
-				grandChild = fn( "grandChild", model );
-			} );
-
-			it( "should build the urlCache correctly", function() {
-				urlCache.should.eql( {
-					parent: { url: "", tokens: [] },
-					child: { url: "/parent/{id}", tokens: [
-							{ original: "id", namespace: "", resource: "parent", property: "id", camel: "parentId" }
-						] },
-					grandChild: { url: "/parent/{id}/child/{child.id}", tokens: [
-							{ original: "id", namespace: "", resource: "parent", property: "id", camel: "parentId" },
-							{ original: "child.id", namespace: "", resource: "child", property: "id", camel: "childId" }
-						] }
-				} );
-			} );
-
-			it( "should build the correct parentUrl for parent", function() {
-				parent.should.equal( "" );
-			} );
-
-			it( "should build the correct parentUrl for child", function() {
-				child.should.equal( "/parent/1" );
-			} );
-
-			it( "should build the correct parentUrl for grandChild", function() {
-				grandChild.should.equal( "/parent/1/child/2" );
-			} );
-		} );
-
-		describe( "when creating action urls", function() {
-			var parent, child, grandChild, children, next;
-
-			before( function() {
-				var model = {
-					parentId: 1,
-					childId: 2,
-					id: 3
-				};
-				var fn = HyperResource.urlFn( resources );
-				parent = fn( "parent", "self", { id: 1 } );
-				children = fn( "parent", "children", { id: 1 } );
-				next = fn( "parent", "next-child-page", { id: 1 }, undefined, { data: { page: 1, size: 5 } } );
-				child = fn( "child", "self", model );
-				grandChild = fn( "grandChild", "self", model );
-			} );
-
-			it( "should build the correct parent url", function() {
-				parent.should.equal( "/parent/1" );
-			} );
-
-			it( "should build the correct children url", function() {
-				children.should.equal( "/parent/1/child" );
-			} );
-
-			it( "should generate the correct next-child-page url", function() {
-				next.should.equal( "/parent/1/child?page=2&size=5" );
-			} );
-
-			it( "should build the correct child url", function() {
-				child.should.equal( "/parent/1/child/2" );
-			} );
-
-			it( "should build the correct grandChild url", function() {
-				grandChild.should.equal( "/parent/1/child/2/grand/3" );
-			} );
-		} );
-
-		describe( "when creating action urls with a prefix", function() {
-			var parent, child, grandChild, children, next;
-
-			before( function() {
-				var model = {
-					parentId: 1,
-					childId: 2,
-					id: 3
-				};
-				var fn = HyperResource.urlFn( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
-				parent = fn( "parent", "self", { id: 1 } );
-				children = fn( "parent", "children", { id: 1 } );
-				next = fn( "parent", "next-child-page", { id: 1 }, undefined, { data: { page: 1, size: 5 } } );
-				child = fn( "child", "self", model );
-				grandChild = fn( "grandChild", "self", model );
-			} );
-
-			it( "should build the correct parent url", function() {
-				parent.should.equal( "/test/api/parent/1" );
-			} );
-
-			it( "should build the correct children url", function() {
-				children.should.equal( "/test/api/parent/1/child" );
-			} );
-
-			it( "should generate the correct next-child-page url", function() {
-				next.should.equal( "/test/api/parent/1/child?page=2&size=5" );
-			} );
-
-			it( "should build the correct child url", function() {
-				child.should.equal( "/test/api/parent/1/child/2" );
-			} );
-
-			it( "should build the correct grandChild url", function() {
-				grandChild.should.equal( "/test/api/parent/1/child/2/grand/3" );
-			} );
-		} );
-	} );
-
-	describe( "When getting versions", function() {
-		var parentVersions, childVersions;
-
-		before( function() {
-			parentVersions = HyperResource.versionsFor( resources.parent );
-			childVersions = HyperResource.versionsFor( resources.child );
-		} );
-
-		it( "should produce new version correctly", function() {
-			parentVersions[ 2 ].actions.self.include.should.eql( [ "id", "title" ] );
-		} );
-
-		it( "should keep version changes separate from original", function() {
-			expect( parentVersions[ 1 ].actions.self.include ).not.to.exist; // jshint ignore:line
-		} );
-
-		it( "should return a version hash with one entry for resources without a version hash", function() {
-			expect( childVersions[ 1 ].actions.self ).to.exist; // jshint ignore:line
-		} );
-	} );
-
-	describe( "When rendering links from different actions", function() {
-		describe( "when rendering an \"plain\" action", function() {
-			var expected = { self: { href: "/parent/1", method: "GET" } };
-			var links;
-
-			before( function() {
-				var model = {
-					id: 1
-				};
-				var fn = HyperResource.linkFn( resources );
-				links = fn( "parent", "self", {}, model );
-			} );
-
-			it( "should produce expected links", function() {
-				links.should.eql( expected );
-			} );
-		} );
-
-		describe( "when rendering action with failed condition", function() {
-			var expected = {};
-			var links;
-
-			before( function() {
-				var model = {
-					id: 1
-				};
-				var fn = HyperResource.linkFn( resources );
-				links = fn( "parent", "children", {}, model );
-			} );
-
-			it( "should produce expected links", function() {
-				links.should.eql( expected );
-			} );
-		} );
-
-		describe( "when rendering action with failed auth", function() {
-			var expected = {};
-			var links;
-
-			before( function() {
-				var model = {
-					id: 1
-				};
-				var fn = HyperResource.linkFn( resources );
-				links = fn( "parent", "children", {}, model, "", function() {
-					return false;
-				} );
-			} );
-
-			it( "should produce expected links", function() {
-				links.should.eql( expected );
-			} );
-		} );
-
-		describe( "when rendering action with passed condition and no page size specified", function() {
-			var parameters = {
-				size: { range: [ 1, 100 ] }
-			};
-			var expected = {
-				children: { href: "/parent/1/child", method: "GET", parameters: parameters }
-			};
-			var links;
-
-			before( function() {
-				var model = {
-					id: 1,
-					children: [ {} ]
-				};
-				var fn = HyperResource.linkFn( resources );
-				links = fn( "parent", "children", { data: { page: 1 } }, model );
-			} );
-
-			it( "should produce expected links", function() {
-				links.should.eql( expected );
-			} );
-		} );
-
-		describe( "when rendering action with passed condition and context", function() {
-			var parameters = {
-				page: { range: [ 1, 2 ] },
-				size: { range: [ 1, 100 ] }
-			};
-			var expected = {
-				children: { href: "/parent/1/child", method: "GET", parameters: parameters },
-				"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters }
-			};
-			var links;
-
-			before( function() {
-				var model = {
-					id: 1,
-					children: [ {}, {}, {}, {}, {}, {}, {}, {}, {}, {} ]
-				};
-				var fn = HyperResource.linkFn( resources );
-				links = fn( "parent", "children", { data: { page: 1, size: 5 } }, model, "" );
-			} );
-
-			it( "should produce expected links", function() {
-				links.should.eql( expected );
-			} );
-		} );
-
+describe( "Hyper Resource", function() {
+	describe( "when rendering actions", function() {
 		describe( "when rendering action with specific version", function() {
 			var parameters = {
 				page: { range: [ 1, 1 ] },
@@ -263,7 +19,6 @@ describe( "Action links", function() {
 				_action: "self",
 				_links: {
 					self: { href: "/parent/1", method: "GET" },
-					list: { href: "/parent", method: "GET" },
 					children: { href: "/parent/1/child", method: "GET", parameters: parameters },
 					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters }
 				}
@@ -281,12 +36,12 @@ describe( "Action links", function() {
 			};
 
 			before( function() {
-				var fn = HyperResource.resourceFn( resources, "", 2 );
+				var fn = HyperResource.resourceGenerator( resources, "", 2 );
 				response = fn( "parent", "self", { data: requestData }, data, "" );
 			} );
 
 			it( "should return the correct response", function() {
-				response.should.eql( expected );
+				return response.should.eventually.eql( expected );
 			} );
 		} );
 
@@ -305,7 +60,6 @@ describe( "Action links", function() {
 				_action: "self",
 				_links: {
 					self: { href: "/parent/1", method: "GET" },
-					list: { href: "/parent", method: "GET" },
 					children: { href: "/parent/1/child", method: "GET", parameters: parameters },
 					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters }
 				}
@@ -323,12 +77,12 @@ describe( "Action links", function() {
 			};
 
 			before( function() {
-				var fn = HyperResource.resourceFn( resources );
+				var fn = HyperResource.resourceGenerator( resources );
 				response = fn( "parent", "self", { data: requestData }, data, "" );
 			} );
 
 			it( "should return the correct response", function() {
-				response.should.eql( expected );
+				return response.should.eventually.eql( expected );
 			} );
 		} );
 
@@ -341,26 +95,18 @@ describe( "Action links", function() {
 				title: "child",
 				grandChildren: [ { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 } ]
 			};
-			var elapsed;
 			var envelope = {
 				user: {
 					name: "Evenly"
 				}
 			};
 			before( function() {
-				var fn1 = HyperResource.resourceFn( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
-
-				var start = Date.now();
+				var fn1 = HyperResource.resourceGenerator( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
 				response = fn1( "child", "self", envelope, data );
-				elapsed = Date.now() - start;
 			} );
 
 			it( "should return the correct response", function() {
-				response.should.eql( expected );
-			} );
-
-			it( "new should be \"quick\"", function() {
-				elapsed.should.be.below( limit );
+				return response.should.eventually.eql( expected );
 			} );
 		} );
 	} );
@@ -386,12 +132,12 @@ describe( "Action links", function() {
 		var options;
 
 		before( function() {
-			var fn = HyperResource.optionsFn( resources, undefined, undefined, undefined, undefined, true );
+			var fn = HyperResource.optionsGenerator( resources, undefined, undefined, undefined, undefined, true );
 			options = fn( {}, {} );
 		} );
 
 		it( "should render options correctly", function() {
-			options.should.eql( expected );
+			return options.should.eventually.eql( expected );
 		} );
 	} );
 
@@ -410,12 +156,12 @@ describe( "Action links", function() {
 		var options;
 
 		before( function() {
-			var fn = HyperResource.optionsFn( resources, "", undefined, true );
+			var fn = HyperResource.optionsGenerator( resources, "", undefined, true );
 			options = fn();
 		} );
 
 		it( "should render options correctly", function() {
-			options.should.eql( expected );
+			return options.should.eventually.eql( expected );
 		} );
 	} );
 
@@ -436,22 +182,14 @@ describe( "Action links", function() {
 				children: [ {} ]
 			}
 		];
-		var elapsed;
 
 		before( function() {
-			var fn1 = HyperResource.resourcesFn( resources );
-
-			var start = Date.now();
+			var fn1 = HyperResource.resourcesGenerator( resources );
 			response = fn1( "parent", "self", {}, data, "", "/parent", "GET" );
-			elapsed = Date.now() - start;
 		} );
 
 		it( "should return the correct response", function() {
-			response.should.eql( expected );
-		} );
-
-		it( "new should be \"quick\"", function() {
-			elapsed.should.be.below( limit );
+			return response.should.eventually.eql( expected );
 		} );
 	} );
 
@@ -481,49 +219,17 @@ describe( "Action links", function() {
 		var elapsed;
 
 		before( function() {
-			var fn1 = HyperResource.resourcesFn( resources );
-			var start = Date.now();
+			var fn1 = HyperResource.resourcesGenerator( resources );
 			var envelope = {
 				user: {
 					name: "Oddly"
 				}
 			};
 			response = fn1( "child", "self", envelope, data, "", "/parent/1/child", "GET" );
-			elapsed = Date.now() - start;
 		} );
 
 		it( "should return the correct response", function() {
-			response.should.eql( expected );
-		} );
-
-		it( "new should be \"quick\"", function() {
-			elapsed.should.be.below( limit );
-		} );
-	} );
-
-	describe( "Timing token replacement", function() {
-		var testUrl = "/parent/:id/child/:child.id";
-
-		describe( "Replacing 2 tokens 1000 times with regex", function() {
-			var elapsed;
-			var urls = [];
-			before( function() {
-				var start = Date.now();
-				var tokens = url.getTokens( testUrl );
-				var halUrl = url.forHal( testUrl );
-				for ( var i = 0; i < 1000; i++ ) {
-					urls.push( url.process( _.clone( tokens ), halUrl, { id: 1, childId: 2 }, "parent" ) );
-				}
-				elapsed = Date.now() - start;
-			} );
-
-			it( "should produce a valid URL", function() {
-				urls[ 1 ].should.equal( "/parent/1/child/2" );
-			} );
-
-			it( "should be \"quick\"", function() {
-				elapsed.should.be.below( 40 );
-			} );
+			return response.should.eventually.eql( expected );
 		} );
 	} );
 } );

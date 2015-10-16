@@ -107,7 +107,7 @@ function getHyperModel( state, envelope ) { // jshint ignore:line
 		version = getVersion( state, envelope );
 	}
 	if ( !state.hypermodels[ version ] ) {
-		state.hypermodels[ version ] = HyperResource.renderFn( state.resources, state.prefix, version ); // jshint ignore: line
+		state.hypermodels[ version ] = HyperResource.renderGenerator( state.resources, state.prefix, version ); // jshint ignore: line
 	}
 	return state.hypermodels[ version ];
 }
@@ -118,20 +118,15 @@ function getOptionModel( state, envelope ) {
 		version = getVersion( state, envelope );
 	}
 	if ( !state.optionModels[ version ] ) {
-		state.optionModels[ version ] = HyperResource.optionsFn( state.resources, state.prefix, version, state.excludeChildren, envelope )( state.engines );
+		state.optionModels[ version ] = HyperResource.optionsGenerator( state.resources, state.prefix, version, state.excludeChildren, envelope )( state.engines );
 	}
 	return state.optionModels[ version ];
 }
 
-function getFullOptionModel( state, envelope ) {
+function getFullOptionModel( state ) {
 	var version = 1;
-	if ( envelope ) {
-		version = getVersion( envelope );
-	} else {
-		envelope = {};
-	}
 	if ( !state.fullOptionModels[ version ] ) {
-		state.fullOptionModels[ version ] = HyperResource.optionsFn( state.resources, state.prefix, version, false, envelope, true )( state.engines );
+		state.fullOptionModels[ version ] = HyperResource.routesGenerator( state.resources, state.prefix, version )( state.engines );
 	}
 	return state.fullOptionModels[ version ];
 }
@@ -183,9 +178,11 @@ function optionsMiddleware( state, req, res, next ) { // jshint ignore:line
 			engine = jsonEngine;
 		}
 		var envelope = getEnvelope( req, res );
-		var optionModel = getOptionModel( state, envelope );
-		var body = engine( optionModel, true );
-		res.status( 200 ).set( "Content-Type", contentType ).send( body );
+		getOptionModel( state, envelope )
+			.then( function( optionModel ) {
+				var body = engine( optionModel, true );
+				res.status( 200 ).set( "Content-Type", contentType ).send( body );
+			} );
 	} else {
 		next();
 	}

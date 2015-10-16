@@ -4,7 +4,7 @@
 		"board:cards": { "href": "/board/{id}/card", "method": "GET", "templated": true },
 		"board:self": { "href": "/board/{id}", "method": "GET", "templated": true },
 		"card:self": { "href": "/card/{id}", "method": "GET", "templated": true },
-		"card:move": { "href": "/card/{id}/board/{boardId}/lane/{laneId}", "method": "PUT", "templated": true },
+		"card:move": { "href": "/card/{id}/board/{targetBoardId}/lane/{targetLaneId}", "method": "PUT", "templated": true },
 		"card:block": { "href": "/card/{id}/block", "method": "PUT", "templated": true },
 		"lane:self": { "href": "/board/{boardId}/lane/{id}", "method": "GET", "templated": true },
 		"lane:cards": { "href": "/board/{boardId}/lane/{id}/card", "method": "GET", "templated": true },
