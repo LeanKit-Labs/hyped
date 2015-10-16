@@ -1,6 +1,6 @@
 ## 0.4.x
 
-### Next
+### 0.4.1
 Fix defect where envelope was not passed to authorize during options call.
 
 ### 0.4.0
