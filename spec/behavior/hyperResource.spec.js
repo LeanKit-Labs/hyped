@@ -111,7 +111,7 @@ describe( "Hyper Resource", function() {
 		} );
 	} );
 
-	describe( "when rendering options including children", function() {
+	describe( "when rendering options including children and skipping auth check", function() {
 		var expected = {
 			_mediaTypes: [],
 			_versions: [ "1", "2" ],
@@ -122,6 +122,7 @@ describe( "Hyper Resource", function() {
 						size: { range: [ 1, 100 ] }
 					} },
 				"parent:bogus": { href: "/parent/bogus", method: "GET" },
+				"parent:privileged": { href: "/parent/privileged", method: "GET" },
 				"child:self": { href: "/parent/{parentId}/child/{id}", method: "GET", templated: true },
 				"child:change": { href: "/parent/{parentId}/child/{id}", method: "PUT", templated: true },
 				"grandChild:self": { href: "/parent/{parentId}/child/{childId}/grand/{id}", method: "GET", templated: true },
@@ -132,7 +133,7 @@ describe( "Hyper Resource", function() {
 		var options;
 
 		before( function() {
-			var fn = HyperResource.optionsGenerator( resources, undefined, undefined, undefined, undefined, true );
+			var fn = HyperResource.optionsGenerator( resources, undefined, undefined, undefined, { user: {}, context: {} }, true );
 			options = fn( {}, {} );
 		} );
 
@@ -141,7 +142,7 @@ describe( "Hyper Resource", function() {
 		} );
 	} );
 
-	describe( "when rendering options excluding children", function() {
+	describe( "when rendering options excluding children as generic user", function() {
 		var expected = {
 			_mediaTypes: [],
 			_versions: [ "1", "2" ],
@@ -156,7 +157,7 @@ describe( "Hyper Resource", function() {
 		var options;
 
 		before( function() {
-			var fn = HyperResource.optionsGenerator( resources, "", undefined, true );
+			var fn = HyperResource.optionsGenerator( resources, "", undefined, true, { user: {} } );
 			options = fn();
 		} );
 
@@ -164,6 +165,32 @@ describe( "Hyper Resource", function() {
 			return options.should.eventually.eql( expected );
 		} );
 	} );
+
+	describe( "when rendering options excluding children as admin", function() {
+		var expected = {
+			_mediaTypes: [],
+			_versions: [ "1", "2" ],
+			_links: {
+				"parent:self": { href: "/parent/{id}", method: "GET", templated: true },
+				"parent:privileged": { href: "/parent/privileged", method: "GET" },
+				"parent:list": { href: "/parent", method: "GET" },
+				"parent:children": { href: "/parent/{id}/child", method: "GET", templated: true, parameters: {
+						size: { range: [ 1, 100 ] }
+					} }
+			}
+		};
+		var options;
+
+		before( function() {
+			var fn = HyperResource.optionsGenerator( resources, "", undefined, true, { user: { name: "admin" } } );
+			options = fn();
+		} );
+
+		it( "should render options correctly", function() {
+			return options.should.eventually.eql( expected );
+		} );
+	} );
+
 
 	describe( "when rendering a list of top-level resources", function() {
 		var expected = require( "./topLevelResources.js" );

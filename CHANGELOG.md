@@ -1,5 +1,8 @@
 ## 0.4.x
 
+### Next
+Fix defect where envelope was not passed to authorize during options call.
+
 ### 0.4.0
  * Allow authorize to return a promise
  * Add `hidden` feature to exclude actions from OPTIONS hyperlinks

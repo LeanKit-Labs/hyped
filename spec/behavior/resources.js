@@ -23,6 +23,13 @@ var resources = {
 				url: "/exclude",
 				hidden: true
 			},
+			privileged: {
+				method: "get",
+				url: "/privileged",
+				authorize: function( envelope ) {
+					return envelope.user.name === "admin";
+				}
+			},
 			children: {
 				method: "get",
 				url: "/parent/:id/child",

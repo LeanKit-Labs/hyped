@@ -4,14 +4,14 @@ var links = require( "./links" );
 var versions = require( "./versions" );
 var when = require( "when" );
 
-function addOptionLinksForResource( resource, resourceName, createLink, auth, options ) {
+function addOptionLinksForResource( resource, resourceName, createLink, envelope, auth, options ) {
 	return when.all( _.map( resource.actions, function( action, actionName ) {
 		function onMain( main ) {
 			if ( !_.isEmpty( main ) ) {
 				options._links[ [ resourceName, actionName ].join( ":" ) ] = _.values( main )[ 0 ];
 			}
 		}
-		return action.hidden ? when.resolve() : createLink( resourceName, actionName, {}, {}, undefined, undefined, auth )
+		return action.hidden ? when.resolve() : createLink( resourceName, actionName, envelope, {}, undefined, undefined, auth )
 			.then( onMain );
 	} ) );
 }
@@ -76,8 +76,8 @@ function getBodyGenerator( resources, prefix, version ) {
 	};
 }
 
-function getOptionCache( resources, prefix, version, excludeChildren, auth, skipAuthCheck ) {
-	var createLink = links.getLinkGenerator( resources, prefix, version, true, skipAuthCheck );
+function getOptionCache( resources, prefix, version, excludeChildren, envelope, skipAuth, auth ) {
+	var createLink = links.getLinkGenerator( resources, prefix, version, true, skipAuth );
 	var options = { _links: {} };
 	var versionList = [ "1" ];
 	return when.all(
@@ -85,7 +85,7 @@ function getOptionCache( resources, prefix, version, excludeChildren, auth, skip
 			versionList = versionList.concat( resource.versions ? _.keys( resource.versions ) : [] );
 			resource = versions.getVersion( resource, version );
 			if ( !resource.parent || !excludeChildren ) {
-				return addOptionLinksForResource( resource, resourceName, createLink, auth, options );
+				return addOptionLinksForResource( resource, resourceName, createLink, envelope, auth, options );
 			}
 		} )
 	).then( function() {
@@ -94,9 +94,9 @@ function getOptionCache( resources, prefix, version, excludeChildren, auth, skip
 	} );
 }
 
-function getOptionGenerator( resources, prefix, version, excludeChildren, auth, skipAuthCheck ) {
+function getOptionGenerator( resources, prefix, version, excludeChildren, envelope, skipAuth, auth ) {
 	return function( types ) {
-		return getOptionCache( resources, prefix, version, excludeChildren, auth, skipAuthCheck )
+		return getOptionCache( resources, prefix, version, excludeChildren, envelope, skipAuth, auth )
 			.then( function( options ) {
 				options._mediaTypes = _.keys( types );
 				return options;
