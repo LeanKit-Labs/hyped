@@ -188,9 +188,16 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 
 	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, auth ) {
 		var body = {};
-		var resource = versions.getVersion( resources[ resourceName ], version );
-		var render = resource.actions[ actionName ].render;
+		var resource = versions.getVersion( resources[ envelope.resource ], version );
+		var itemResource = versions.getVersion( resources[ resourceName ], version );
+		var render = itemResource.actions[ actionName ].render;
 		var items = render ? pluralize.plural( render.resource ) : pluralize.plural( resourceName );
+
+		var action = resource.actions[ envelope.action ];
+		var actions = action.actions || _.keys( resource.actions );
+		var actionList = _.pick( resource.actions, actions );
+
+		var createLink = links.getLinkGenerator( resources, prefix, version );
 		var promises = _.map( data, function( item, childProp ) {
 			var child = data[ childProp ];
 			if ( render ) {
@@ -199,15 +206,30 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 				return resourceCache[ resourceName ][ actionName ]( envelope, child, parentUrl, undefined, undefined, auth );
 			}
 		} );
+
+		function onBody( body ) {
+			return when.all(
+				_.map( actionList, function( link, linkName ) {
+					return createLink( envelope.resource, linkName, envelope, data, parentUrl, auth );
+				} ) )
+			.then( function( list ) {
+				body._links = _.merge.apply( undefined, list );
+				return body;
+			} );
+		}
+
 		if ( originUrl && originMethod ) {
 			body._origin = { href: originUrl, method: originMethod };
 		} else {
 			body._origin = originFn( resourceName, actionName, data[ 0 ], parentUrl );
 		}
+		body._action = envelope.action;
+		body._resource = envelope.resource;
 		return when.all( promises ).then( function( list ) {
 			body[ items ] = list;
 			return body;
-		} );
+		} )
+		.then( onBody );
 	};
 }
 

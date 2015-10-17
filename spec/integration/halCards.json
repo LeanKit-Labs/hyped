@@ -1,5 +1,7 @@
 {
 	"_origin": { "href": "/test/api/board/100/card", "method": "GET" },
+	"_resource": "board",
+	"_action": "cards",
 	"cards": [
 		{
 			"id": 301,
@@ -79,5 +81,15 @@
 				"block": { "href": "/test/api/card/306/block", "method": "PUT" }
 			}
 		}
-	]
+	],
+	"_links": {
+		"self": {
+			"href": "/test/api/board/100",
+			"method": "GET"
+		},
+		"cards": {
+			"href": "/test/api/board/100/card",
+			"method": "GET"
+		}
+	}
 }

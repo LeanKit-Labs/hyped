@@ -148,7 +148,6 @@ function getActionUrlCache( resources, prefix, version ) {
 					}
 				};
 			} );
-
 			return acc;
 		}, {} );
 		return rAcc;

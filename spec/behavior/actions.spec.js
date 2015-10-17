@@ -225,7 +225,8 @@ describe( "Action links", function() {
 				size: { range: [ 1, 100 ] }
 			};
 			var expected = {
-				children: { href: "/parent/1/child", method: "GET", parameters: parameters }
+				children: { href: "/parent/1/child", method: "GET", parameters: parameters },
+				"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters }
 			};
 			var createLinks;
 			var model;
@@ -239,7 +240,7 @@ describe( "Action links", function() {
 			} );
 
 			it( "should produce expected links", function() {
-				createLinks( "parent", "children", { data: { page: 1 } }, model )
+				return createLinks( "parent", "children", { data: { page: 1 } }, model )
 					.should.eventually.eql( expected );
 			} );
 		} );
@@ -266,7 +267,7 @@ describe( "Action links", function() {
 			} );
 
 			it( "should produce expected links", function() {
-				createLinks( "parent", "children", { data: { page: 1, size: 5 } }, model, "" )
+				return createLinks( "parent", "children", { data: { page: 1, size: 5 } }, model, "" )
 					.should.eventually.eql( expected );
 			} );
 		} );

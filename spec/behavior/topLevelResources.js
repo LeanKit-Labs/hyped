@@ -1,5 +1,7 @@
 module.exports = {
 	_origin: { href: "/parent", method: "GET" },
+	_resource: "parent",
+	_action: "list",
 	parents: [
 		{
 			id: 1,
@@ -35,5 +37,10 @@ module.exports = {
 				}
 			}
 		}
-	]
+	],
+	_links: {
+		list: {
+			href: "/parent", method: "GET"
+		}
+	}
 };

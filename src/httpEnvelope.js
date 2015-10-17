@@ -12,10 +12,24 @@ function HttpEnvelope( req, res ) {
 	this.responseStream = res;
 	this.session = req.session;
 	this.user = req.user;
+	this.method = req.method.toLowerCase();
 	this._original = {
 		req: req,
 		res: res
 	};
+
+	Object.defineProperties( this, {
+		action: {
+			get: function() {
+				return req._action;
+			}
+		},
+		resource: {
+			get: function() {
+				return req._resource;
+			}
+		}
+	} );
 
 	[ req.params, req.query ].forEach( function( source ) {
 		Object.keys( source ).forEach( function( key ) {
