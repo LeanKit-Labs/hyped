@@ -9,6 +9,22 @@ describe( "JSON Engine", function() {
 	var hypermodel = {
 		id: 100,
 		title: "Test Board",
+		list: [
+			{
+				id: 1,
+				title: "One",
+				_links: {},
+				_resource: "board",
+				_action: "self"
+			},
+			{
+				id: 2,
+				title: "Two",
+				_links: {},
+				_resource: "board",
+				_action: "self"
+			}
+		],
 		_origin: { href: "/board/100", method: "GET" },
 		_links: {
 			self: { href: "/board/100", method: "GET" },
@@ -106,6 +122,7 @@ describe( "JSON Engine", function() {
 	};
 
 	var expected = _.omit( model.board1, "tags", "_hidden", "description" );
+	expected.list = [ { id: 1, title: "One" }, { id: 2, title: "Two" } ];
 
 	before( function() {
 		json = jsonEngine( hypermodel );

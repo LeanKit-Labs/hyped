@@ -25,9 +25,17 @@ function process( model, preserveMetadata ) {
 }
 
 function stripMetadata( model ) { // jshint ignore:line
-	return _.omit( model, function( val, key ) {
-		return key.indexOf( "_" ) === 0;
+	var plainModel = {};
+
+	_.each( model, function( val, key ) {
+		if ( key[ 0 ] === "_" ) {
+			return;
+		}
+
+		plainModel[ key ] = _.isArray( val ) ? handleList( val ) : val;
 	} );
+
+	return plainModel;
 }
 
 module.exports = process;
