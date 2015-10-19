@@ -1,6 +1,6 @@
 ## 0.4.x
 
-### Next
+### 0.4.2
  * Don't evaluate authorize on hidden actions
  * Add method to envelope
  * Improvement - lists should include link hypermedia at the top level
@@ -8,6 +8,7 @@
  * Bug fix - don't call authorize multiple times per action link when generating a response
  * Bug fix - action links weren't rendered in hypermedia
  * Bug fix - action and resource were missing from lists
+ * Bug fix - jsonEngine wasn't remove hypermedia keys from list results
 
 ### 0.4.1
 Fix defect where envelope was not passed to authorize during options call.
