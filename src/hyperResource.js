@@ -135,7 +135,7 @@ function getRenderGenerator( resources, prefix, version ) {
 	var resourcesGenerator = getResourcesGenerator( resources, prefix, version );
 
 	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, authCheck ) {
-		if ( _.isArray( data ) ) {
+		if ( _.isArray( data ) || data._list ) {
 			return resourcesGenerator( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, authCheck );
 		} else {
 			return resourceGenerator( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, authCheck );
@@ -188,26 +188,48 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 
 	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, auth ) {
 		var body = {};
+		var meta = _.isArray( data ) ? {} : _.omit( data, [ "_list", "_alias" ] );
 		var resource = versions.getVersion( resources[ envelope.resource ], version );
 		var itemResource = versions.getVersion( resources[ resourceName ], version );
 		var render = itemResource.actions[ actionName ].render;
-		var items = render ? pluralize.plural( render.resource ) : pluralize.plural( resourceName );
+		var renderResource = render ? render.resource || resourceName : resourceName;
+		var renderAction = render ? render.action || actionName : actionName;
+		var alias = data._alias || pluralize.plural( renderResource );
+		var list = data._list || data;
 
+		// determine what set of actions to render for the list
 		var action = resource.actions[ envelope.action ];
 		var actions = action.actions || _.keys( resource.actions );
 		var actionList = _.pick( resource.actions, actions );
 
 		var createLink = links.getLinkGenerator( resources, prefix, version );
-		var promises = _.map( data, function( item, childProp ) {
-			var child = data[ childProp ];
-			if ( render ) {
-				return resourceCache[ render.resource ][ render.action ]( envelope, child, parentUrl, undefined, undefined, auth );
-			} else {
-				return resourceCache[ resourceName ][ actionName ]( envelope, child, parentUrl, undefined, undefined, auth );
-			}
+		var promises = _.map( list, function( item, index ) {
+			var child = list[ index ];
+			return resourceCache[ renderResource ][ renderAction ]( envelope, child, parentUrl, undefined, undefined, auth );
 		} );
 
-		function onBody( body ) {
+		// render additional metadata for the list
+		function attachMetadata( body ) {
+			if ( !_.isEmpty( meta ) ) {
+				return resourceCache[ resourceName ][ actionName ]( envelope, meta, parentUrl, undefined, undefined, auth )
+					.then( function( metadata ) {
+						return _.merge( {}, body, metadata );
+					} );
+			} else {
+				return body;
+			}
+		}
+
+		// attach hypermedia
+		function attachHypermedia( body ) {
+			// request related metadata
+			if ( originUrl && originMethod ) {
+				body._origin = { href: originUrl, method: originMethod };
+			} else {
+				body._origin = originFn( resourceName, actionName, data[ 0 ], parentUrl );
+			}
+			body._action = envelope.action;
+			body._resource = envelope.resource;
 			return when.all(
 				_.map( actionList, function( link, linkName ) {
 					return createLink( envelope.resource, linkName, envelope, data, parentUrl, auth );
@@ -218,18 +240,14 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 			} );
 		}
 
-		if ( originUrl && originMethod ) {
-			body._origin = { href: originUrl, method: originMethod };
-		} else {
-			body._origin = originFn( resourceName, actionName, data[ 0 ], parentUrl );
-		}
-		body._action = envelope.action;
-		body._resource = envelope.resource;
-		return when.all( promises ).then( function( list ) {
-			body[ items ] = list;
-			return body;
-		} )
-		.then( onBody );
+		// put it all together now ...
+		return when.all( promises )
+			.then( function( listItems ) {
+				body[ alias ] = listItems;
+				return body;
+			} )
+		.then( attachMetadata )
+		.then( attachHypermedia );
 	};
 }
 
