@@ -216,6 +216,7 @@ describe( "Autohost Integration", function() {
 
 		describe( "when rendering an endpoint with an rejected promise", function() {
 			var body, contentType, elapsedMs, httpStatus;
+			var expected = require( "./halCards.json" );
 
 			before( function( done ) {
 				var start = Date.now();
