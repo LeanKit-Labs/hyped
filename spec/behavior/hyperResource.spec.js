@@ -155,14 +155,19 @@ describe( "Hyper Resource", function() {
 			}
 		};
 		var options;
+		var envelope = { user: {} };
 
 		before( function() {
-			var fn = HyperResource.optionsGenerator( resources, "", undefined, true, { user: {} } );
+			var fn = HyperResource.optionsGenerator( resources, "", undefined, true, envelope );
 			options = fn();
 		} );
 
 		it( "should render options correctly", function() {
 			return options.should.eventually.eql( expected );
+		} );
+
+		it( "should not have called authorize on hidden action", function() {
+			return should.not.exist( envelope.hiddenWasAuthorized );
 		} );
 	} );
 
@@ -191,7 +196,6 @@ describe( "Hyper Resource", function() {
 		} );
 	} );
 
-
 	describe( "when rendering a list of top-level resources", function() {
 		var expected = require( "./topLevelResources.js" );
 		var response;
@@ -212,7 +216,7 @@ describe( "Hyper Resource", function() {
 
 		before( function() {
 			var fn1 = HyperResource.resourcesGenerator( resources );
-			response = fn1( "parent", "self", {}, data, "", "/parent", "GET" );
+			response = fn1( "parent", "self", { resource: "parent", action: "list" }, data, "", "/parent", "GET" );
 		} );
 
 		it( "should return the correct response", function() {
@@ -248,11 +252,16 @@ describe( "Hyper Resource", function() {
 		before( function() {
 			var fn1 = HyperResource.resourcesGenerator( resources );
 			var envelope = {
+				data: {
+					id: 1
+				},
 				user: {
 					name: "Oddly"
-				}
+				},
+				resource: "parent",
+				action: "children"
 			};
-			response = fn1( "child", "self", envelope, data, "", "/parent/1/child", "GET" );
+			response = fn1( "child", "self", envelope, data, "", "/parent/1/child?page=1&size=5", "GET" );
 		} );
 
 		it( "should return the correct response", function() {

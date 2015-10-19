@@ -8,7 +8,8 @@ var resources = {
 			},
 			list: {
 				method: "get",
-				url: "/parent"
+				url: "/parent",
+				actions: [ "list" ]
 			},
 			// this will only display when fullOptions are requested (authorize is skipped)
 			bogus: {
@@ -21,7 +22,11 @@ var resources = {
 			exclude: {
 				method: "get",
 				url: "/exclude",
-				hidden: true
+				hidden: true,
+				authorize: function( envelope ) {
+					envelope.hiddenWasAuthorized = true;
+					return true;
+				}
 			},
 			privileged: {
 				method: "get",
@@ -34,14 +39,19 @@ var resources = {
 				method: "get",
 				url: "/parent/:id/child",
 				render: { resource: "child", action: "self" },
+				actions: [ "self", "children" ],
 				condition: function( envelope, data ) {
-					return data.children && data.children.length > 0;
+					if ( _.isArray( data ) ) {
+						return data.length;
+					} else {
+						return data.children && data.children.length > 0;
+					}
 				},
 				links: {
 					"next-child-page": function( envelope, data ) {
 						if ( envelope.data ) {
-							var page = envelope.data.page || undefined;
-							var size = envelope.data.size || undefined;
+							var page = envelope.data.page || 1;
+							var size = envelope.data.size || 5;
 							if ( page && size ) {
 								return "/parent/:id/child?page=" + ( page + 1 ) + "&size=" + ( size );
 							}

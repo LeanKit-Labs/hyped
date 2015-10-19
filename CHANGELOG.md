@@ -1,5 +1,12 @@
 ## 0.4.x
 
+### Next
+ * Don't evaluate authorize on hidden actions
+ * Add method to envelope
+ * Improvement - lists should include link hypermedia at the top level
+ * Bug fix - action links weren't rendered in hypermedia
+ * Bug fix - action and resource were missing from lists
+
 ### 0.4.1
 Fix defect where envelope was not passed to authorize during options call.
 
