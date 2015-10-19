@@ -34,7 +34,6 @@ var HyperResponse = function( envelope, engine, hyperResource, contentType ) {
 		self._cookies = result.cookies || {};
 		self._resource = result.resource || self._resource;
 		self._action = result.action || self._action;
-		return self.getResponse();
 	};
 };
 
@@ -102,7 +101,7 @@ HyperResponse.prototype.getResponse = function() {
 
 HyperResponse.prototype.render = function() {
 	var res = this._res;
-	this.getResponse()
+	return this.getResponse()
 		.then( function( response ) {
 			if ( response.headers ) {
 				_.each( response.headers, function( v, k ) {
@@ -115,6 +114,7 @@ HyperResponse.prototype.render = function() {
 				} );
 			}
 			res.status( response.status ).send( response.data );
+			return response;
 		} );
 };
 

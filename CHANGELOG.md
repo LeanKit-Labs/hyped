@@ -4,6 +4,8 @@
  * Don't evaluate authorize on hidden actions
  * Add method to envelope
  * Improvement - lists should include link hypermedia at the top level
+ * Improvement - lists should allow additional metadata in response
+ * Bug fix - don't call authorize multiple times per action link when generating a response
  * Bug fix - action links weren't rendered in hypermedia
  * Bug fix - action and resource were missing from lists
 

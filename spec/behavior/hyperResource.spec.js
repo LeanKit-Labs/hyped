@@ -224,6 +224,38 @@ describe( "Hyper Resource", function() {
 		} );
 	} );
 
+	describe( "when rendering a list of top-level resources with metadata", function() {
+		var expected = require( "./listWithMetadata.js" );
+		var response;
+		var data = {
+			total: 2,
+			description: "no need to argue, parents just don't understand",
+			_list: [
+				{
+					id: 1,
+					title: "one",
+					description: "the first item",
+					children: [ {} ]
+				},
+				{
+					id: 2,
+					title: "two",
+					description: "the second item",
+					children: [ {} ]
+				}
+			]
+		};
+
+		before( function() {
+			var fn1 = HyperResource.resourcesGenerator( resources );
+			response = fn1( "parent", "self", { resource: "parent", action: "list" }, data, "", "/parent", "GET" );
+		} );
+
+		it( "should return the correct response", function() {
+			return response.should.eventually.eql( expected );
+		} );
+	} );
+
 	describe( "when rendering a list of resources from another resource", function() {
 		var expected = require( "./listFromOtherResource.js" );
 		var response;

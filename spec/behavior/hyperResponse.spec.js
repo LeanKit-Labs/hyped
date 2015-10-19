@@ -98,8 +98,8 @@ describe( "Hyper Response", function() {
 
 			var response = new HyperResponse( envelope, engine, hyperResource, contentType );
 			response.origin( "/test", "GET" );
-			result = req.extendHttp.render( {}, undefined, undefined, handleResult );
-			response.render();
+			req.extendHttp.render( {}, undefined, undefined, handleResult );
+			result = response.render();
 		} );
 
 		it( "should produce the exepcted result", function() {

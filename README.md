@@ -541,6 +541,18 @@ The response literal has the following structure:
 	action: , // defaults to the action that received the request
 }
 ```
+### Controlling the top-level result
+The `resource` and `action` properties of the _response_ returned from your action handle control what resource and action metdata will be used when rendering the top-level response.
+
+### Rendering Lists
+If the `data` property contains an array, the rendering engine will assume that you are returning a list of the resource that owns the list action and use the `"self"` action to determine how to render each item.
+
+To change the resource or action that is used to render the items in the list, you can use the `render` property on the action and provide `resource` and/or `action` properties which will change what resource and action metadata are being used to render each item in the list.
+
+The property on the response containing the rendered items will be the pluralized form of the resource used to render each item. To control this yourself, you can provide a `_alias` property on data.
+
+### Rendering Lists With Metadata
+If the `data` property is an object with a `_list` property containing an array, then the array will be rendered as before but with the additional properties from data included as part of the body.
 
 ### With Autohost
 In an autohost handler, this literal will be processed by hyped first. The data property will be replaced by the output of the appropriate rendering engine. If only the data is returned from the handler, then that will be used to generate the data property of the literal with defaults used for all other properties.
