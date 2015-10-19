@@ -11,6 +11,15 @@ module.exports = function() {
 				condition: function( data, context ) {
 					return context !== {};
 				}
+			},
+			reject: {
+				method: "get",
+				url: "/reject",
+				actions: [],
+				hidden: true,
+				handle: function( envelope ) {
+					return when.reject( new Error( "Something went wrong" ) );
+				}
 			}
 		}
 	};

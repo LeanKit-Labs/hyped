@@ -2,6 +2,7 @@
 
 ### Next
  * Bug fix - jsonEngine was turning strings in arrays into objects
+ * Bug fix - An undefined response was causing errors
 
 ### 0.4.2
  * Don't evaluate authorize on hidden actions

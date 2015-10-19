@@ -256,6 +256,20 @@ describe( "Hyper Resource", function() {
 		} );
 	} );
 
+	describe( "when rendering an undefined response", function() {
+		var response;
+		var expected = require( "./listWithUndefined.js" );
+
+		before( function() {
+			var fn1 = HyperResource.resourcesGenerator( resources );
+			response = fn1( "parent", "self", { resource: "parent", action: "list" }, undefined, "", "/parent", "GET" );
+		} );
+
+		it( "should return the correct response", function() {
+			return response.should.eventually.eql( expected );
+		} );
+	} );
+
 	describe( "when rendering a list of resources from another resource", function() {
 		var expected = require( "./listFromOtherResource.js" );
 		var response;

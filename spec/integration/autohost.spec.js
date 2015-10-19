@@ -214,6 +214,34 @@ describe( "Autohost Integration", function() {
 			} );
 		} );
 
+		describe( "when rendering an endpoint with an rejected promise", function() {
+			var body, contentType, elapsedMs, httpStatus;
+			var expected = require( "./halCards.json" );
+
+			before( function( done ) {
+				var start = Date.now();
+				request.get( "http://localhost:8800/test/api/test/reject", { headers: { accept: "application/hal+json" } }, function( err, res ) {
+					elapsedMs = ( Date.now() - start );
+					body = res.body;
+					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+					done();
+				} );
+			} );
+
+			it( "should not hang and should still return", function() {
+				contentType.should.equal( "application/hal+json" );
+				var json = JSON.parse( body );
+				json.should.eql( {
+					_action: "reject",
+					_origin: {
+						href: "/test/api/test/reject",
+						method: "GET"
+					},
+					_resource: "test"
+				} );
+			} );
+		} );
+
 		describe( "when hitting root with options verb", function() {
 			var body, contentType, elapsedMs;
 			var expectedOptions = require( "./halOptions.json" );
