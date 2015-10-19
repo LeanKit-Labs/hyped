@@ -1,5 +1,8 @@
 ## 0.4.x
 
+### Next
+ * Bug fix - jsonEngine was turning strings in arrays into objects
+
 ### 0.4.2
  * Don't evaluate authorize on hidden actions
  * Add method to envelope

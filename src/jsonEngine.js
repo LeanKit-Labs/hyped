@@ -10,7 +10,11 @@ function handleEmbedded( target, model, preserveMetadata ) {
 
 function handleList( list, preserveMetadata ) { // jshint ignore:line
 	return _.map( list, function( item ) {
-		return process( item, preserveMetadata );
+		if ( _.isPlainObject( item ) ) {
+			return process( item, preserveMetadata );
+		} else {
+			return item;
+		}
 	} );
 }
 

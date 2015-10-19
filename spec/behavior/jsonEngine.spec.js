@@ -9,6 +9,7 @@ describe( "JSON Engine", function() {
 	var hypermodel = {
 		id: 100,
 		title: "Test Board",
+		stringList: [ "one", "two", "three" ],
 		list: [
 			{
 				id: 1,
@@ -122,6 +123,7 @@ describe( "JSON Engine", function() {
 	};
 
 	var expected = _.omit( model.board1, "tags", "_hidden", "description" );
+	expected.stringList = [ "one", "two", "three" ];
 	expected.list = [ { id: 1, title: "One" }, { id: 2, title: "Two" } ];
 
 	before( function() {
