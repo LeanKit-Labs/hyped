@@ -135,7 +135,7 @@ function getRenderGenerator( resources, prefix, version ) {
 	var resourcesGenerator = getResourcesGenerator( resources, prefix, version );
 
 	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, authCheck ) {
-		if ( _.isArray( data ) || data._list ) {
+		if ( _.isArray( data ) || data && data._list ) {
 			return resourcesGenerator( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, authCheck );
 		} else {
 			return resourceGenerator( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, authCheck );
@@ -194,8 +194,8 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 		var render = itemResource.actions[ actionName ].render;
 		var renderResource = render ? render.resource || resourceName : resourceName;
 		var renderAction = render ? render.action || actionName : actionName;
-		var alias = data._alias || pluralize.plural( renderResource );
-		var list = data._list || data;
+		var alias = data && data._alias || pluralize.plural( renderResource );
+		var list = data && data._list || data;
 
 		// determine what set of actions to render for the list
 		var action = resource.actions[ envelope.action ];

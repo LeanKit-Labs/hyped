@@ -12,7 +12,7 @@
     "when": "^3.x"
   },
   "devDependencies": {
-    "autohost": "0.4.x",
+    "autohost": "0.5.x",
     "biggulp": "0.2.x",
     "chai": "^2.2.0",
     "chai-as-promised": "^5.0.0",
