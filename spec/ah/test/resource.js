@@ -17,7 +17,7 @@ module.exports = function() {
 				url: "/reject",
 				actions: [],
 				hidden: true,
-				handle: function( envelope ) {
+				handle: function() {
 					return when.reject( new Error( "Something went wrong" ) );
 				}
 			}
