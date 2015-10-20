@@ -1,6 +1,6 @@
 ## 0.4.x
 
-### Next
+### 0.4.3
  * Bug fix - jsonEngine was turning strings in arrays into objects
  * Bug fix - An undefined response was causing errors
 
