@@ -1,6 +1,6 @@
 {
   "name": "hyped",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Hypermedia response generation engine",
   "main": "src/index.js",
   "dependencies": {
@@ -39,6 +39,14 @@
     {
       "name": "Alex Robson",
       "url": "http://nerdventure.io"
+    },
+    {
+      "name": "Doug Neiner",
+      "url": "http://dougneiner.com"
+    },
+    {
+      "name": "Jim Cowart",
+      "url": "http://ifandelse.com"
     }
   ],
   "publishConfig": {

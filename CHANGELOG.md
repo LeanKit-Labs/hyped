@@ -1,5 +1,9 @@
 ## 0.4.x
 
+### 0.4.4
+
+* Fixed issue where OPTIONS call was cached in memory on first request and cached result was used from then on.
+
 ### 0.4.3
  * Bug fix - jsonEngine was turning strings in arrays into objects
  * Bug fix - An undefined response was causing errors
