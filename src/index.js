@@ -117,10 +117,7 @@ function getOptionModel( state, envelope ) {
 	if ( envelope ) {
 		version = getVersion( state, envelope );
 	}
-	if ( !state.optionModels[ version ] ) {
-		state.optionModels[ version ] = HyperResource.optionsGenerator( state.resources, state.prefix, version, state.excludeChildren, envelope )( state.engines );
-	}
-	return state.optionModels[ version ];
+	return HyperResource.optionsGenerator( state.resources, state.prefix, version, state.excludeChildren, envelope )( state.engines );
 }
 
 function getFullOptionModel( state ) {
@@ -207,7 +204,6 @@ module.exports = function( resourceList, defaultToNewest, includeChildrenInOptio
 		engines: {},
 		hypermodels: {},
 		resources: {},
-		optionModels: {},
 		fullOptionModels: {},
 		prefix: undefined,
 		maxVersion: undefined,

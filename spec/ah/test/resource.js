@@ -20,6 +20,17 @@ module.exports = function() {
 				handle: function() {
 					return when.reject( new Error( "Something went wrong" ) );
 				}
+			},
+			sometimesShow: {
+				method: "get",
+				url: "/more",
+				actions: [],
+				authorize: function( envelope ) {
+					return envelope._original.req.headers.hasOwnProperty( "x-show-me-more" );
+				},
+				handle: function( envelope ) {
+					return { data: envelope.context };
+				}
 			}
 		}
 	};
