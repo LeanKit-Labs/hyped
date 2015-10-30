@@ -266,6 +266,43 @@ describe( "Autohost Integration", function() {
 			} );
 		} );
 
+		describe( "when hitting root with options verb and the options change between requests", function() {
+			var body, contentType, secondBody, secondContentType;
+			var expectedOptions = require( "./halOptions.json" );
+			var moreExpectedOptions = require( "./halOptionsMore.json" );
+
+			before( function( done ) {
+				request( { method: "OPTIONS", url: "http://localhost:8800/test/api" }, function( err, res ) {
+					body = res.body;
+					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+
+					request( {
+						method: "OPTIONS",
+						url: "http://localhost:8800/test/api",
+						headers: { "x-show-me-more": "true" }
+					}, function( err, res ) {
+						secondBody = res.body;
+						secondContentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+						done();
+					} );
+				} );
+			} );
+
+			it( "should get options", function() {
+				contentType.should.equal( "application/json" );
+				var json = JSON.parse( body );
+				delete json._links[ "ah:metrics" ];
+				json.should.eql( expectedOptions );
+			} );
+
+			it( "should get the additional link on the second call", function() {
+				secondContentType.should.equal( "application/json" );
+				var json = JSON.parse( secondBody );
+				delete json._links[ "ah:metrics" ];
+				json.should.eql( moreExpectedOptions );
+			} );
+		} );
+
 		after( function() {
 			host.stop();
 		} );
