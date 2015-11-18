@@ -120,29 +120,29 @@ describe( "Additional Links", function() {
 		var expectedSelf1 = {
 			id: 100,
 			title: "Test Board",
-			_origin: { href: "/prefix1/prefix2/board/100", method: "GET" },
+			_origin: { href: "/badUrl/prefix1/badUrl/prefix2/board/100", method: "GET" },
 			_resource: "board",
 			_action: "self",
 			_links: {
-				self: { href: "/prefix1/prefix2/board/100", method: "GET" },
-				favstarred: { href: "/prefix1/prefix2/board/100?favstarred=true", method: "GET" },
-				worstever: { href: "/prefix1/prefix2/board/100?h8=true", method: "GET" },
-				"next-page": { href: "/prefix1/prefix2/board/100?page=2&size=10", method: "GET" }
+				self: { href: "/badUrl/prefix1/badUrl/prefix2/board/100", method: "GET" },
+				favstarred: { href: "/badUrl/prefix1/badUrl/prefix2/board/100?favstarred=true", method: "GET" },
+				worstever: { href: "/badUrl/prefix1/badUrl/prefix2/board/100?h8=true", method: "GET" },
+				"next-page": { href: "/badUrl/prefix1/badUrl/prefix2/board/100?page=2&size=10", method: "GET" }
 			}
 		};
 
 		var expectedSelf2 = {
 			id: 100,
 			title: "Test Board",
-			_origin: { href: "/prefix1/prefix2/board/100", method: "GET" },
+			_origin: { href: "/badUrl/prefix1/badUrl/prefix2/board/100", method: "GET" },
 			_resource: "board",
 			_action: "self",
 			_links: {
-				self: { href: "/prefix1/prefix2/board/100", method: "GET" },
-				favstarred: { href: "/prefix1/prefix2/board/100?favstarred=true", method: "GET" },
-				worstever: { href: "/prefix1/prefix2/board/100?h8=true", method: "GET" },
-				"next-page": { href: "/prefix1/prefix2/board/100?page=3&size=10", method: "GET" },
-				"prev-page": { href: "/prefix1/prefix2/board/100?page=1&size=10", method: "GET" }
+				self: { href: "/badUrl/prefix1/badUrl/prefix2/board/100", method: "GET" },
+				favstarred: { href: "/badUrl/prefix1/badUrl/prefix2/board/100?favstarred=true", method: "GET" },
+				worstever: { href: "/badUrl/prefix1/badUrl/prefix2/board/100?h8=true", method: "GET" },
+				"next-page": { href: "/badUrl/prefix1/badUrl/prefix2/board/100?page=3&size=10", method: "GET" },
+				"prev-page": { href: "/badUrl/prefix1/badUrl/prefix2/board/100?page=1&size=10", method: "GET" }
 			}
 		};
 

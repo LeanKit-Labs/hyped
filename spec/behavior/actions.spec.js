@@ -13,7 +13,7 @@ describe( "Action links", function() {
 					childId: 2,
 					id: 3
 				};
-				var fn = links.getParentUrlGenerator( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
+				var fn = links.getParentUrlGenerator( {}, resources, { urlPrefix: "/test", apiPrefix: "/api" } );
 				urlCache = links.getParentUrlCache( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
 				parent = fn( "parent", model );
 				child = fn( "child", model );
