@@ -93,14 +93,14 @@ function canAndShould( can, should ) {
 
 function getActionUrlCache( resources, prefix, version ) {
 	var cache = {};
-	var parentUrlFn = getParentUrlGenerator( resources, version );
+	var parentUrlFn = getParentUrlGenerator( prefix, resources, version );
 	var prefixFn = getPrefix.bind( undefined, resources, prefix );
 
 	_.reduce( resources, function( rAcc, resource, resourceName ) {
 		resource = versions.getVersion( resource, version );
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
 			var actionSegment = resource.actions[ actionName ].url;
-			var resourceSegment = getResourcePrefix( actionSegment, resource, resourceName );
+			var resourceSegment = getResourcePrefix( prefix, actionSegment, resource, resourceName );
 			var actionUrl = [ resourceSegment, actionSegment ].join( "" ).replace( "//", "/" );
 			var templated = isTemplated( actionUrl );
 			var getActionUrl = function() {
@@ -312,13 +312,13 @@ function getParentUrlCache( resources, version ) {
 	return cache;
 }
 
-function getParentUrlGenerator( resources, version ) { // jshint ignore:line
+function getParentUrlGenerator( prefix, resources, version ) { // jshint ignore:line
 	var cache = getParentUrlCache( resources );
 	return function( resourceName, data, envelope ) {
 		var meta = cache[ resourceName ];
-		var tokens = _.clone( meta.tokens );
+		var tokens = meta ? _.clone( meta.tokens ) : [];
 		var parent = resources[ resourceName ].parent;
-		var resourceSegment = getResourcePrefix( meta.url, resources[ parent ], parent );
+		var resourceSegment = getResourcePrefix( prefix, meta.url, resources[ parent ], parent );
 		var parentUrl = [ resourceSegment, meta.url ].join( "" ).replace( "//", "/" );
 		var values = _.reduce( tokens, function( acc, token ) {
 			var val = url.readToken( resourceName, data, envelope, token );
@@ -342,13 +342,13 @@ function getPrefix( resources, prefix, resource ) {
 	if ( resource.urlPrefix === undefined ) {
 		urlPrefix = parentPrefix.urlPrefix === undefined ? urlPrefix : parentPrefix.urlPrefix;
 	} else {
-		urlPrefix = resource.urlPrefix;
+		urlPrefix = [ prefix.urlPrefix, resource.urlPrefix ].join( "/" ).replace( "//", "/" );
 	}
 
 	if ( resource.apiPrefix === undefined ) {
 		apiPrefix = parentPrefix.apiPrefix === undefined ? apiPrefix : parentPrefix.apiPrefix;
 	} else {
-		apiPrefix = resource.apiPrefix;
+		apiPrefix = [ prefix.apiPrefix, resource.apiPrefix ].join( "/" ).replace( "//", "/" );
 	}
 
 	return {
@@ -379,7 +379,7 @@ function getRenderPredicate( action, actionName, resourceName, forOptions ) { //
 	};
 }
 
-function getResourcePrefix( url, resource, resourceName ) {
+function getResourcePrefix( prefix, url, resource, resourceName ) {
 	if ( !resource || resource.resourcePrefix === false ) {
 		return "";
 	} else {

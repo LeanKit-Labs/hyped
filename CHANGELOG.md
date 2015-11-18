@@ -1,3 +1,9 @@
+## 0.5.x
+
+### 0.5.0
+ * Bug fix - jsonEngine was turning strings in arrays into objects
+ * Refactor url generation to include resource url and api prefixes (instead of replacing them)
+
 ## 0.4.x
 
 ### 0.4.4

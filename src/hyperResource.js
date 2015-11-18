@@ -154,6 +154,7 @@ function getResourceCache( resources, prefix, version ) {
 		var prefixes = getPrefix( resource );
 		var urlPrefix = [
 				prefixes.urlPrefix,
+				resource.urlPrefix,
 				prefixes.apiPrefix
 			].join( "" ).replace( "//", "/" );
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {

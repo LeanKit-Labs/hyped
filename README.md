@@ -12,7 +12,8 @@ The resource definition provides the metadata necessary for hyped to generate hy
 {
 	[resourceName]: the resource name (must be unique)
 	parent: (optional) the name of the resource that this "belongs" to
-	urlPrefix: (optional) a URL prefix for all actions in this resource
+	urlPrefix: (optional) a resource-level URL prefix for all actions in this resource
+	apiPrefix: (optional) an api-level URL prefix for all actions in this resource
 	resourcePrefix: (optional) defaults to true - guarantees URLs begin with resource name
 	actions: {
 		[actionName]: {
@@ -85,7 +86,9 @@ The resource definition provides the metadata necessary for hyped to generate hy
 	<dt>parent</dt>
 	<dd>Defines this resource as belonging to another resource. This will cause all of the action URLs in this resource to be prefixed by the parent resource's <tt>self</tt> href.</dd>
 	<dt>urlPrefix</dt>
-	<dd>Provide a common URL prefix for all actions in this resource.</dd>
+	<dd>Provide a common URL prefix for all actions in this resource. This appears _after_ the server level urlPrefix and before either the server or resource apiPrefixes.</dd>
+	<dt>apiPrefix</dt>
+	<dd>Provide a common API prefix for all actions in this resource. This appears at the end of all prefixes right before the urlPath.</dd>
 	<dt>actionName</dt>
 	<dd>The name of the action will determine the name of the link exposed in the resource's links.</dd>
 	<dt>method</dt>

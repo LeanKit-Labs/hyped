@@ -1,6 +1,7 @@
 module.exports = function() {
 	return {
 		name: "test",
+		urlPrefix: "/prefix",
 		actions: {
 			self: {
 				method: "get",

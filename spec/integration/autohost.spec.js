@@ -28,7 +28,7 @@ describe( "Autohost Integration", function() {
 			var body, contentType;
 
 			before( function( done ) {
-				request( "http://localhost:8800/test/api/test", { headers: { accept: "*/*" } }, function( err, res ) {
+				request( "http://localhost:8800/test/prefix/api/test", { headers: { accept: "*/*" } }, function( err, res ) {
 					body = JSON.parse( res.body );
 					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
 					done();
@@ -216,10 +216,11 @@ describe( "Autohost Integration", function() {
 
 		describe( "when rendering an endpoint with an rejected promise", function() {
 			var body, contentType, elapsedMs, httpStatus;
+			var expected = require( "./halCards.json" );
 
 			before( function( done ) {
 				var start = Date.now();
-				request.get( "http://localhost:8800/test/api/test/reject", { headers: { accept: "application/hal+json" } }, function( err, res ) {
+				request.get( "http://localhost:8800/test/prefix/api/test/reject", { headers: { accept: "application/hal+json" } }, function( err, res ) {
 					elapsedMs = ( Date.now() - start );
 					body = res.body;
 					httpStatus = res.statusCode;
@@ -235,7 +236,7 @@ describe( "Autohost Integration", function() {
 				json.should.eql( {
 					_action: "reject",
 					_origin: {
-						href: "/test/api/test/reject",
+						href: "/test/prefix/api/test/reject",
 						method: "GET"
 					},
 					_resource: "test",

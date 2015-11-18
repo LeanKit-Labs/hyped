@@ -32,6 +32,7 @@ function addMiddleware( state, host, apiPrefix ) { // jshint ignore:line
 			urlPrefix: urlPrefix,
 			apiPrefix: apiPrefix
 		};
+
 		var prefixUrl = [
 			urlPrefix,
 			apiPrefix
@@ -46,6 +47,7 @@ function addResourceMiddleware( state, host ) {
 	var resourcePrefixes = _.filter( _.unique( _.pluck( _.values( state.resources ), "urlPrefix" ) ) );
 	_.each( resourcePrefixes, function( resourcePrefix ) {
 		var resourcePrefixUrl = [
+			state.prefix.urlPrefix,
 			resourcePrefix,
 			state.prefix.apiPrefix
 		].join( "" ).replace( "//", "/" );
