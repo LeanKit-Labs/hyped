@@ -1,5 +1,8 @@
 ## 0.5.x
 
+### 0.5.1
+ * Bug fix - hypermedia links no longer returned in error responses (status > 400)
+
 ### 0.5.0
  * Bug fix - jsonEngine was turning strings in arrays into objects
  * Refactor url generation to include resource url and api prefixes (instead of replacing them)
