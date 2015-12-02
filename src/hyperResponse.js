@@ -51,6 +51,24 @@ HyperResponse.prototype.createResponse = function() {
 	var resource = this._req._resource;
 	var action = this._req._action;
 	this._headers[ "Content-Type" ] = this._contentType;
+
+	if ( this._code >= 400 ) {
+		_.assign( this._model, {
+			_action: this._action || action,
+			_resource: this._resource || resource,
+			_origin: {
+				href: this._originUrl,
+				method: this._originMethod
+			}
+		} );
+		return when( {
+			status: this._code,
+			headers: this._headers,
+			cookies: this._cookies,
+			data: this._engine( this._model )
+		} );
+	}
+
 	return this._hyperResource(
 		this._resource || resource,
 		this._action || action,
