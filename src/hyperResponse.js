@@ -69,6 +69,14 @@ HyperResponse.prototype.createResponse = function() {
 		} );
 	}
 
+	if ( this._code === 204 || !this._model ) {
+		return when( {
+			status: this._code,
+			headers: this._headers,
+			cookies: this._cookies
+		} );
+	}
+
 	return this._hyperResource(
 		this._resource || resource,
 		this._action || action,

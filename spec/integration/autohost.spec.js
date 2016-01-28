@@ -245,6 +245,25 @@ describe( "Autohost Integration", function() {
 			} );
 		} );
 
+		describe( "when rendering an endpoint with an empty response", function() {
+			var body, contentType, httpStatus;
+
+			before( function( done ) {
+				request.del( "http://localhost:8800/test/api/card/123", { headers: { accept: "application/hal+json" } }, function( err, res ) {
+					body = res.body;
+					httpStatus = res.statusCode;
+					contentType = res.headers[ "content-type" ];
+					done();
+				} );
+			} );
+
+			it( "should have an empty response", function() {
+				body.should.equal( "" );
+				should.not.exist( contentType );
+				httpStatus.should.equal( 204 );
+			} );
+		} );
+
 		describe( "when hitting root with options verb", function() {
 			var body, contentType, elapsedMs;
 			var expectedOptions = require( "./halOptions.json" );

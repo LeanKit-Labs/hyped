@@ -125,6 +125,97 @@ describe( "Hyper Response", function() {
 			resMock.verify();
 		} );
 	} );
+	describe( "when creating an empty response", function() {
+		var result, res, resMock;
+		before( function() {
+			// transport request fake
+			var req = {
+				_resource: "test",
+				_action: "empty",
+				context: {
+					middlewareData: "secret"
+				},
+				extendHttp: {
+				}
+			};
+
+			// full hash returned from handler
+			var handleResult = {
+				status: 204,
+				data: undefined,
+				headers: {
+					custom: "yay, a goat!"
+				},
+				cookies: {
+					cookieMonster: "umnumnumnumnum"
+				}
+			};
+
+			// transport response mock
+			res = {
+				set: _.noop,
+				cookie: _.noop,
+				status: _.noop,
+				send: _.noop
+			};
+			resMock = sinon.mock( res );
+			resMock
+				.expects( "set" )
+				.withArgs( "Content-Type", "application/hal+json" )
+				.once();
+
+			resMock
+				.expects( "set" )
+				.withArgs( "custom", "yay, a goat!" )
+				.once();
+
+			res.cookie( "cookieMonster", "umnumnumnumnum" );
+			resMock.expects( "status" )
+				.once()
+				.withArgs( 204 )
+				.returns( res );
+
+			resMock.expects( "send" )
+				.once();
+
+			// an envelope mock
+			var envelope = {
+				_original: {
+					res: res,
+					req: req
+				},
+				middlewareData: "secret"
+			};
+
+			// engine just returns the data passed to it
+			var engine = function( x ) {
+				return x;
+			};
+			var contentType = "application/hal+json";
+
+			var response = new HyperResponse( envelope, engine, {}, contentType );
+			response.origin( "/empty", "GET" );
+			req.extendHttp.render( {}, undefined, undefined, handleResult );
+			result = response.render();
+		} );
+
+		it( "should produce the expected result", function() {
+			return result.should.eventually.eql( {
+				status: 204,
+				headers: {
+					"Content-Type": "application/hal+json",
+					custom: "yay, a goat!"
+				},
+				cookies: {
+					cookieMonster: "umnumnumnumnum"
+				}
+			} );
+		} );
+
+		it( "should render correctly", function() {
+			resMock.verify();
+		} );
+	} );
 	describe( "when creating a failure response", function() {
 		var result, res, resMock;
 		before( function() {
