@@ -35,7 +35,7 @@ describe( "Property Filtering", function() {
 
 		before( function() {
 			var fn = hyperResource.renderGenerator( { board: resource } );
-			self = fn( "board", "self", {}, board1 );
+			self = fn( "board", "self", {}, board1, "", undefined, undefined, true );
 		} );
 
 		it( "should generate hypermedia without `lanes` or `hidden` fields", function() {

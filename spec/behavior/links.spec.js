@@ -69,8 +69,8 @@ describe( "Additional Links", function() {
 
 		before( function() {
 			var fn = HyperResource.renderGenerator( { board: resource } );
-			self1 = fn( "board", "self", { data: { page: 1, size: 10 } }, board1 );
-			self2 = fn( "board", "self", { data: { page: 2, size: 10 } }, board1 );
+			self1 = fn( "board", "self", { data: { page: 1, size: 10 } }, board1, "", undefined, undefined, true );
+			self2 = fn( "board", "self", { data: { page: 2, size: 10 } }, board1, "", undefined, undefined, true );
 		} );
 
 		it( "should include next-page in links for page 1", function() {
@@ -148,8 +148,8 @@ describe( "Additional Links", function() {
 
 		before( function() {
 			var fn = HyperResource.renderGenerator( { board: resource }, { urlPrefix: "/badUrl", apiPrefix: "/badUrl" } );
-			self1 = fn( "board", "self", { data: { page: 1, size: 10 } }, board1 );
-			self2 = fn( "board", "self", { data: { page: 2, size: 10 } }, board1 );
+			self1 = fn( "board", "self", { data: { page: 1, size: 10 } }, board1, "", undefined, undefined, true );
+			self2 = fn( "board", "self", { data: { page: 2, size: 10 } }, board1, "", undefined, undefined, true );
 		} );
 
 		it( "should include next-page in links for page 1", function() {

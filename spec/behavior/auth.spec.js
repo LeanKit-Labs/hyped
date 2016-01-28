@@ -4,7 +4,7 @@ var HyperResource = require( "../../src/hyperResource.js" );
 
 var board1 = model.board1;
 
-describe( "Authorization", function() {
+describe.only( "Authorization", function() {
 	describe( "when filtering links by permission", function() {
 		var resource = {
 			name: "board",
@@ -12,12 +12,16 @@ describe( "Authorization", function() {
 				self: {
 					method: "get",
 					url: "/board/:id",
+					authorize: sinon.stub().returns( true ),
 					include: [ "id", "title" ]
 				},
 				full: {
 					method: "get",
 					url: "/board/:id?embed=lanes,cards,classOfService",
 					include: [ "id", "title", "description" ],
+					authorize: function() {
+						return false;
+					},
 					links: {
 						shouldGetOmitted: "/board/:id?WAT"
 					}
@@ -37,17 +41,19 @@ describe( "Authorization", function() {
 			_action: "self"
 		};
 
-		var authCheck = function( actionName ) {
-			return actionName !== "board:full";
-		};
-
 		before( function() {
 			var fn = HyperResource.renderGenerator( { board: resource } );
-			self = fn( "board", "self", {}, board1, "", undefined, undefined, authCheck );
+			return fn( "board", "self", {}, board1, "", undefined, undefined, true ).then( function( data ) {
+				self = data;
+			} );
 		} );
 
 		it( "should generate self hypermedia object model", function() {
-			return self.should.eventually.eql( expectedSelf );
+			self.should.eql( expectedSelf );
+		} );
+
+		it( "should not call authorize a second time when rendering the self response", function() {
+			resource.actions.self.authorize.should.be.calledOnce;
 		} );
 	} );
 } );

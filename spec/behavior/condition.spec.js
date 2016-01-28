@@ -74,19 +74,19 @@ describe( "Conditions", function() {
 		} );
 
 		it( "should not show withdraw on a new account", function() {
-			return render( "account", "self", {}, acct )
+			return render( "account", "self", {}, acct, "", undefined, undefined, true )
 				.should.eventually.eql( expected1 );
 		} );
 
 		it( "should show withdraw since balance is greater than 0", function() {
 			acct.balance = 100;
-			return render( "account", "self", {}, acct )
+			return render( "account", "self", {}, acct, "", undefined, undefined, true )
 				.should.eventually.eql( expected2 );
 		} );
 
 		it( "should not show withdraw on an empty account", function() {
 			acct.balance = 0;
-			return render( "account", "self", {}, acct )
+			return render( "account", "self", {}, acct, "", undefined, undefined, true )
 				.should.eventually.eql( expected3 );
 		} );
 	} );

@@ -53,14 +53,16 @@ HyperResponse.prototype.createResponse = function() {
 	this._headers[ "Content-Type" ] = this._contentType;
 
 	if ( this._code >= 400 ) {
-		_.assign( this._model, {
-			_action: this._action || action,
-			_resource: this._resource || resource,
-			_origin: {
-				href: this._originUrl,
-				method: this._originMethod
-			}
-		} );
+		if ( this._engine.hal ) {
+			_.assign( this._model, {
+				_action: this._action || action,
+				_resource: this._resource || resource,
+				_origin: {
+					href: this._originUrl,
+					method: this._originMethod
+				}
+			} );
+		}
 		return when( {
 			status: this._code,
 			headers: this._headers,
@@ -84,7 +86,8 @@ HyperResponse.prototype.createResponse = function() {
 		this._model,
 		"",
 		this._originUrl,
-		this._originMethod
+		this._originMethod,
+		this._engine.hal
 	).then( function( hypermedia ) {
 		return {
 			status: this._code,
