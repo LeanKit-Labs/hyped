@@ -37,7 +37,7 @@ describe( "Hyper Resource", function() {
 
 			before( function() {
 				var fn = HyperResource.resourceGenerator( resources, "", 2 );
-				response = fn( "parent", "self", { data: requestData }, data, "" );
+				response = fn( "parent", "self", { data: requestData }, data, "", undefined, undefined, true );
 			} );
 
 			it( "should return the correct response", function() {
@@ -78,7 +78,7 @@ describe( "Hyper Resource", function() {
 
 			before( function() {
 				var fn = HyperResource.resourceGenerator( resources );
-				response = fn( "parent", "self", { data: requestData }, data, "" );
+				response = fn( "parent", "self", { data: requestData }, data, "", undefined, undefined, true );
 			} );
 
 			it( "should return the correct response", function() {
@@ -102,7 +102,7 @@ describe( "Hyper Resource", function() {
 			};
 			before( function() {
 				var fn1 = HyperResource.resourceGenerator( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
-				response = fn1( "child", "self", envelope, data );
+				response = fn1( "child", "self", envelope, data, "", undefined, undefined, true );
 			} );
 
 			it( "should return the correct response", function() {
@@ -216,7 +216,7 @@ describe( "Hyper Resource", function() {
 
 		before( function() {
 			var fn1 = HyperResource.resourcesGenerator( resources );
-			response = fn1( "parent", "self", { resource: "parent", action: "list" }, data, "", "/parent", "GET" );
+			response = fn1( "parent", "self", { resource: "parent", action: "list" }, data, "", "/parent", "GET", true );
 		} );
 
 		it( "should return the correct response", function() {
@@ -248,7 +248,7 @@ describe( "Hyper Resource", function() {
 
 		before( function() {
 			var fn1 = HyperResource.resourcesGenerator( resources );
-			response = fn1( "parent", "self", { resource: "parent", action: "list" }, data, "", "/parent", "GET" );
+			response = fn1( "parent", "self", { resource: "parent", action: "list" }, data, "", "/parent", "GET", true );
 		} );
 
 		it( "should return the correct response", function() {
@@ -262,7 +262,7 @@ describe( "Hyper Resource", function() {
 
 		before( function() {
 			var fn1 = HyperResource.resourcesGenerator( resources );
-			response = fn1( "parent", "self", { resource: "parent", action: "list" }, undefined, "", "/parent", "GET" );
+			response = fn1( "parent", "self", { resource: "parent", action: "list" }, undefined, "", "/parent", "GET", true );
 		} );
 
 		it( "should return the correct response", function() {
@@ -307,7 +307,7 @@ describe( "Hyper Resource", function() {
 				resource: "parent",
 				action: "children"
 			};
-			response = fn1( "child", "self", envelope, data, "", "/parent/1/child?page=1&size=5", "GET" );
+			response = fn1( "child", "self", envelope, data, "", "/parent/1/child?page=1&size=5", "GET", true );
 		} );
 
 		it( "should return the correct response", function() {

@@ -4,14 +4,14 @@ var links = require( "./links" );
 var versions = require( "./versions" );
 var when = require( "when" );
 
-function addOptionLinksForResource( resource, resourceName, createLink, envelope, auth, options ) {
+function addOptionLinksForResource( resource, resourceName, createLink, envelope, options ) {
 	return when.all( _.map( resource.actions, function( action, actionName ) {
 		function onMain( main ) {
 			if ( !_.isEmpty( main ) ) {
 				options._links[ [ resourceName, actionName ].join( ":" ) ] = _.values( main )[ 0 ];
 			}
 		}
-		return action.hidden ? when.resolve() : createLink( resourceName, actionName, envelope, {}, undefined, undefined, auth )
+		return action.hidden ? when.resolve() : createLink( resourceName, actionName, envelope, {} )
 			.then( onMain );
 	} ) );
 }
@@ -76,7 +76,7 @@ function getBodyGenerator( resources, prefix, version ) {
 	};
 }
 
-function getOptionCache( resources, prefix, version, excludeChildren, envelope, skipAuth, auth ) {
+function getOptionCache( resources, prefix, version, excludeChildren, envelope, skipAuth ) {
 	var createLink = links.getLinkGenerator( resources, prefix, version, true, skipAuth );
 	var options = { _links: {} };
 	var versionList = [ "1" ];
@@ -85,7 +85,7 @@ function getOptionCache( resources, prefix, version, excludeChildren, envelope, 
 			versionList = versionList.concat( resource.versions ? _.keys( resource.versions ) : [] );
 			resource = versions.getVersion( resource, version );
 			if ( !resource.parent || !excludeChildren ) {
-				return addOptionLinksForResource( resource, resourceName, createLink, envelope, auth, options );
+				return addOptionLinksForResource( resource, resourceName, createLink, envelope, options );
 			}
 		} )
 	).then( function() {
@@ -94,9 +94,9 @@ function getOptionCache( resources, prefix, version, excludeChildren, envelope, 
 	} );
 }
 
-function getOptionGenerator( resources, prefix, version, excludeChildren, envelope, skipAuth, auth ) {
+function getOptionGenerator( resources, prefix, version, excludeChildren, envelope, skipAuth ) {
 	return function( types ) {
-		return getOptionCache( resources, prefix, version, excludeChildren, envelope, skipAuth, auth )
+		return getOptionCache( resources, prefix, version, excludeChildren, envelope, skipAuth )
 			.then( function( options ) {
 				options._mediaTypes = _.keys( types );
 				return options;
@@ -112,7 +112,7 @@ function getOriginCache( resources, prefix, version ) {
 		resource = versions.getVersion( resource, version );
 		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
 			var method = action.method.toUpperCase();
-			acc[ actionName ] = function( parentUrl /*, auth */ ) {
+			acc[ actionName ] = function( parentUrl ) {
 				var actionUrl = createUrl( resourceName, actionName, {}, parentUrl, {} );
 				return { href: actionUrl, method: method };
 			};
@@ -134,11 +134,11 @@ function getRenderGenerator( resources, prefix, version ) {
 	var resourceGenerator = getResourceGenerator( resources, prefix, version );
 	var resourcesGenerator = getResourcesGenerator( resources, prefix, version );
 
-	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, authCheck ) {
+	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, useHal ) {
 		if ( _.isArray( data ) || data && data._list ) {
-			return resourcesGenerator( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, authCheck );
+			return resourcesGenerator( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, useHal );
 		} else {
-			return resourceGenerator( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, authCheck );
+			return resourceGenerator( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, useHal );
 		}
 	};
 }
@@ -147,6 +147,7 @@ function getResourceCache( resources, prefix, version ) {
 	var cache = {};
 	var render = getBodyGenerator( resources, prefix, version );
 	var createLink = links.getLinkGenerator( resources, prefix, version );
+	var createLinkNoAuth = links.getLinkGenerator( resources, prefix, version, true, true );
 	var getPrefix = links.getPrefix.bind( undefined, resources, prefix );
 
 	_.reduce( resources, function( rAcc, resource, resourceName ) {
@@ -162,6 +163,7 @@ function getResourceCache( resources, prefix, version ) {
 				action: action,
 				actionName: actionName,
 				createLink: createLink,
+				createLinkNoAuth: createLinkNoAuth,
 				cache: cache,
 				render: render,
 				resource: resource,
@@ -178,8 +180,8 @@ function getResourceCache( resources, prefix, version ) {
 
 function getResourceGenerator( resources, prefix, version ) { // jshint ignore:line
 	var resourceCache = getResourceCache( resources, prefix, version );
-	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, auth ) {
-		return resourceCache[ resourceName ][ actionName ]( envelope, data, parentUrl, originUrl, originMethod, auth );
+	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, useHal ) {
+		return resourceCache[ resourceName ][ actionName ]( envelope, data, parentUrl, originUrl, originMethod, useHal );
 	};
 }
 
@@ -187,7 +189,7 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 	var resourceCache = getResourceCache( resources, prefix, version );
 	var originFn = getOriginFn( resources, prefix, version );
 
-	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, auth ) {
+	return function( resourceName, actionName, envelope, data, parentUrl, originUrl, originMethod, useHal ) {
 		var body = {};
 		var meta = _.isArray( data ) ? {} : _.omit( data, [ "_list", "_alias" ] );
 		var resource = versions.getVersion( resources[ envelope.resource ], version );
@@ -206,13 +208,13 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 		var createLink = links.getLinkGenerator( resources, prefix, version );
 		var promises = _.map( list, function( item, index ) {
 			var child = list[ index ];
-			return resourceCache[ renderResource ][ renderAction ]( envelope, child, parentUrl, undefined, undefined, auth );
+			return resourceCache[ renderResource ][ renderAction ]( envelope, child, parentUrl, undefined, undefined, useHal );
 		} );
 
 		// render additional metadata for the list
 		function attachMetadata( body ) {
 			if ( !_.isEmpty( meta ) ) {
-				return resourceCache[ resourceName ][ actionName ]( envelope, meta, parentUrl, undefined, undefined, auth )
+				return resourceCache[ resourceName ][ actionName ]( envelope, meta, parentUrl, undefined, undefined, useHal )
 					.then( function( metadata ) {
 						return _.merge( {}, body, metadata );
 					} );
@@ -233,7 +235,7 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 			body._resource = envelope.resource;
 			return when.all(
 				_.map( actionList, function( link, linkName ) {
-					return createLink( envelope.resource, linkName, envelope, data, parentUrl, auth );
+					return createLink( envelope.resource, linkName, envelope, data, parentUrl );
 				} ) )
 			.then( function( list ) {
 				body._links = _.merge.apply( undefined, list );
@@ -242,13 +244,17 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 		}
 
 		// put it all together now ...
-		return when.all( promises )
+		var result = when.all( promises )
 			.then( function( listItems ) {
 				body[ alias ] = listItems;
 				return body;
 			} )
-		.then( attachMetadata )
-		.then( attachHypermedia );
+			.then( attachMetadata );
+
+		if ( useHal ) {
+			result = result.then( attachHypermedia );
+		}
+		return result;
 	};
 }
 
@@ -291,10 +297,11 @@ function removeEmbedded( embedded, unit ) { // jshint ignore:line
 	} : unit;
 }
 
-function resourceGenerator( state, envelope, data, parentUrl, originUrl, originMethod, auth ) {
+function resourceGenerator( state, envelope, data, parentUrl, originUrl, originMethod, useHal ) {
 	var action = state.action;
 	var actionName = state.actionName;
 	var createLink = state.createLink;
+	var createLinkNoAuth = state.createLinkNoAuth;
 	var cache = state.cache;
 	var render = state.render;
 	var resource = state.resource;
@@ -308,7 +315,10 @@ function resourceGenerator( state, envelope, data, parentUrl, originUrl, originM
 	function onLink( mainLink ) {
 		return when.all(
 			_.map( actionList, function( link, linkName ) {
-				return createLink( resourceName, linkName, envelope, data, parentUrl, auth );
+				if ( actionName === linkName ) {
+					return createLinkNoAuth( resourceName, linkName, envelope, data, parentUrl );
+				}
+				return createLink( resourceName, linkName, envelope, data, parentUrl );
 			} ) )
 		.then( function( list ) {
 			return { origin: mainLink, actions: _.merge.apply( undefined, list ) };
@@ -330,7 +340,7 @@ function resourceGenerator( state, envelope, data, parentUrl, originUrl, originM
 		var eAcc = {};
 
 		function renderChild( childFn, inheritedUrl, child ) {
-			return childFn( envelope, child, inheritedUrl, undefined, undefined, auth )
+			return childFn( envelope, child, inheritedUrl, undefined, undefined, useHal )
 				.then( function( item ) {
 					if ( child.actions ) {
 						item._links = _.pick( item._links, child.actions );
@@ -343,7 +353,7 @@ function resourceGenerator( state, envelope, data, parentUrl, originUrl, originM
 			var childFn = cache[ child.resource ][ child.render ];
 			var childItem = data[ childName ];
 			var embed;
-			var inheritedUrl = resources[ child.resource ].parent ? body._links.self.href : "";
+			var inheritedUrl = useHal ? ( resources[ child.resource ].parent ? body._links.self.href : "" ) : "";
 			inheritedUrl = inheritedUrl.replace( urlPrefix, "" );
 			var childRenderer = renderChild.bind( undefined, childFn, inheritedUrl );
 			if ( _.isArray( childItem ) ) {
@@ -364,16 +374,25 @@ function resourceGenerator( state, envelope, data, parentUrl, originUrl, originM
 
 		return when.all( embedded ).then( function() {
 			if ( !_.isEmpty( eAcc ) ) {
-				body._embedded = eAcc;
+				if ( useHal ) {
+					body._embedded = eAcc;
+				} else {
+					_.extend( body, eAcc );
+				}
 			}
 			return body;
 		} );
 	}
 
-	return createLink( resourceName, actionName, envelope, data, parentUrl, auth )
-		.then( onLink )
-		.then( onLinks )
-		.then( onBody );
+	if ( !useHal ) {
+		return when( body )
+			.then( onBody );
+	} else {
+		return createLink( resourceName, actionName, envelope, data, parentUrl )
+			.then( onLink )
+			.then( onLinks )
+			.then( onBody );
+	}
 }
 
 module.exports = {

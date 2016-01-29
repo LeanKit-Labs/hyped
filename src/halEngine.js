@@ -1,5 +1,5 @@
-function render( model ) {
-	return JSON.stringify( model );
-}
-
+var render = function( data ) {
+	return data;
+};
+render.hal = true;
 module.exports = render;

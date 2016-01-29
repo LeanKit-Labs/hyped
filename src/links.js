@@ -216,8 +216,8 @@ function getLinkFactory( link, resource, resourceName ) { // jshint ignore:line
 
 function getLinkGenerator( resources, prefix, version, forOptions, skipAuthCheck ) {
 	var linkCache = getLinksCache( resources, prefix, version, forOptions, skipAuthCheck );
-	return function( resourceName, actionName, envelope, data, parentUrl, auth ) {
-		auth = auth || function() {
+	return function( resourceName, actionName, envelope, data, parentUrl ) {
+		var auth = function() {
 			return true;
 		};
 		return linkCache[ resourceName ][ actionName ]( envelope, data, parentUrl, auth );

@@ -1,5 +1,10 @@
 ## 0.5.x
 
+### Next
+* Send 204 (or other empty responses) without HAL wrapper
+* Skip extra HAL links, authorization work when returning JSON responses
+* Don't call authorize a second time for the link currently being rendered
+
 ### 0.5.1
  * Bug fix - hypermedia links no longer returned in error responses (status > 400)
 
