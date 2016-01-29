@@ -1,6 +1,6 @@
-## 0.5.x
+## 0.6.x
 
-### Next
+### 0.6.0
 * Send 204 (or other empty responses) without HAL wrapper
 * Skip extra HAL links, authorization work when returning JSON responses
 * Don't call authorize a second time for the link currently being rendered
