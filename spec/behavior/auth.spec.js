@@ -4,7 +4,7 @@ var HyperResource = require( "../../src/hyperResource.js" );
 
 var board1 = model.board1;
 
-describe.only( "Authorization", function() {
+describe( "Authorization", function() {
 	describe( "when filtering links by permission", function() {
 		var resource = {
 			name: "board",
