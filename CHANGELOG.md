@@ -3,6 +3,7 @@
 ### Next
  * Support for "hoisting" child resource actions to parent's hypermedia
  * First pass at adding support for action hoisting
+ * Add support for handle versioning
 
 ### 0.6.1
 * When not using hal, still render empty arrays at the top-level for embedded resources
