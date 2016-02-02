@@ -313,14 +313,36 @@ function resourceGenerator( state, envelope, data, parentUrl, originUrl, originM
 	var body = render( resourceName, actionName, data );
 
 	function onLink( mainLink ) {
-		return when.all(
-			_.map( actionList, function( link, linkName ) {
-				if ( actionName === linkName ) {
-					return createLinkNoAuth( resourceName, linkName, envelope, data, parentUrl );
-				}
+		var ownLinks = _.map( actionList, function( link, linkName ) {
+			if ( actionName === linkName ) {
+				return createLinkNoAuth( resourceName, linkName, envelope, data, parentUrl );
+			} else {
 				return createLink( resourceName, linkName, envelope, data, parentUrl );
-			} ) )
-		.then( function( list ) {
+			}
+		} );
+
+		var otherLinks = [];
+		if( resource.hoist ) {
+			var inheritedData = _.cloneDeep( data );
+			inheritedData[ resourceName ] = data;
+			otherLinks = _.map( resource.hoist, function( hoistedActions, hoistedResource ) {
+				return _.map( hoistedActions, function( actionName ) {
+					var hoistedActionName = [ hoistedResource, actionName ].join( ":" );
+					if( action.actions && action.actions.length && _.contains( action.actions, hoistedActionName ) ) {
+						return createLink( hoistedResource, actionName, envelope, inheritedData, parentUrl )
+							.then( function( link ) {
+								link[ hoistedActionName ] = link[ actionName ];
+								delete link[ actionName ];
+								return link;
+							} );
+					}
+				} );
+			} );	
+		}
+		
+
+		return when.all( ownLinks.concat( _.flatten( otherLinks ) ) )
+			.then( function( list ) {
 			return { origin: mainLink, actions: _.merge.apply( undefined, list ) };
 		} );
 	}

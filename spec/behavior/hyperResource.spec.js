@@ -20,7 +20,8 @@ describe( "Hyper Resource", function() {
 				_links: {
 					self: { href: "/parent/1", method: "GET" },
 					children: { href: "/parent/1/child", method: "GET", parameters: parameters },
-					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters }
+					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters },
+					"child:create": { href: "/parent/1/child", method: "POST" }
 				}
 			};
 			var response;
@@ -61,7 +62,8 @@ describe( "Hyper Resource", function() {
 				_links: {
 					self: { href: "/parent/1", method: "GET" },
 					children: { href: "/parent/1/child", method: "GET", parameters: parameters },
-					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters }
+					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters },
+					"child:create": { href: "/parent/1/child", method: "POST" }
 				}
 			};
 			var response;
@@ -185,6 +187,7 @@ describe( "Hyper Resource", function() {
 					} },
 				"parent:bogus": { href: "/parent/bogus", method: "GET" },
 				"parent:privileged": { href: "/parent/privileged", method: "GET" },
+				"child:create": { href: "/parent/{parentId}/child", method: "POST", templated: true },
 				"child:self": { href: "/parent/{parentId}/child/{id}", method: "GET", templated: true },
 				"child:change": { href: "/parent/{parentId}/child/{id}", method: "PUT", templated: true },
 				"grandChild:self": { href: "/parent/{parentId}/child/{childId}/grand/{id}", method: "GET", templated: true },

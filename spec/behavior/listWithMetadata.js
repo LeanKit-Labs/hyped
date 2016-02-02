@@ -19,7 +19,8 @@ module.exports = {
 					parameters: {
 						size: { range: [ 1, 100 ] }
 					}
-				}
+				},
+				"child:create": { href: "/parent/1/child", method: "POST" }
 			}
 		},
 		{
@@ -36,7 +37,8 @@ module.exports = {
 					parameters: {
 						size: { range: [ 1, 100 ] }
 					}
-				}
+				},
+				"child:create": { href: "/parent/2/child", method: "POST" }
 			}
 		}
 	],
