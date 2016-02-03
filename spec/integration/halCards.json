@@ -90,6 +90,10 @@
 		"cards": {
 			"href": "/test/api/board/100/card",
 			"method": "GET"
+		},
+		"next": {
+			"href": "/test/api/board/100/card?page=2",
+			"method": "GET"
 		}
 	}
 }

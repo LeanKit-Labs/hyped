@@ -182,6 +182,9 @@ function getLinksCache( resources, prefix, version, forOptions, skipAuthCheck ) 
 				render: render,
 				resourceName: resourceName
 			} );
+			_.each( action.links, function( link, linkName ) {
+				acc[ linkName ] = getLinkFactory( link, resource, resourceName );
+			} );
 			return acc;
 		}, {} );
 		return rAcc;
@@ -209,6 +212,10 @@ function getLinkFactory( link, resource, resourceName ) { // jshint ignore:line
 			var tokens = url.getTokens( halUrl );
 			return function( data ) {
 				return url.process( _.cloneDeep( tokens ), halUrl, data, {}, resourceName );
+			};
+		} else {
+			return function() {
+				return link;
 			};
 		}
 	}

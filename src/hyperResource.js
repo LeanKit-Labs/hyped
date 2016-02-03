@@ -8,7 +8,7 @@ function addOptionLinksForResource( resource, resourceName, createLink, envelope
 	return when.all( _.map( resource.actions, function( action, actionName ) {
 		function onMain( main ) {
 			if ( !_.isEmpty( main ) ) {
-				options._links[ [ resourceName, actionName ].join( ":" ) ] = _.values( main )[ 0 ];
+				options._links[ [ resourceName, actionName ].join( ":" ) ] = main[ actionName ];
 			}
 		}
 		return action.hidden ? when.resolve() : createLink( resourceName, actionName, envelope, {} )
@@ -259,7 +259,8 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 }
 
 function getRoutesCache( resources, prefix, version ) {
-	var createLink = links.getRouteGenerator( resources, prefix, version );
+	var createRoute = links.getRouteGenerator( resources, prefix, version );
+	var createLink = links.getLinkGenerator( resources, prefix, version );
 	var options = { _links: {} };
 	var versionList = [ "1" ];
 	_.each( resources, function( resource, resourceName ) {
@@ -267,9 +268,10 @@ function getRoutesCache( resources, prefix, version ) {
 		resource = versions.getVersion( resource, version );
 
 		_.each( resource.actions, function( action, actionName ) {
-			var main = createLink( resourceName, actionName, {}, {} );
+			var main = createRoute( resourceName, actionName, {}, {} );
+
 			if ( !_.isEmpty( main ) ) {
-				options._links[ [ resourceName, actionName ].join( ":" ) ] = _.values( main )[ 0 ];
+				options._links[ [ resourceName, actionName ].join( ":" ) ] = main[ actionName ];
 			}
 			_.each( action.links, function( link, linkName ) {
 				var additional = _.values( createLink( resourceName, linkName, {}, {} ) )[ 0 ];
@@ -322,13 +324,13 @@ function resourceGenerator( state, envelope, data, parentUrl, originUrl, originM
 		} );
 
 		var otherLinks = [];
-		if( resource.hoist ) {
+		if ( resource.hoist ) {
 			var inheritedData = _.cloneDeep( data );
 			inheritedData[ resourceName ] = data;
 			otherLinks = _.map( resource.hoist, function( hoistedActions, hoistedResource ) {
 				return _.map( hoistedActions, function( actionName ) {
 					var hoistedActionName = [ hoistedResource, actionName ].join( ":" );
-					if( action.actions && action.actions.length && _.contains( action.actions, hoistedActionName ) ) {
+					if ( action.actions && action.actions.length && _.contains( action.actions, hoistedActionName ) ) {
 						return createLink( hoistedResource, actionName, envelope, inheritedData, parentUrl )
 							.then( function( link ) {
 								link[ hoistedActionName ] = link[ actionName ];
@@ -337,9 +339,8 @@ function resourceGenerator( state, envelope, data, parentUrl, originUrl, originM
 							} );
 					}
 				} );
-			} );	
+			} );
 		}
-		
 
 		return when.all( ownLinks.concat( _.flatten( otherLinks ) ) )
 			.then( function( list ) {
