@@ -363,7 +363,7 @@ function resourceGenerator( state, envelope, data, parentUrl, originUrl, originM
 			}
 			if ( embed ) {
 				embed.then( function( child ) {
-					if ( !_.isEmpty( child ) ) {
+					if ( !useHal || !_.isEmpty( child ) ) {
 						eAcc[ childName ] = child;
 					}
 				} );
