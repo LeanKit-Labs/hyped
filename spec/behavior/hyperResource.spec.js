@@ -109,6 +109,68 @@ describe( "Hyper Resource", function() {
 				return response.should.eventually.eql( expected );
 			} );
 		} );
+
+		describe( "when rendering action with embedded resources and not using hal", function() {
+			var response;
+			var data = {
+				id: 2,
+				parentId: 1,
+				title: "child",
+				grandChildren: [ { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 } ]
+			};
+			var envelope = {
+				user: {
+					name: "Evenly"
+				}
+			};
+			before( function() {
+				var fn1 = HyperResource.resourceGenerator( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
+				response = fn1( "child", "self", envelope, data, "", undefined, undefined, false );
+			} );
+
+			it( "should keep embedded resources as top-level properties ", function() {
+				return response.should.eventually.eql( {
+					id: 2,
+					parentId: 1,
+					title: "child",
+					grandChildren: [
+						{ id: 1 },
+						{ id: 2 },
+						{ id: 3 },
+						{ id: 4 },
+						{ id: 5 }
+					]
+				} );
+			} );
+		} );
+
+		describe( "when rendering action with embedded resources, with an empty array, and not using hal", function() {
+			var response;
+			var data = {
+				id: 2,
+				parentId: 1,
+				title: "child",
+				grandChildren: []
+			};
+			var envelope = {
+				user: {
+					name: "Evenly"
+				}
+			};
+			before( function() {
+				var fn1 = HyperResource.resourceGenerator( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
+				response = fn1( "child", "self", envelope, data, "", undefined, undefined, false );
+			} );
+
+			it( "should still render an empty array at the top-level", function() {
+				return response.should.eventually.eql( {
+					id: 2,
+					parentId: 1,
+					title: "child",
+					grandChildren: []
+				} );
+			} );
+		} );
 	} );
 
 	describe( "when rendering options including children and skipping auth check", function() {
