@@ -5,6 +5,7 @@ module.exports = {
 	_origin: { href: "/test/api/parent/1/child/2", method: "GET" },
 	_resource: "child",
 	_action: "self",
+	_version: 1,
 	_links: {
 		self: { href: "/test/api/parent/1/child/2", method: "GET" },
 		change: { href: "/test/api/parent/1/child/2", method: "PUT" }
@@ -19,7 +20,8 @@ module.exports = {
 					self: { href: "/test/api/parent/1/child/2/grand/1", method: "GET" },
 					create: { href: "/test/api/parent/1/child/2/grand", method: "POST" },
 					delete: { href: "/test/api/parent/1/child/2/grand/1", method: "DELETE" }
-				}
+				},
+				_version: 1
 			},
 			{ id: 2,
 				_origin: { href: "/test/api/parent/1/child/2/grand/2", method: "GET" },
@@ -29,7 +31,8 @@ module.exports = {
 					self: { href: "/test/api/parent/1/child/2/grand/2", method: "GET" },
 					create: { href: "/test/api/parent/1/child/2/grand", method: "POST" },
 					delete: { href: "/test/api/parent/1/child/2/grand/2", method: "DELETE" }
-				}
+				},
+				_version: 1
 			},
 			{ id: 3,
 				_origin: { href: "/test/api/parent/1/child/2/grand/3", method: "GET" },
@@ -39,7 +42,8 @@ module.exports = {
 					self: { href: "/test/api/parent/1/child/2/grand/3", method: "GET" },
 					create: { href: "/test/api/parent/1/child/2/grand", method: "POST" },
 					delete: { href: "/test/api/parent/1/child/2/grand/3", method: "DELETE" }
-				}
+				},
+				_version: 1
 			},
 			{ id: 4,
 				_origin: { href: "/test/api/parent/1/child/2/grand/4", method: "GET" },
@@ -49,7 +53,8 @@ module.exports = {
 					self: { href: "/test/api/parent/1/child/2/grand/4", method: "GET" },
 					create: { href: "/test/api/parent/1/child/2/grand", method: "POST" },
 					delete: { href: "/test/api/parent/1/child/2/grand/4", method: "DELETE" }
-				}
+				},
+				_version: 1
 			},
 			{ id: 5,
 				_origin: { href: "/test/api/parent/1/child/2/grand/5", method: "GET" },
@@ -59,7 +64,8 @@ module.exports = {
 					self: { href: "/test/api/parent/1/child/2/grand/5", method: "GET" },
 					create: { href: "/test/api/parent/1/child/2/grand", method: "POST" },
 					delete: { href: "/test/api/parent/1/child/2/grand/5", method: "DELETE" }
-				}
+				},
+				_version: 1
 			}
 		]
 	}

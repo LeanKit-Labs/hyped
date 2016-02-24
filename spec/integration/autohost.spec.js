@@ -38,7 +38,8 @@ describe( "Autohost Integration", function() {
 			it( "should get JSON representation of context", function() {
 				contentType.should.equal( "application/json" );
 				body.should.eql( {
-					test: { message: "I came from middleware!" }
+					test: { message: "I came from middleware!" },
+					version: 1
 				} );
 			} );
 		} );
@@ -66,7 +67,7 @@ describe( "Autohost Integration", function() {
 
 			before( function( done ) {
 				var start = Date.now();
-				request.get( "http://localhost:8800/test/api/board/100", { headers: { accept: "application/hal.v2+json" } }, function( err, res ) {
+				request.get( "http://localhost:8800/test/api/board/100", { headers: { accept: "application/hal+json; version=2" } }, function( err, res ) {
 					elapsedMs = ( Date.now() - start );
 					body = res.body;
 					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
@@ -75,7 +76,7 @@ describe( "Autohost Integration", function() {
 			} );
 
 			it( "should get HAL version 2", function() {
-				contentType.should.equal( "application/hal.v2+json" );
+				contentType.should.equal( "application/hal+json" );
 				var json = JSON.parse( body );
 				json.should.eql( expectedJson );
 			} );
@@ -97,6 +98,46 @@ describe( "Autohost Integration", function() {
 
 			it( "should get JSON version 2", function() {
 				contentType.should.equal( "application/json.v2" );
+				body.should.eql( expected );
+			} );
+		} );
+
+		describe( "when requesting intermediate board json version", function() {
+			var expected = require( "./board2.json" );
+			var body, contentType, elapsedMs;
+
+			before( function( done ) {
+				var start = Date.now();
+				request.get( "http://localhost:8800/test/api/board/100", { headers: { accept: "application/json.v7" } }, function( err, res ) {
+					elapsedMs = ( Date.now() - start );
+					body = JSON.parse( res.body );
+					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+					done();
+				} );
+			} );
+
+			it( "should get JSON version 7", function() {
+				contentType.should.equal( "application/json.v7" );
+				body.should.eql( expected );
+			} );
+		} );
+
+		describe( "when requesting board json version 10", function() {
+			var expected = { wat: "crazy train" };
+			var body, contentType, elapsedMs;
+
+			before( function( done ) {
+				var start = Date.now();
+				request.get( "http://localhost:8800/test/api/board/100", { headers: { accept: "application/json.v10" } }, function( err, res ) {
+					elapsedMs = ( Date.now() - start );
+					body = JSON.parse( res.body );
+					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+					done();
+				} );
+			} );
+
+			it( "should get JSON version 10", function() {
+				contentType.should.equal( "application/json.v10" );
 				body.should.eql( expected );
 			} );
 		} );
@@ -240,6 +281,7 @@ describe( "Autohost Integration", function() {
 						method: "GET"
 					},
 					_resource: "test",
+					_version: 1,
 					message: "Server error"
 				} );
 			} );
@@ -341,7 +383,7 @@ describe( "Autohost Integration", function() {
 		} );
 
 		describe( "when requesting board with no media type", function() {
-			var expected = require( "./board2.json" );
+			var expected = { wat: "crazy train" };
 			var body, contentType;
 
 			before( function( done ) {
@@ -352,7 +394,7 @@ describe( "Autohost Integration", function() {
 				} );
 			} );
 
-			it( "should get JSON version 2", function() {
+			it( "should get version 10's hot nonsense", function() {
 				contentType.should.equal( "application/json" );
 				body.should.eql( expected );
 			} );
@@ -436,7 +478,7 @@ describe( "Autohost Integration", function() {
 		} );
 
 		describe( "when requesting board with no media type", function() {
-			var expected = require( "./board2.json" );
+			var expected = { wat: "crazy train" };
 			var body, contentType;
 
 			before( function( done ) {
@@ -447,7 +489,7 @@ describe( "Autohost Integration", function() {
 				} );
 			} );
 
-			it( "should get JSON version 2", function() {
+			it( "should get version 10's hot nonsense", function() {
 				contentType.should.equal( "application/json" );
 				body.should.eql( expected );
 			} );
@@ -495,7 +537,7 @@ describe( "Autohost Integration", function() {
 		} );
 
 		describe( "when requesting board with no media type", function() {
-			var expected = require( "./board2.json" );
+			var expected = { wat: "crazy train" };
 			var body, contentType;
 
 			before( function( done ) {
@@ -506,7 +548,7 @@ describe( "Autohost Integration", function() {
 				} );
 			} );
 
-			it( "should get JSON version 2", function() {
+			it( "should get version 10's hot nonsense", function() {
 				contentType.should.equal( "application/json" );
 				body.should.eql( expected );
 			} );

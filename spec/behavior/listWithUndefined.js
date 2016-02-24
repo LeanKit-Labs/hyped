@@ -11,5 +11,6 @@ module.exports = {
 		method: "GET"
 	},
 	_resource: "parent",
+	_version: 1,
 	parents: []
 };

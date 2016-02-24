@@ -2,6 +2,7 @@ module.exports = {
 	_origin: { href: "/parent", method: "GET" },
 	_resource: "parent",
 	_action: "list",
+	_version: 1,
 	parents: [
 		{
 			id: 1,
@@ -18,8 +19,9 @@ module.exports = {
 						size: { range: [ 1, 100 ] }
 					}
 				},
-				"child:create": { href: "/parent/1/child", method: "POST" }
-			}
+				"create-child": { href: "/parent/1/child", method: "POST" }
+			},
+			_version: 1
 		},
 		{
 			id: 2,
@@ -36,8 +38,9 @@ module.exports = {
 						size: { range: [ 1, 100 ] }
 					}
 				},
-				"child:create": { href: "/parent/2/child", method: "POST" }
-			}
+				"create-child": { href: "/parent/2/child", method: "POST" }
+			},
+			_version: 1
 		}
 	],
 	_links: {

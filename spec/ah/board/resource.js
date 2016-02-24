@@ -16,7 +16,10 @@ module.exports = function( host ) {
 					}
 				},
 				handle: function( envelope ) {
-					envelope.hyped( model.board1 ).status( 200 ).render();
+					return {
+						status: 200,
+						data: model.board1
+					};
 				}
 			},
 			cards: {
@@ -57,7 +60,26 @@ module.exports = function( host ) {
 		versions: {
 			2: {
 				self: {
-					include: [ "id", "title", "description" ]
+					handle: function( envelope ) {
+						var data = _.cloneDeep( model.board1 );
+						data.version = 2;
+						return {
+							status: 200,
+							data: data
+						};
+					},
+					include: [ "id", "title", "description", "version" ]
+				}
+			},
+			10: {
+				self: {
+					handle: function( envelope ) {
+						return {
+							status: 200,
+							data: { wat: "crazy train" }
+						};
+					},
+					include: [ "wat" ]
 				}
 			}
 		}

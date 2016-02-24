@@ -2,6 +2,8 @@
 	"id": 100,
 	"title": "Test Board",
 	"description": "This is a board and stuff!",
+	"version": 2,
+	"_version": 2,
 	"_origin": {
 		"href": "/test/api/board/100",
 		"method": "GET"
@@ -40,6 +42,7 @@
 						"method": "GET"
 					}
 				},
+				"_version": 2,
 				"_embedded": {
 					"cards": [
 						{
@@ -66,7 +69,8 @@
 									"href": "/test/api/card/301/block",
 									"method": "PUT"
 								}
-							}
+							},
+							"_version": 2
 						},
 						{
 							"id": 302,
@@ -92,7 +96,8 @@
 									"href": "/test/api/card/302/block",
 									"method": "PUT"
 								}
-							}
+							},
+							"_version": 2
 						},
 						{
 							"id": 303,
@@ -118,7 +123,8 @@
 									"href": "/test/api/card/303/block",
 									"method": "PUT"
 								}
-							}
+							},
+							"_version": 2
 						}
 					]
 				}
@@ -143,6 +149,7 @@
 						"method": "GET"
 					}
 				},
+				"_version": 2,
 				"_embedded": {
 					"cards": [
 						{
@@ -169,7 +176,8 @@
 									"href": "/test/api/card/304/block",
 									"method": "PUT"
 								}
-							}
+							},
+							"_version": 2
 						}
 					]
 				}
@@ -194,6 +202,7 @@
 						"method": "GET"
 					}
 				},
+				"_version": 2,
 				"_embedded": {
 					"cards": [
 						{
@@ -220,7 +229,8 @@
 									"href": "/test/api/card/305/block",
 									"method": "PUT"
 								}
-							}
+							},
+							"_version": 2
 						},
 						{
 							"id": 306,
@@ -246,7 +256,8 @@
 									"href": "/test/api/card/306/block",
 									"method": "PUT"
 								}
-							}
+							},
+							"_version": 2
 						}
 					]
 				}

@@ -4,23 +4,28 @@ var versions = require( "../../src/versions" );
 
 describe( "Versioning", function() {
 	describe( "When getting versions", function() {
-		var parentVersions, childVersions;
+		var parentVersion1, parentVersion2, parentVersion3, childVersion;
 
 		before( function() {
-			parentVersions = versions.getVersions( resources.parent );
-			childVersions = versions.getVersions( resources.child );
+			versions.processHandles( resources.parent );
+			parentVersion1 = versions.getVersion( resources.parent, 1 );
+			parentVersion2 = versions.getVersion( resources.parent, 2 );
+			parentVersion3 = versions.getVersion( resources.parent, 10 );
+			childVersion = versions.getVersion( resources.child, 3 );
 		} );
 
-		it( "should produce new version correctly", function() {
-			parentVersions[ 2 ].actions.self.include.should.eql( [ "id", "title" ] );
-		} );
-
-		it( "should keep version changes separate from original", function() {
-			expect( parentVersions[ 1 ].actions.self.include ).not.to.exist; // jshint ignore:line
+		it( "should merge distinct versions correctly", function() {
+			should.not.exist( parentVersion1.actions.self.include );
+			parentVersion2.actions.self.include.should.eql( [ "id", "title" ] );
+			parentVersion3.actions.self.include.should.eql( [ "id" ] );
 		} );
 
 		it( "should return a version hash with one entry for resources without a version hash", function() {
-			expect( childVersions[ 1 ].actions.self ).to.exist; // jshint ignore:line
+			expect( childVersion.actions.self ).to.exist; // jshint ignore:line
+		} );
+
+		it( "should convert handle to a differentiated handle", function() {
+			parentVersion2.actions.self.handle.length.should.equal( 3 );
 		} );
 	} );
 } );

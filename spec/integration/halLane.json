@@ -18,6 +18,7 @@
 			"method": "GET"
 		}
 	},
+	"_version": 1,
 	"_embedded": {
 		"cards": [
 			{
@@ -44,7 +45,8 @@
 						"href": "/test/api/card/304/block",
 						"method": "PUT"
 					}
-				}
+				},
+				"_version": 1
 			}
 		]
 	}

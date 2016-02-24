@@ -31,6 +31,8 @@ function HttpEnvelope( req, res ) {
 		}
 	} );
 
+	this.version = ( this.context && this.context.version ) ? this.context.version : 1;
+
 	[ req.params, req.query ].forEach( function( source ) {
 		Object.keys( source ).forEach( function( key ) {
 			var val = source[ key ];

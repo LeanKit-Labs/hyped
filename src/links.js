@@ -234,7 +234,7 @@ function getLinkGenerator( resources, prefix, version, forOptions, skipAuthCheck
 function buildParametersGenerator( action ) {
 	// get static parameters
 	var parameters = _.reduce(
-		_.omit( action.parameters, function( v ) {
+		_.omitBy( action.parameters, function( v ) {
 			return _.isFunction( v );
 		} ), function( acc, v, k ) {
 			acc[ k ] = v;
@@ -244,7 +244,7 @@ function buildParametersGenerator( action ) {
 	);
 
 	// get dynamic parameters
-	var generators = _.omit( action.parameters, function( v ) {
+	var generators = _.omitBy( action.parameters, function( v ) {
 		return !_.isFunction( v );
 	} );
 

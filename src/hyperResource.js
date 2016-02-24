@@ -30,7 +30,7 @@ function getInclusion( include, unit ) {
 
 function getFilter( filter, unit ) {
 	return filter ? function( data ) {
-		return _.pick( data, filter );
+		return _.pickBy( data, filter );
 	} : unit;
 }
 
@@ -43,8 +43,8 @@ function getMap( map, unit ) {
 function getBodyCache( resources, prefix, version ) {
 	var cache = {};
 	_.reduce( resources, function( rAcc, resource, resourceName ) {
-		resource = versions.getVersion( resource, version );
-		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
+		var versionedResource = versions.getVersion( resource, version );
+		rAcc[ resourceName ] = _.reduce( versionedResource.actions, function( acc, action, actionName ) {
 			var unit = function( x ) {
 				return x;
 			};
@@ -57,7 +57,7 @@ function getBodyCache( resources, prefix, version ) {
 			var filter = getFilter( action.filter, unit );
 			var map = getMap( action.transform, unit );
 			var strip = removeEmbedded( embedded, unit );
-			var fn = _.compose( strip, map, filter, exclude, include );
+			var fn = _.flowRight( strip, map, filter, exclude, include );
 			acc[ actionName ] = function( data ) {
 				var cloned = _.cloneDeep( data );
 				return fn( cloned );
@@ -89,7 +89,7 @@ function getOptionCache( resources, prefix, version, excludeChildren, envelope, 
 			}
 		} )
 	).then( function() {
-		options._versions = _.unique( versionList );
+		options._versions = _.uniq( versionList );
 		return options;
 	} );
 }
@@ -231,8 +231,10 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 			} else {
 				body._origin = originFn( resourceName, actionName, data[ 0 ], parentUrl );
 			}
+
 			body._action = envelope.action;
 			body._resource = envelope.resource;
+			body._version = envelope.version;
 			return when.all(
 				_.map( actionList, function( link, linkName ) {
 					return createLink( envelope.resource, linkName, envelope, data, parentUrl );
@@ -281,7 +283,7 @@ function getRoutesCache( resources, prefix, version ) {
 			} );
 		} );
 	} );
-	options._versions = _.unique( versionList );
+	options._versions = _.uniq( versionList );
 	return options;
 }
 
@@ -327,10 +329,10 @@ function resourceGenerator( state, envelope, data, parentUrl, originUrl, originM
 		if ( resource.hoist ) {
 			var inheritedData = _.cloneDeep( data );
 			inheritedData[ resourceName ] = data;
-			otherLinks = _.map( resource.hoist, function( hoistedActions, hoistedResource ) {
+			otherLinks = _.flatMap( resource.hoist, function( hoistedActions, hoistedResource ) {
 				return _.map( hoistedActions, function( actionName ) {
-					var hoistedActionName = [ hoistedResource, actionName ].join( ":" );
-					if ( action.actions && action.actions.length && _.contains( action.actions, hoistedActionName ) ) {
+					var hoistedActionName = [ actionName, hoistedResource ].join( "-" );
+					if ( action.actions && action.actions.length && _.includes( action.actions, hoistedActionName ) ) {
 						return createLink( hoistedResource, actionName, envelope, inheritedData, parentUrl )
 							.then( function( link ) {
 								link[ hoistedActionName ] = link[ actionName ];
@@ -356,6 +358,7 @@ function resourceGenerator( state, envelope, data, parentUrl, originUrl, originM
 		body._origin = origin;
 		body._resource = resourceName;
 		body._action = actionName;
+		body._version = envelope.version;
 		return body;
 	}
 

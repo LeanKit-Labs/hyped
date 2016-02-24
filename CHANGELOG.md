@@ -6,7 +6,7 @@
  * Add support for handle versioning
 
 ### 0.6.1
-* When not using hal, still render empty arrays at the top-level for embedded resources
+ * When not using hal, still render empty arrays at the top-level for embedded resources
 
 ### 0.6.0
  * Send 204 (or other empty responses) without HAL wrapper

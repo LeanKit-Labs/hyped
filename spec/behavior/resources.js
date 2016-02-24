@@ -7,7 +7,10 @@ var resources = {
 			self: {
 				method: "get",
 				url: "/parent/:id",
-				actions: [ "self", "children", "next-child-page", "child:create" ]
+				handle: function() {
+					return "one";
+				},
+				actions: [ "self", "children", "next-child-page", "create-child" ]
 			},
 			list: {
 				method: "get",
@@ -77,7 +80,18 @@ var resources = {
 		versions: {
 			2: {
 				self: {
-					include: [ "id", "title" ]
+					include: [ "id", "title" ],
+					handle: function() {
+						return "two";
+					}
+				}
+			},
+			10: {
+				self: {
+					include: [ "id" ],
+					handle: function() {
+						return "three";
+					}
 				}
 			}
 		}

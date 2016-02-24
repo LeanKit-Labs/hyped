@@ -57,6 +57,7 @@ HyperResponse.prototype.createResponse = function() {
 			_.assign( this._model, {
 				_action: this._action || action,
 				_resource: this._resource || resource,
+				_version: this._envelope.version,
 				_origin: {
 					href: this._originUrl,
 					method: this._originMethod
