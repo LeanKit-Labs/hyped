@@ -1,10 +1,13 @@
 var resources = {
 	parent: {
+		hoist: {
+			child: [ "create" ]
+		},
 		actions: {
 			self: {
 				method: "get",
 				url: "/parent/:id",
-				actions: [ "self", "children", "next-child-page" ]
+				actions: [ "self", "children", "next-child-page", "child:create" ]
 			},
 			list: {
 				method: "get",
@@ -85,6 +88,7 @@ var resources = {
 			self: {
 				method: "get",
 				url: "/child/:child.id",
+				actions: [ "self", "change" ],
 				embed: {
 					grandChildren: {
 						resource: "grandChild",
@@ -92,6 +96,10 @@ var resources = {
 						actions: [ "self", "create" ]
 					}
 				}
+			},
+			create: {
+				method: "post",
+				url: "/child"
 			},
 			change: {
 				method: "put",

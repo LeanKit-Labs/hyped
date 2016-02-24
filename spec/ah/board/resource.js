@@ -24,9 +24,23 @@ module.exports = function( host ) {
 				url: "/:id/card",
 				render: { resource: "card", action: "self" },
 				handle: function( envelope ) {
-					return _.reduce( model.board1.lanes, function( acc, lane ) {
+					var list = _.reduce( model.board1.lanes, function( acc, lane ) {
 						return acc.concat( lane.cards );
 					}, [] );
+					list.id = envelope.data.id;
+					return list;
+				},
+				links: {
+					next: function( envelope, data ) {
+						var currentPage = 1;
+						if ( envelope.data ) {
+							currentPage = envelope.data.page || 1;
+						}
+
+						if ( data.length > 5 ) {
+							return "/board/:id/card?page=" + ( currentPage + 1 );
+						}
+					}
 				}
 			},
 			hidden: {

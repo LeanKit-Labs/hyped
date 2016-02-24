@@ -33,6 +33,9 @@ The resource definition provides the metadata necessary for hyped to generate hy
 			actions: allows control of which actions are shown in the hypermedia
 		}
 	},
+	hoist: {
+		[childResourceName]: [ ] // list of child actions to hoist to this resource's default hypermedia
+	},
 	versions: {
 		#: {
 			[actionName]: {
@@ -165,7 +168,7 @@ The resource definition provides the metadata necessary for hyped to generate hy
 	<dt><h3>hidden</h3></dt>
 	<dd>Setting this property to true will exclude this action from hyperlinks when rendering options.</dd>
 	<dt><h3>actions</h3></dt>
-	<dd>Allows control of which actions appear as hyperlinks when rendering this action.</dd>
+	<dd>Allows control of which actions appear as hyperlinks when rendering this action. When including a hoisted action, the child resource name should appear before the action name seperated by a colon. Ex. `"child:action"`.</dd>
 </dl>
 
 #### Example
