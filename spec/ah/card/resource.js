@@ -13,7 +13,7 @@ module.exports = function( host ) {
 					var cards = _.reduce( model.board1.lanes, function( acc, x ) {
 						return acc.concat( x.cards );
 					} );
-					var card = _.where( cards, { id: parseInt( envelope.data.cardId ) } )[ 0 ];
+					var card = _.filter( cards, { id: parseInt( envelope.data.cardId ) } )[ 0 ];
 					return card;
 				}
 			},

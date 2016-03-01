@@ -14,7 +14,8 @@
 				"self": { "href": "/test/api/card/301", "method": "GET" },
 				"move": { "href": "/test/api/card/301/board/{targetBoardId}/lane/{targetLaneId}", "method": "PUT", "templated": true },
 				"block": { "href": "/test/api/card/301/block", "method": "PUT" }
-			}
+			},
+			"_version": 1
 		},
 		{
 			"id": 302,
@@ -27,7 +28,8 @@
 				"self": { "href": "/test/api/card/302", "method": "GET" },
 				"move": { "href": "/test/api/card/302/board/{targetBoardId}/lane/{targetLaneId}", "method": "PUT", "templated": true },
 				"block": { "href": "/test/api/card/302/block", "method": "PUT" }
-			}
+			},
+			"_version": 1
 		},
 		{
 			"id": 303,
@@ -40,7 +42,8 @@
 				"self": { "href": "/test/api/card/303", "method": "GET" },
 				"move": { "href": "/test/api/card/303/board/{targetBoardId}/lane/{targetLaneId}", "method": "PUT", "templated": true },
 				"block": { "href": "/test/api/card/303/block", "method": "PUT" }
-			}
+			},
+			"_version": 1
 		},
 		{
 			"id": 304,
@@ -53,7 +56,8 @@
 				"self": { "href": "/test/api/card/304", "method": "GET" },
 				"move": { "href": "/test/api/card/304/board/{targetBoardId}/lane/{targetLaneId}", "method": "PUT", "templated": true },
 				"block": { "href": "/test/api/card/304/block", "method": "PUT" }
-			}
+			},
+			"_version": 1
 		},
 		{
 			"id": 305,
@@ -66,7 +70,8 @@
 				"self": { "href": "/test/api/card/305", "method": "GET" },
 				"move": { "href": "/test/api/card/305/board/{targetBoardId}/lane/{targetLaneId}", "method": "PUT", "templated": true },
 				"block": { "href": "/test/api/card/305/block", "method": "PUT" }
-			}
+			},
+			"_version": 1
 		},
 		{
 			"id": 306,
@@ -79,7 +84,8 @@
 				"self": { "href": "/test/api/card/306", "method": "GET" },
 				"move": { "href": "/test/api/card/306/board/{targetBoardId}/lane/{targetLaneId}", "method": "PUT", "templated": true },
 				"block": { "href": "/test/api/card/306/block", "method": "PUT" }
-			}
+			},
+			"_version": 1
 		}
 	],
 	"_links": {
@@ -90,6 +96,11 @@
 		"cards": {
 			"href": "/test/api/board/100/card",
 			"method": "GET"
+		},
+		"next": {
+			"href": "/test/api/board/100/card?page=2",
+			"method": "GET"
 		}
-	}
+	},
+	"_version": 1
 }

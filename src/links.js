@@ -182,6 +182,9 @@ function getLinksCache( resources, prefix, version, forOptions, skipAuthCheck ) 
 				render: render,
 				resourceName: resourceName
 			} );
+			_.each( action.links, function( link, linkName ) {
+				acc[ linkName ] = getLinkFactory( link, resource, resourceName );
+			} );
 			return acc;
 		}, {} );
 		return rAcc;
@@ -210,6 +213,10 @@ function getLinkFactory( link, resource, resourceName ) { // jshint ignore:line
 			return function( data ) {
 				return url.process( _.cloneDeep( tokens ), halUrl, data, {}, resourceName );
 			};
+		} else {
+			return function() {
+				return link;
+			};
 		}
 	}
 }
@@ -227,7 +234,7 @@ function getLinkGenerator( resources, prefix, version, forOptions, skipAuthCheck
 function buildParametersGenerator( action ) {
 	// get static parameters
 	var parameters = _.reduce(
-		_.omit( action.parameters, function( v ) {
+		_.omitBy( action.parameters, function( v ) {
 			return _.isFunction( v );
 		} ), function( acc, v, k ) {
 			acc[ k ] = v;
@@ -237,7 +244,7 @@ function buildParametersGenerator( action ) {
 	);
 
 	// get dynamic parameters
-	var generators = _.omit( action.parameters, function( v ) {
+	var generators = _.omitBy( action.parameters, function( v ) {
 		return !_.isFunction( v );
 	} );
 

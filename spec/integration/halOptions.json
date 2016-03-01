@@ -11,5 +11,5 @@
 		"test:self": { "href": "/test/prefix/api/test/", "method": "GET" }
 	},
 	"_mediaTypes": [ "application/json", "application/hal+json" ],
-	"_versions": [ "1", "2" ]
+	"_versions": [ "1", "2", "10" ]
 }

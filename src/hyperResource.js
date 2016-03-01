@@ -8,7 +8,7 @@ function addOptionLinksForResource( resource, resourceName, createLink, envelope
 	return when.all( _.map( resource.actions, function( action, actionName ) {
 		function onMain( main ) {
 			if ( !_.isEmpty( main ) ) {
-				options._links[ [ resourceName, actionName ].join( ":" ) ] = _.values( main )[ 0 ];
+				options._links[ [ resourceName, actionName ].join( ":" ) ] = main[ actionName ];
 			}
 		}
 		return action.hidden ? when.resolve() : createLink( resourceName, actionName, envelope, {} )
@@ -30,7 +30,7 @@ function getInclusion( include, unit ) {
 
 function getFilter( filter, unit ) {
 	return filter ? function( data ) {
-		return _.pick( data, filter );
+		return _.pickBy( data, filter );
 	} : unit;
 }
 
@@ -43,8 +43,8 @@ function getMap( map, unit ) {
 function getBodyCache( resources, prefix, version ) {
 	var cache = {};
 	_.reduce( resources, function( rAcc, resource, resourceName ) {
-		resource = versions.getVersion( resource, version );
-		rAcc[ resourceName ] = _.reduce( resource.actions, function( acc, action, actionName ) {
+		var versionedResource = versions.getVersion( resource, version );
+		rAcc[ resourceName ] = _.reduce( versionedResource.actions, function( acc, action, actionName ) {
 			var unit = function( x ) {
 				return x;
 			};
@@ -57,7 +57,7 @@ function getBodyCache( resources, prefix, version ) {
 			var filter = getFilter( action.filter, unit );
 			var map = getMap( action.transform, unit );
 			var strip = removeEmbedded( embedded, unit );
-			var fn = _.compose( strip, map, filter, exclude, include );
+			var fn = _.flowRight( strip, map, filter, exclude, include );
 			acc[ actionName ] = function( data ) {
 				var cloned = _.cloneDeep( data );
 				return fn( cloned );
@@ -89,7 +89,7 @@ function getOptionCache( resources, prefix, version, excludeChildren, envelope, 
 			}
 		} )
 	).then( function() {
-		options._versions = _.unique( versionList );
+		options._versions = _.uniq( versionList );
 		return options;
 	} );
 }
@@ -231,8 +231,10 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 			} else {
 				body._origin = originFn( resourceName, actionName, data[ 0 ], parentUrl );
 			}
+
 			body._action = envelope.action;
 			body._resource = envelope.resource;
+			body._version = envelope.version;
 			return when.all(
 				_.map( actionList, function( link, linkName ) {
 					return createLink( envelope.resource, linkName, envelope, data, parentUrl );
@@ -259,7 +261,8 @@ function getResourcesGenerator( resources, prefix, version ) { // jshint ignore:
 }
 
 function getRoutesCache( resources, prefix, version ) {
-	var createLink = links.getRouteGenerator( resources, prefix, version );
+	var createRoute = links.getRouteGenerator( resources, prefix, version );
+	var createLink = links.getLinkGenerator( resources, prefix, version );
 	var options = { _links: {} };
 	var versionList = [ "1" ];
 	_.each( resources, function( resource, resourceName ) {
@@ -267,9 +270,10 @@ function getRoutesCache( resources, prefix, version ) {
 		resource = versions.getVersion( resource, version );
 
 		_.each( resource.actions, function( action, actionName ) {
-			var main = createLink( resourceName, actionName, {}, {} );
+			var main = createRoute( resourceName, actionName, {}, {} );
+
 			if ( !_.isEmpty( main ) ) {
-				options._links[ [ resourceName, actionName ].join( ":" ) ] = _.values( main )[ 0 ];
+				options._links[ [ resourceName, actionName ].join( ":" ) ] = main[ actionName ];
 			}
 			_.each( action.links, function( link, linkName ) {
 				var additional = _.values( createLink( resourceName, linkName, {}, {} ) )[ 0 ];
@@ -279,7 +283,7 @@ function getRoutesCache( resources, prefix, version ) {
 			} );
 		} );
 	} );
-	options._versions = _.unique( versionList );
+	options._versions = _.uniq( versionList );
 	return options;
 }
 
@@ -313,14 +317,35 @@ function resourceGenerator( state, envelope, data, parentUrl, originUrl, originM
 	var body = render( resourceName, actionName, data );
 
 	function onLink( mainLink ) {
-		return when.all(
-			_.map( actionList, function( link, linkName ) {
-				if ( actionName === linkName ) {
-					return createLinkNoAuth( resourceName, linkName, envelope, data, parentUrl );
-				}
+		var ownLinks = _.map( actionList, function( link, linkName ) {
+			if ( actionName === linkName ) {
+				return createLinkNoAuth( resourceName, linkName, envelope, data, parentUrl );
+			} else {
 				return createLink( resourceName, linkName, envelope, data, parentUrl );
-			} ) )
-		.then( function( list ) {
+			}
+		} );
+
+		var otherLinks = [];
+		if ( resource.hoist ) {
+			var inheritedData = _.cloneDeep( data );
+			inheritedData[ resourceName ] = data;
+			otherLinks = _.flatMap( resource.hoist, function( hoistedActions, hoistedResource ) {
+				return _.map( hoistedActions, function( actionName ) {
+					var hoistedActionName = [ actionName, hoistedResource ].join( "-" );
+					if ( action.actions && action.actions.length && _.includes( action.actions, hoistedActionName ) ) {
+						return createLink( hoistedResource, actionName, envelope, inheritedData, parentUrl )
+							.then( function( link ) {
+								link[ hoistedActionName ] = link[ actionName ];
+								delete link[ actionName ];
+								return link;
+							} );
+					}
+				} );
+			} );
+		}
+
+		return when.all( ownLinks.concat( _.flatten( otherLinks ) ) )
+			.then( function( list ) {
 			return { origin: mainLink, actions: _.merge.apply( undefined, list ) };
 		} );
 	}
@@ -333,6 +358,7 @@ function resourceGenerator( state, envelope, data, parentUrl, originUrl, originM
 		body._origin = origin;
 		body._resource = resourceName;
 		body._action = actionName;
+		body._version = envelope.version;
 		return body;
 	}
 

@@ -33,6 +33,9 @@ The resource definition provides the metadata necessary for hyped to generate hy
 			actions: allows control of which actions are shown in the hypermedia
 		}
 	},
+	hoist: {
+		[childResourceName]: [ ] // list of child actions to hoist to this resource's default hypermedia
+	},
 	versions: {
 		#: {
 			[actionName]: {
@@ -165,7 +168,7 @@ The resource definition provides the metadata necessary for hyped to generate hy
 	<dt><h3>hidden</h3></dt>
 	<dd>Setting this property to true will exclude this action from hyperlinks when rendering options.</dd>
 	<dt><h3>actions</h3></dt>
-	<dd>Allows control of which actions appear as hyperlinks when rendering this action.</dd>
+	<dd>Allows control of which actions appear as hyperlinks when rendering this action. When including a hoisted action, the child resource name should after the action name seperated by a dash. Ex. `"action-child"` to create a unique action name.</dd>
 </dl>
 
 #### Example
@@ -281,10 +284,17 @@ The default mediaTypes supported are:
 ### Versioning
 New versions are implemented as diffs that get applied, in order, against the baseline. Each version provides new values for properties that replace parts of the metadata for the resource. This will hopefully make it easy to see the differences between versions of a resource and reduce the amount of copy/pasted code between versions of a resource definition.
 
-The default versioning strategy parses the version specifier out of the mediaType in the Accept header:
+The default versioning strategies parses the version specifier out of the `Accept` header either as mimeType version specifiers or as a header parameter:
 
  * `application/json.v2`
  * `application/hal.v3+json`
+ * `application/json; version=2`
+ * `application/hal+json; version=3`
+
+#### Versioning handlers
+Handlers behave a bit differently. When providing a new handle implementation for a version, that handle implementation will apply for the current version _and_ any consecutive versions after that don't provide their own handle implementation.
+
+__Example__: version 3 for the `self` action introduces a new handle implementation but no changes are made to the handle again until version 6. Versions 4 and 5 will use version 3's handle implementation.
 
 ### URLs
 hyped will attempt to replace path variables specified in two separate styles for two separate use cases:
@@ -649,6 +659,21 @@ In those cases, we believe hypermedia should include metadata about the availabl
 	}
 }
 ```
+
+### Version
+We've also added a `_version` property so that the effective version of the API call which generated the response is included in the response body:
+
+```json
+{
+	"id": 1,
+	"_origin": { "href": "/item/1", "method": "GET" }
+	"_resource": "item",
+	"_action": "self",
+	"_version": 1
+}
+```
+
+> Note: if no version has ever been specified in your resources, the default is always `1`.
 
 ## Contributing
 The tests are a bit of a contrived mess at the moment but do exercise the features and known use cases. If submitting a PR, please do the following:

@@ -17,7 +17,7 @@ module.exports = function( host ) {
 					}
 				},
 				handle: function( envelope ) {
-					var lane = _.cloneDeep( _.where( model.board1.lanes, { id: parseInt( envelope.data.id ) } )[ 0 ] );
+					var lane = _.cloneDeep( _.filter( model.board1.lanes, { id: parseInt( envelope.data.id ) } )[ 0 ] );
 					return lane;
 				}
 			},
@@ -27,7 +27,7 @@ module.exports = function( host ) {
 				include: [ "id", "title", "wip" ],
 				handle: function( envelope ) {
 					return {
-						data: _.where( model.board1.lanes, { id: parseInt( envelope.data.id ) } )[ 0 ].cards,
+						data: _.filter( model.board1.lanes, { id: parseInt( envelope.data.id ) } )[ 0 ].cards,
 						resource: "card",
 						action: "self"
 					};

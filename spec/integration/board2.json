@@ -2,6 +2,7 @@
   "id": 100,
   "title": "Test Board",
   "description": "This is a board and stuff!",
+  "version": 2,
   "lanes": [
     {
       "id": 200,

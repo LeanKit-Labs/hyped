@@ -49,7 +49,8 @@ describe( "Additional Links", function() {
 				favstarred: { href: "/board/100?favstarred=true", method: "GET" },
 				worstever: { href: "/board/100?h8=true", method: "GET" },
 				"next-page": { href: "/board/100?page=2&size=10", method: "GET" }
-			}
+			},
+			_version: 1
 		};
 
 		var expectedSelf2 = {
@@ -64,13 +65,14 @@ describe( "Additional Links", function() {
 				worstever: { href: "/board/100?h8=true", method: "GET" },
 				"next-page": { href: "/board/100?page=3&size=10", method: "GET" },
 				"prev-page": { href: "/board/100?page=1&size=10", method: "GET" }
-			}
+			},
+			_version: 1
 		};
 
 		before( function() {
 			var fn = HyperResource.renderGenerator( { board: resource } );
-			self1 = fn( "board", "self", { data: { page: 1, size: 10 } }, board1, "", undefined, undefined, true );
-			self2 = fn( "board", "self", { data: { page: 2, size: 10 } }, board1, "", undefined, undefined, true );
+			self1 = fn( "board", "self", { data: { page: 1, size: 10 }, version: 1 }, board1, "", undefined, undefined, true );
+			self2 = fn( "board", "self", { data: { page: 2, size: 10 }, version: 1 }, board1, "", undefined, undefined, true );
 		} );
 
 		it( "should include next-page in links for page 1", function() {
@@ -128,7 +130,8 @@ describe( "Additional Links", function() {
 				favstarred: { href: "/badUrl/prefix1/badUrl/prefix2/board/100?favstarred=true", method: "GET" },
 				worstever: { href: "/badUrl/prefix1/badUrl/prefix2/board/100?h8=true", method: "GET" },
 				"next-page": { href: "/badUrl/prefix1/badUrl/prefix2/board/100?page=2&size=10", method: "GET" }
-			}
+			},
+			_version: 1
 		};
 
 		var expectedSelf2 = {
@@ -143,13 +146,14 @@ describe( "Additional Links", function() {
 				worstever: { href: "/badUrl/prefix1/badUrl/prefix2/board/100?h8=true", method: "GET" },
 				"next-page": { href: "/badUrl/prefix1/badUrl/prefix2/board/100?page=3&size=10", method: "GET" },
 				"prev-page": { href: "/badUrl/prefix1/badUrl/prefix2/board/100?page=1&size=10", method: "GET" }
-			}
+			},
+			_version: 1
 		};
 
 		before( function() {
 			var fn = HyperResource.renderGenerator( { board: resource }, { urlPrefix: "/badUrl", apiPrefix: "/badUrl" } );
-			self1 = fn( "board", "self", { data: { page: 1, size: 10 } }, board1, "", undefined, undefined, true );
-			self2 = fn( "board", "self", { data: { page: 2, size: 10 } }, board1, "", undefined, undefined, true );
+			self1 = fn( "board", "self", { data: { page: 1, size: 10 }, version: 1 }, board1, "", undefined, undefined, true );
+			self2 = fn( "board", "self", { data: { page: 2, size: 10 }, version: 1 }, board1, "", undefined, undefined, true );
 		} );
 
 		it( "should include next-page in links for page 1", function() {

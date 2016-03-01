@@ -5,6 +5,7 @@ var jsonEngine = require( "./jsonEngine.js" );
 var halEngine = require( "./halEngine.js" );
 var HttpEnvelope = require( "./httpEnvelope" );
 var url = require( "./urlTemplate.js" );
+var versions = require( "./versions" );
 
 function addEngine( state, engine, mediaType ) { // jshint ignore:line
 	if ( _.isArray( mediaType ) ) {
@@ -44,7 +45,7 @@ function addMiddleware( state, host, apiPrefix ) { // jshint ignore:line
 }
 
 function addResourceMiddleware( state, host ) {
-	var resourcePrefixes = _.filter( _.unique( _.pluck( _.values( state.resources ), "urlPrefix" ) ) );
+	var resourcePrefixes = _.filter( _.uniq( _.map( _.values( state.resources ), "urlPrefix" ) ) );
 	_.each( resourcePrefixes, function( resourcePrefix ) {
 		var resourcePrefixUrl = [
 			state.prefix.urlPrefix,
@@ -56,6 +57,7 @@ function addResourceMiddleware( state, host ) {
 }
 
 function addResource( state, resource, resourceName ) { // jshint ignore:line
+	versions.processHandles( resource );
 	state.resources[ resourceName ] = resource;
 }
 
@@ -95,7 +97,7 @@ function getContentType( req ) { // jshint ignore:line
 }
 
 function getEngine( state, mediaType ) { // jshint ignore:line
-	var filtered = mediaType.replace( /[.]v[0-9]*/, "" );
+	var filtered = mediaType.replace( /[.]v[0-9]*/, "" ).split( ";" )[ 0 ];
 	return state.engines[ filtered ];
 }
 
@@ -132,9 +134,27 @@ function getFullOptionModel( state ) {
 
 function getMaxVersion( state ) { // jshint ignore:line
 	return _.reduce( state.resources, function( version, resource ) {
-		var max = _.max( _.keys( resource.versions ) );
+		var max = _.maxBy( _.keys( resource.versions ), parseInt );
 		return max > version ? max : version;
 	}, 1 );
+}
+
+function getMimeVersion( header ) {
+	var version;
+	var match = /[.]v([0-9]*)/.exec( header );
+	if ( match && match.length > 0 ) {
+		version = match[ 1 ];
+	}
+	return version;
+}
+
+function getParameterVersion( header ) {
+	var version;
+	var match = /version\s*[=]\s*([0-9]+)[;]?/g.exec( header );
+	if ( match && match.length > 0 ) {
+		version = match[ 1 ];
+	}
+	return version;
 }
 
 function getVersion( state, envelope ) {
@@ -144,13 +164,13 @@ function getVersion( state, envelope ) {
 	if ( !state.maxVersion ) {
 		state.maxVersion = getMaxVersion( state );
 	}
-	var accept = envelope.headers.accept;
-	var match = /[.]v([0-9]*)/.exec( accept );
+	var accept = envelope.headers.accept || "";
+	var mimeVersion = getMimeVersion( accept );
+	var parameterVersion = getParameterVersion( accept );
 	var version = state.preferLatest ? state.maxVersion : 1;
-	if ( match && match.length > 0 ) {
-		version = parseInt( match[ 1 ] );
-	}
-	return version;
+	var final = parseInt( mimeVersion || parameterVersion || version );
+	envelope.version = final;
+	return final;
 }
 
 function hyperMiddleware( state, req, res, next ) { // jshint ignore:line
@@ -165,6 +185,10 @@ function hyperMiddleware( state, req, res, next ) { // jshint ignore:line
 	var hyperModel = getHyperModel( state, req );
 	var envelope = getEnvelope( req, res );
 	var response = new HyperResponse( envelope, engine, hyperModel, contentType ).origin( req.originalUrl, req.method ); // jshint ignore:line
+	if ( !req.context ) {
+		req.context = {};
+	}
+	req.context.version = getVersion( state, envelope );
 	next();
 }
 

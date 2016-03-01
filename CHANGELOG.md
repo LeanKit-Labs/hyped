@@ -1,12 +1,17 @@
 ## 0.6.x
 
+### Next
+ * Support for "hoisting" child resource actions to parent's hypermedia
+ * First pass at adding support for action hoisting
+ * Add support for handle versioning
+
 ### 0.6.1
-* When not using hal, still render empty arrays at the top-level for embedded resources
+ * When not using hal, still render empty arrays at the top-level for embedded resources
 
 ### 0.6.0
-* Send 204 (or other empty responses) without HAL wrapper
-* Skip extra HAL links, authorization work when returning JSON responses
-* Don't call authorize a second time for the link currently being rendered
+ * Send 204 (or other empty responses) without HAL wrapper
+ * Skip extra HAL links, authorization work when returning JSON responses
+ * Don't call authorize a second time for the link currently being rendered
 
 ### 0.5.1
  * Bug fix - hypermedia links no longer returned in error responses (status > 400)

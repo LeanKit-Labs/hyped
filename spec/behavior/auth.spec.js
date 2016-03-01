@@ -38,12 +38,13 @@ describe( "Authorization", function() {
 				self: { href: "/board/100", method: "GET" }
 			},
 			_resource: "board",
-			_action: "self"
+			_action: "self",
+			_version: 10
 		};
 
 		before( function() {
 			var fn = HyperResource.renderGenerator( { board: resource } );
-			return fn( "board", "self", {}, board1, "", undefined, undefined, true ).then( function( data ) {
+			return fn( "board", "self", { version: 10 }, board1, "", undefined, undefined, true ).then( function( data ) {
 				self = data;
 			} );
 		} );

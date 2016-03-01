@@ -16,7 +16,10 @@ module.exports = function( host ) {
 					}
 				},
 				handle: function( envelope ) {
-					envelope.hyped( model.board1 ).status( 200 ).render();
+					return {
+						status: 200,
+						data: model.board1
+					};
 				}
 			},
 			cards: {
@@ -24,9 +27,23 @@ module.exports = function( host ) {
 				url: "/:id/card",
 				render: { resource: "card", action: "self" },
 				handle: function( envelope ) {
-					return _.reduce( model.board1.lanes, function( acc, lane ) {
+					var list = _.reduce( model.board1.lanes, function( acc, lane ) {
 						return acc.concat( lane.cards );
 					}, [] );
+					list.id = envelope.data.id;
+					return list;
+				},
+				links: {
+					next: function( envelope, data ) {
+						var currentPage = 1;
+						if ( envelope.data ) {
+							currentPage = envelope.data.page || 1;
+						}
+
+						if ( data.length > 5 ) {
+							return "/board/:id/card?page=" + ( currentPage + 1 );
+						}
+					}
 				}
 			},
 			hidden: {
@@ -43,7 +60,26 @@ module.exports = function( host ) {
 		versions: {
 			2: {
 				self: {
-					include: [ "id", "title", "description" ]
+					handle: function( envelope ) {
+						var data = _.cloneDeep( model.board1 );
+						data.version = 2;
+						return {
+							status: 200,
+							data: data
+						};
+					},
+					include: [ "id", "title", "description", "version" ]
+				}
+			},
+			10: {
+				self: {
+					handle: function( envelope ) {
+						return {
+							status: 200,
+							data: { wat: "crazy train" }
+						};
+					},
+					include: [ "wat" ]
 				}
 			}
 		}

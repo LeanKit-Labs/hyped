@@ -2,6 +2,7 @@ module.exports = {
 	_origin: { href: "/parent/1/child?page=1&size=5", method: "GET" },
 	_resource: "parent",
 	_action: "children",
+	_version: 3,
 	children: [
 		{
 			id: 1,
@@ -14,7 +15,8 @@ module.exports = {
 			_links: {
 				self: { href: "/parent/1/child/1", method: "GET" },
 				change: { href: "/parent/1/child/1", method: "PUT" }
-			}
+			},
+			_version: 3
 		},
 		{
 			id: 2,
@@ -26,7 +28,8 @@ module.exports = {
 			_origin: { href: "/parent/1/child/2", method: "GET" },
 			_links: {
 				self: { href: "/parent/1/child/2", method: "GET" }
-			}
+			},
+			_version: 3
 		},
 		{
 			id: 3,
@@ -39,7 +42,8 @@ module.exports = {
 			_links: {
 				self: { href: "/parent/1/child/3", method: "GET" },
 				change: { href: "/parent/1/child/3", method: "PUT" }
-			}
+			},
+			_version: 3
 		}
 	],
 	_links: {

@@ -17,10 +17,12 @@ describe( "Hyper Resource", function() {
 				_origin: { href: "/parent/1", method: "GET" },
 				_resource: "parent",
 				_action: "self",
+				_version: 2,
 				_links: {
 					self: { href: "/parent/1", method: "GET" },
 					children: { href: "/parent/1/child", method: "GET", parameters: parameters },
-					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters }
+					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters },
+					"create-child": { href: "/parent/1/child", method: "POST" }
 				}
 			};
 			var response;
@@ -37,7 +39,7 @@ describe( "Hyper Resource", function() {
 
 			before( function() {
 				var fn = HyperResource.resourceGenerator( resources, "", 2 );
-				response = fn( "parent", "self", { data: requestData }, data, "", undefined, undefined, true );
+				response = fn( "parent", "self", { data: requestData, version: 2 }, data, "", undefined, undefined, true );
 			} );
 
 			it( "should return the correct response", function() {
@@ -58,10 +60,12 @@ describe( "Hyper Resource", function() {
 				_origin: { href: "/parent/1", method: "GET" },
 				_resource: "parent",
 				_action: "self",
+				_version: 1,
 				_links: {
 					self: { href: "/parent/1", method: "GET" },
 					children: { href: "/parent/1/child", method: "GET", parameters: parameters },
-					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters }
+					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters },
+					"create-child": { href: "/parent/1/child", method: "POST" }
 				}
 			};
 			var response;
@@ -78,7 +82,7 @@ describe( "Hyper Resource", function() {
 
 			before( function() {
 				var fn = HyperResource.resourceGenerator( resources );
-				response = fn( "parent", "self", { data: requestData }, data, "", undefined, undefined, true );
+				response = fn( "parent", "self", { data: requestData, version: 1 }, data, "", undefined, undefined, true );
 			} );
 
 			it( "should return the correct response", function() {
@@ -98,7 +102,8 @@ describe( "Hyper Resource", function() {
 			var envelope = {
 				user: {
 					name: "Evenly"
-				}
+				},
+				version: 1
 			};
 			before( function() {
 				var fn1 = HyperResource.resourceGenerator( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
@@ -121,7 +126,8 @@ describe( "Hyper Resource", function() {
 			var envelope = {
 				user: {
 					name: "Evenly"
-				}
+				},
+				version: 1
 			};
 			before( function() {
 				var fn1 = HyperResource.resourceGenerator( resources, { urlPrefix: "/test", apiPrefix: "/api" } );
@@ -176,7 +182,7 @@ describe( "Hyper Resource", function() {
 	describe( "when rendering options including children and skipping auth check", function() {
 		var expected = {
 			_mediaTypes: [],
-			_versions: [ "1", "2" ],
+			_versions: [ "1", "2", "10" ],
 			_links: {
 				"parent:self": { href: "/parent/{id}", method: "GET", templated: true },
 				"parent:list": { href: "/parent", method: "GET" },
@@ -185,6 +191,7 @@ describe( "Hyper Resource", function() {
 					} },
 				"parent:bogus": { href: "/parent/bogus", method: "GET" },
 				"parent:privileged": { href: "/parent/privileged", method: "GET" },
+				"child:create": { href: "/parent/{parentId}/child", method: "POST", templated: true },
 				"child:self": { href: "/parent/{parentId}/child/{id}", method: "GET", templated: true },
 				"child:change": { href: "/parent/{parentId}/child/{id}", method: "PUT", templated: true },
 				"grandChild:self": { href: "/parent/{parentId}/child/{childId}/grand/{id}", method: "GET", templated: true },
@@ -207,7 +214,7 @@ describe( "Hyper Resource", function() {
 	describe( "when rendering options excluding children as generic user", function() {
 		var expected = {
 			_mediaTypes: [],
-			_versions: [ "1", "2" ],
+			_versions: [ "1", "2", "10" ],
 			_links: {
 				"parent:self": { href: "/parent/{id}", method: "GET", templated: true },
 				"parent:list": { href: "/parent", method: "GET" },
@@ -236,7 +243,7 @@ describe( "Hyper Resource", function() {
 	describe( "when rendering options excluding children as admin", function() {
 		var expected = {
 			_mediaTypes: [],
-			_versions: [ "1", "2" ],
+			_versions: [ "1", "2", "10" ],
 			_links: {
 				"parent:self": { href: "/parent/{id}", method: "GET", templated: true },
 				"parent:privileged": { href: "/parent/privileged", method: "GET" },
@@ -278,7 +285,7 @@ describe( "Hyper Resource", function() {
 
 		before( function() {
 			var fn1 = HyperResource.resourcesGenerator( resources );
-			response = fn1( "parent", "self", { resource: "parent", action: "list" }, data, "", "/parent", "GET", true );
+			response = fn1( "parent", "self", { resource: "parent", action: "list", version: 1 }, data, "", "/parent", "GET", true );
 		} );
 
 		it( "should return the correct response", function() {
@@ -310,7 +317,7 @@ describe( "Hyper Resource", function() {
 
 		before( function() {
 			var fn1 = HyperResource.resourcesGenerator( resources );
-			response = fn1( "parent", "self", { resource: "parent", action: "list" }, data, "", "/parent", "GET", true );
+			response = fn1( "parent", "self", { resource: "parent", action: "list", version: 2 }, data, "", "/parent", "GET", true );
 		} );
 
 		it( "should return the correct response", function() {
@@ -324,7 +331,7 @@ describe( "Hyper Resource", function() {
 
 		before( function() {
 			var fn1 = HyperResource.resourcesGenerator( resources );
-			response = fn1( "parent", "self", { resource: "parent", action: "list" }, undefined, "", "/parent", "GET", true );
+			response = fn1( "parent", "self", { resource: "parent", action: "list", version: 1 }, undefined, "", "/parent", "GET", true );
 		} );
 
 		it( "should return the correct response", function() {
@@ -367,7 +374,8 @@ describe( "Hyper Resource", function() {
 					name: "Oddly"
 				},
 				resource: "parent",
-				action: "children"
+				action: "children",
+				version: 3
 			};
 			response = fn1( "child", "self", envelope, data, "", "/parent/1/child?page=1&size=5", "GET", true );
 		} );

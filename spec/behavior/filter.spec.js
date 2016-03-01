@@ -30,12 +30,13 @@ describe( "Property Filtering", function() {
 			_action: "self",
 			_links: {
 				self: { href: "/board/100", method: "GET" }
-			}
+			},
+			_version: 2
 		};
 
 		before( function() {
 			var fn = hyperResource.renderGenerator( { board: resource } );
-			self = fn( "board", "self", {}, board1, "", undefined, undefined, true );
+			self = fn( "board", "self", { version: 2 }, board1, "", undefined, undefined, true );
 		} );
 
 		it( "should generate hypermedia without `lanes` or `hidden` fields", function() {
