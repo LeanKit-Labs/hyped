@@ -1,5 +1,8 @@
 ## 0.6.x
 
+### 0.6.3
+ * Add support for preInit call to configuration to allow pre-empting addition of hyped middelware
+
 ### 0.6.2
  * Support for "hoisting" child resource actions to parent's hypermedia
  * Add support for versioning action handles

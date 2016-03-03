@@ -357,6 +357,22 @@ This example will add middleware to `autohost` that extends the envelope to inte
 
 	Note: this approach only works with Autohost 0.4.0 or greater.
 
+
+#### PreInit
+There may be times where you need to add routes or middleware that pre-empt `hyped`'s. To do this, you can provide a `preInit` property in the configuration block (second argument to `createHost`). This function will be passed a handle to autohost and should either return a promise or invoke a callback when its finished.
+
+```javascript
+{
+	preInit: function( host, cb ) {
+		host.http.middleware( "/", function( req, res, next ) {
+			// this would get called before all other middleware
+			// and for every request
+			next();
+		}, "global" );
+	}
+}
+```
+
 __index.js__
 ```javascript
 var autohost = require( "autohost" );
