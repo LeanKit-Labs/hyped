@@ -581,4 +581,68 @@ describe( "Autohost Integration", function() {
 			host.stop();
 		} );
 	} );
+
+	describe( "with preInit as callback", function() {
+		var hyped, host, globalCalled;
+		before( function( done ) {
+			hyped = require( "../../src/index.js" )( true, true );
+			host = hyped.createHost( autohost, {
+				resources: "./spec/ah",
+				apiPrefix: "",
+				preInit: function( host, callback ) {
+					host.http.middleware( "/", function( req, res, next ) {
+						globalCalled = true;
+						next();
+					}, "global" );
+					callback();
+				}
+			}, function() {
+					host.start();
+					done();
+				} );
+		} );
+
+		it( "should invoke global middleware added during preInit", function( done ) {
+			request( "http://localhost:8800/board/100", function( err, res ) {
+				globalCalled.should.equal( true );
+				done();
+			} );
+		} );
+
+		after( function() {
+			host.stop();
+		} );
+	} );
+
+	describe( "with preInit as promise", function() {
+		var hyped, host, globalCalled;
+		before( function( done ) {
+			hyped = require( "../../src/index.js" )( true, true );
+			host = hyped.createHost( autohost, {
+				resources: "./spec/ah",
+				apiPrefix: "",
+				preInit: function( host ) {
+					host.http.middleware( "/", function( req, res, next ) {
+						globalCalled = true;
+						next();
+					}, "global" );
+					return when.resolve();
+				}
+			}, function() {
+					host.start();
+					done();
+				} );
+		} );
+
+		it( "should invoke global middleware added during preInit", function( done ) {
+			request( "http://localhost:8800/board/100", function( err, res ) {
+				globalCalled.should.equal( true );
+				done();
+			} );
+		} );
+
+		after( function() {
+			host.stop();
+		} );
+	} );
 } );

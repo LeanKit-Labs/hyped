@@ -75,16 +75,27 @@ function createHost( state, autohost, config, done ) {
 	config.noOptions = true;
 	config.urlStrategy = state.urlStrategy;
 	var host = autohost( config );
-	state.setupMiddleware( host );
-	var subscription;
-	subscription = host.onResources( function( resources ) {
-		state.addResources( resources );
-		addResourceMiddleware( state, host );
-		subscription.unsubscribe();
-		if ( done ) {
-			done();
+	var preInit = config.preInit;
+	function callback() {
+		state.setupMiddleware( host );
+		var subscription;
+		subscription = host.onResources( function( resources ) {
+			state.addResources( resources );
+			addResourceMiddleware( state, host );
+			subscription.unsubscribe();
+			if ( done ) {
+				done();
+			}
+		} );
+	}
+	if ( preInit ) {
+		var result = preInit( host, callback );
+		if ( result && result.then ) {
+			result.then( callback );
 		}
-	} );
+	} else {
+		callback();
+	}
 	return host;
 }
 
