@@ -14,12 +14,12 @@ describe( "Hyper Resource", function() {
 			var expected = {
 				id: 1,
 				title: "test",
-				_origin: { href: "/parent/1", method: "GET" },
+				_origin: { href: "/parent/2/1", method: "GET" },
 				_resource: "parent",
 				_action: "self",
 				_version: 2,
 				_links: {
-					self: { href: "/parent/1", method: "GET" },
+					self: { href: "/parent/2/1", method: "GET" },
 					children: { href: "/parent/1/child", method: "GET", parameters: parameters },
 					"next-child-page": { href: "/parent/1/child?page=2&size=5", method: "GET", parameters: parameters },
 					"create-child": { href: "/parent/1/child", method: "POST" }
@@ -228,6 +228,35 @@ describe( "Hyper Resource", function() {
 
 		before( function() {
 			var fn = HyperResource.optionsGenerator( resources, "", undefined, true, envelope );
+			options = fn();
+		} );
+
+		it( "should render options correctly", function() {
+			return options.should.eventually.eql( expected );
+		} );
+
+		it( "should not have called authorize on hidden action", function() {
+			return should.not.exist( envelope.hiddenWasAuthorized );
+		} );
+	} );
+
+	describe( "when rendering options (version 10) excluding children as generic user", function() {
+		var expected = {
+			_mediaTypes: [],
+			_versions: [ "1", "2", "10" ],
+			_links: {
+				"parent:self": { href: "/parent/10/{id}", method: "GET", templated: true },
+				"parent:list": { href: "/parent", method: "GET" },
+				"parent:children": { href: "/parent/{id}/child", method: "GET", templated: true, parameters: {
+						size: { range: [ 1, 100 ] }
+					} }
+			}
+		};
+		var options;
+		var envelope = { user: {} };
+
+		before( function() {
+			var fn = HyperResource.optionsGenerator( resources, "", 10, true, envelope );
 			options = fn();
 		} );
 

@@ -73,6 +73,7 @@ module.exports = function( host ) {
 			},
 			10: {
 				self: {
+					url: "/train/:id",
 					handle: function( envelope ) {
 						return {
 							status: 200,

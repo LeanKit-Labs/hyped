@@ -58,6 +58,7 @@ function addResourceMiddleware( state, host ) {
 
 function addResource( state, resource, resourceName ) { // jshint ignore:line
 	versions.processHandles( resource );
+	versions.processAuthorize( resource );
 	state.resources[ resourceName ] = resource;
 }
 
@@ -108,7 +109,7 @@ function getContentType( req ) { // jshint ignore:line
 }
 
 function getEngine( state, mediaType ) { // jshint ignore:line
-	var filtered = mediaType.replace( /[.]v[0-9]*/, "" ).split( ";" )[ 0 ];
+	var filtered = mediaType.replace( /[.]v([0-9]+|latest)/, "" ).split( ";" )[ 0 ];
 	return state.engines[ filtered ];
 }
 
@@ -136,23 +137,25 @@ function getOptionModel( state, envelope ) {
 }
 
 function getFullOptionModel( state ) {
-	var version = 1;
-	if ( !state.fullOptionModels[ version ] ) {
-		state.fullOptionModels[ version ] = HyperResource.routesGenerator( state.resources, state.prefix, version )( state.engines );
+	var maxVersion = getMaxVersion( state );
+	for ( var i = 1; i <= maxVersion; i++ ) {
+		if ( !state.fullOptionModels[ i ] ) {
+			state.fullOptionModels[ i ] = HyperResource.routesGenerator( state.resources, state.prefix, i )( state.engines );
+		}
 	}
-	return state.fullOptionModels[ version ];
+	return state.fullOptionModels;
 }
 
 function getMaxVersion( state ) { // jshint ignore:line
 	return _.reduce( state.resources, function( version, resource ) {
-		var max = _.maxBy( _.keys( resource.versions ), parseInt );
+		var max = parseInt( _.maxBy( _.keys( resource.versions ), parseInt ) ) || 0;
 		return max > version ? max : version;
 	}, 1 );
 }
 
 function getMimeVersion( header ) {
 	var version;
-	var match = /[.]v([0-9]*)/.exec( header );
+	var match = /[.]v([0-9]+|latest)/.exec( header );
 	if ( match && match.length > 0 ) {
 		version = match[ 1 ];
 	}
@@ -161,7 +164,7 @@ function getMimeVersion( header ) {
 
 function getParameterVersion( header ) {
 	var version;
-	var match = /version\s*[=]\s*([0-9]+)[;]?/g.exec( header );
+	var match = /version\s*[=]\s*([0-9]+|latest)[;]?/g.exec( header );
 	if ( match && match.length > 0 ) {
 		version = match[ 1 ];
 	}
@@ -178,6 +181,8 @@ function getVersion( state, envelope ) {
 	var accept = envelope.headers.accept || "";
 	var mimeVersion = getMimeVersion( accept );
 	var parameterVersion = getParameterVersion( accept );
+	parameterVersion = parameterVersion === "latest" ? state.maxVersion : parameterVersion;
+	mimeVersion = mimeVersion === "latest" ? state.maxVersion : mimeVersion;
 	var version = state.preferLatest ? state.maxVersion : 1;
 	var final = parseInt( mimeVersion || parameterVersion || version );
 	envelope.version = final;
@@ -230,10 +235,25 @@ function urlStrategy( state, resourceName, actionName, action, resourceList ) { 
 	if ( _.isEmpty( state.resources ) ) {
 		state.resources = resourceList;
 	}
-	// will need to do this for all available versions at some point ...
+
 	var options = getFullOptionModel( state );
-	var link = options._links[ [ resourceName, actionName ].join( ":" ) ];
-	return link ? url.forExpress( link.href ) : "";
+	var versions = options[ 1 ]._versions;
+	var key = [ resourceName, actionName ].join( ":" );
+	var links = _.uniq( _.reduce( versions, function( acc, version ) {
+		var versionSet = options[ version ];
+		if ( versionSet ) {
+			var link = url.forExpress( versionSet._links[ key ].href );
+			acc.push( link || "" );
+		}
+		return acc;
+	}, [] ) );
+	if ( links.length === 0 ) {
+		return "";
+	} else if ( links.length === 1 ) {
+		return links[ 0 ];
+	} else {
+		return links;
+	}
 }
 
 module.exports = function( resourceList, defaultToNewest, includeChildrenInOptions ) {

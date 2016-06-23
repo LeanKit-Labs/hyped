@@ -272,4 +272,23 @@ describe( "Action links", function() {
 			} );
 		} );
 	} );
+
+	describe( "with action rendering with non-default version", function() {
+		describe( "when rendering an \"plain\" action", function() {
+			var expected = { self: { href: "/parent/2/1", method: "GET" } };
+			var createLinks;
+			var model;
+			before( function() {
+				model = {
+					id: 1
+				};
+				createLinks = links.getLinkGenerator( resources, "", 2 );
+			} );
+
+			it( "should produce expected links", function() {
+				return createLinks( "parent", "self", {}, model )
+					.should.eventually.eql( expected );
+			} );
+		} );
+	} );
 } );
