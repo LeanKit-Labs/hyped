@@ -387,8 +387,9 @@ describe( "Autohost Integration", function() {
 			var body, contentType;
 
 			before( function( done ) {
-				request( "http://localhost:8800/api/board/100", function( err, res ) {
+				request( "http://localhost:8800/api/board/train/100", function( err, res ) {
 					body = JSON.parse( res.body );
+
 					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
 					done();
 				} );
@@ -464,7 +465,107 @@ describe( "Autohost Integration", function() {
 		} );
 	} );
 
-	describe( "with undefined api prefix", function() {
+	describe( "with versioned authorization calls", function() {
+		var hyped, host;
+		before( function( done ) {
+			hyped = require( "../../src/index.js" )( {
+				defaultContentType: "application/hal+json"
+			} );
+			host = hyped.createHost( autohost, {
+				urlPrefix: "/test",
+				resources: "./spec/ah"
+			}, function() {
+					host.start();
+					done();
+				} );
+		} );
+
+		describe( "when requesting with version 1 and adequate authorization", function() {
+			var body, contentType;
+
+			before( function( done ) {
+				request( "http://localhost:8800/test/api/secure?level=2",
+						{ headers: { accept: "*/*" } },
+						function( err, res ) {
+							body = JSON.parse( res.body );
+							contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+							done();
+						} );
+			}
+		);
+
+			it( "should get HAL version 1 (default content type and version)", function() {
+				contentType.should.equal( "application/hal+json" );
+				body.result.should.eql( "level 1" );
+			} );
+		} );
+
+		describe( "when requesting with version 1 and inadequate authorization", function() {
+			var body, contentType;
+
+			before( function( done ) {
+				request( "http://localhost:8800/test/api/secure?level=1",
+						{ headers: { accept: "*/*" } },
+						function( err, res ) {
+							body = JSON.parse( res.body );
+							contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+							done();
+						} );
+			}
+		);
+
+			it( "should get HAL version 1 (default content type and version)", function() {
+				contentType.should.equal( "application/hal+json" );
+				body.message.should.eql( "User lacks sufficient permissions" );
+			} );
+		} );
+
+		describe( "when requesting with version 2 and adequate authorization", function() {
+			var body, contentType;
+
+			before( function( done ) {
+				request( "http://localhost:8800/test/api/secure?level=3",
+						{ headers: { accept: "application/hal.v2+json" } },
+						function( err, res ) {
+							body = JSON.parse( res.body );
+							contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+							done();
+						} );
+			}
+		);
+
+			it( "should get HAL version 2 (default content type and version)", function() {
+				contentType.should.equal( "application/hal.v2+json" );
+				body.result.should.eql( "level 2" );
+			} );
+		} );
+
+		describe( "when requesting with version 2 and inadequate authorization", function() {
+			var body, contentType;
+
+			before( function( done ) {
+				request( "http://localhost:8800/test/api/secure?level=2",
+						{ headers: { accept: "application/hal.v2+json" } },
+						function( err, res ) {
+							body = JSON.parse( res.body );
+							contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+							done();
+						} );
+			}
+		);
+
+			it( "should get HAL version 2 (default content type and version)", function() {
+				contentType.should.equal( "application/hal.v2+json" );
+				body.message.should.eql( "User lacks sufficient permissions" );
+			} );
+		} );
+
+		after( function() {
+			host.stop();
+		} );
+	} );
+
+	describe( "with undefined api prefix and latest version as default", function() {
 		var hyped, host;
 		before( function( done ) {
 			hyped = require( "../../src/index.js" )( true, true );

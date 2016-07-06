@@ -54,7 +54,7 @@ function deepMerge( target, source ) { // jshint ignore:line
 				target[ key ] = _.clone( val );
 			}
 		} else {
-			target[ key ] = ( original === undefined ) ? _.clone( val ) : original;
+			target[ key ] = ( val ) ? _.clone( val ) : original;
 		}
 	} );
 }
@@ -117,8 +117,41 @@ function processHandles( resource ) {
 	}
 }
 
+function processAuthorize( resource ) {
+	if ( resource.versions ) {
+		_.each( resource.versions, function( change, version ) {
+			version = parseInt( version );
+			_.each( change, function( action, name ) {
+				if ( action.authorize ) {
+					var targetAction = resource.actions[ name ];
+					if ( !targetAction ) {
+						resource.actions[ name ].authorize = [];
+					} else if ( !_.isArray( targetAction.authorize ) ) {
+						var original = targetAction.authorize;
+						resource.actions[ name ].authorize = [
+							{
+								when: function() {
+									return true;
+								},
+								then: original
+							}
+						];
+					}
+					resource.actions[ name ].authorize.unshift( {
+						when: function( envelope ) {
+							return envelope.version >= version;
+						},
+						then: action.authorize
+					} );
+				}
+			} );
+		} );
+	}
+}
+
 module.exports = {
 	getVersions: getVersions,
 	getVersion: getVersion,
+	processAuthorize: processAuthorize,
 	processHandles: processHandles
 };

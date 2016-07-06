@@ -16,6 +16,7 @@ describe( "Versioning", function() {
 
 		it( "should merge distinct versions correctly", function() {
 			should.not.exist( parentVersion1.actions.self.include );
+			parentVersion2.actions.self.url.should.eql( "/parent/2/:id" );
 			parentVersion2.actions.self.include.should.eql( [ "id", "title" ] );
 			parentVersion3.actions.self.include.should.eql( [ "id" ] );
 		} );

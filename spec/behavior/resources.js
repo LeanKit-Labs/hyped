@@ -80,6 +80,7 @@ var resources = {
 		versions: {
 			2: {
 				self: {
+					url: "/parent/2/:id",
 					include: [ "id", "title" ],
 					handle: function() {
 						return "two";
@@ -88,6 +89,7 @@ var resources = {
 			},
 			10: {
 				self: {
+					url: "/parent/10/:id",
 					include: [ "id" ],
 					handle: function() {
 						return "three";

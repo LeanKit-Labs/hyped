@@ -376,7 +376,16 @@ function getRenderPredicate( action, actionName, resourceName, forOptions ) { //
 		};
 	}
 	if ( action.authorize ) {
-		allowRender = action.authorize;
+		allowRender = function( envelope, data ) {
+			if ( _.isArray( action.authorize ) ) {
+				var fn = _.find( action.authorize, function( auth ) {
+					return auth.when( envelope );
+				} );
+				return fn.then( envelope, data );
+			} else {
+				return action.authorize( envelope, data );
+			}
+		};
 	}
 	var authName = [ resourceName, actionName ].join( ":" );
 	return function( envelope, data, auth ) {

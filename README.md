@@ -291,6 +291,8 @@ The default versioning strategies parses the version specifier out of the `Accep
  * `application/json; version=2`
  * `application/hal+json; version=3`
 
+> Note: hyped also supports the use of the keyword `latest` in place of a numeric indicator.
+
 #### Versioning handlers
 Handlers behave a bit differently. When providing a new handle implementation for a version, that handle implementation will apply for the current version _and_ any consecutive versions after that don't provide their own handle implementation.
 

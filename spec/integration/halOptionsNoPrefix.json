@@ -2,7 +2,7 @@
 	"_links":
 	{
 		"board:cards": { "href": "/board/{id}/card", "method": "GET", "templated": true },
-		"board:self": { "href": "/board/{id}", "method": "GET", "templated": true },
+		"board:self": { "href": "/board/train/{id}", "method": "GET", "templated": true },
 		"card:self": { "href": "/card/{id}", "method": "GET", "templated": true },
 		"card:move": { "href": "/card/{id}/board/{targetBoardId}/lane/{targetLaneId}", "method": "PUT", "templated": true },
 		"card:block": { "href": "/card/{id}/block", "method": "PUT", "templated": true },

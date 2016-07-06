@@ -1,3 +1,10 @@
+## 0.7.x
+
+### 0.7.0
+ * Support use of `latest` as a version specifier
+ * Support URL changes across versions (includes OPTIONS)
+ * Support authorize changes across versions
+
 ## 0.6.x
 
 ### 0.6.3
