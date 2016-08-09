@@ -24,6 +24,57 @@ describe( "Autohost Integration", function() {
 				} );
 		} );
 
+		describe( "when request factors create overlapping properties for envelope", function() {
+			var body, contentType;
+
+			before( function( done ) {
+				request( "http://localhost:8800/test/api/board/100?id=200&qp=iwin",
+					{
+						method: "post",
+						headers: {
+							"content-type": "application/json",
+							accept: "application/json; version=11"
+						},
+						body: {
+							id: 300,
+							qp: "ilose",
+							bp: "iwin"
+						},
+						json: true
+					},
+					function( err, res ) {
+						body = res.body;
+						contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+						done();
+					} );
+			} );
+
+			it( "should get JSON representation of context", function() {
+				contentType.should.equal( "application/json" );
+				body.should.eql( {
+					merged: {
+						id: "100",
+						qp: "iwin",
+						bp: "iwin"
+					},
+					params: {
+						id: "100",
+						qp: "iwin"
+					},
+					query: {
+						id: "200",
+						qp: "iwin"
+					},
+					body: {
+						id: 300,
+						qp: "ilose",
+						bp: "iwin"
+					},
+					version: 8
+				} );
+			} );
+		} );
+
 		describe( "when altering context", function() {
 			var body, contentType;
 

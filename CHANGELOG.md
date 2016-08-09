@@ -1,5 +1,10 @@
 ## 0.7.x
 
+### 0.7.1
+ * Bug fix - change order of merge operations into `data` to prefer url parameter, then request body, then query parameter.
+ * Bug fix - clone request body to data property on envelope; do not copy reference and allow mutation
+ * Improvement - add query, parameter and body properties to envelope
+
 ### 0.7.0
  * Support use of `latest` as a version specifier
  * Support URL changes across versions (includes OPTIONS)

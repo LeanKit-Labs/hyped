@@ -1,6 +1,7 @@
 {
 	"_links":
 	{
+		"board:add": { "href": "/test/api/board/{id}", "method": "POST", "templated": true },
 		"board:cards": { "href": "/test/api/board/{id}/card", "method": "GET", "templated": true },
 		"board:self": { "href": "/test/api/board/{id}", "method": "GET", "templated": true },
 		"card:self": { "href": "/test/api/card/{id}", "method": "GET", "templated": true },
