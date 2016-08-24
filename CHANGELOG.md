@@ -1,3 +1,9 @@
+## 1.x
+
+### 1.0.0
+
+* Fixes several bugs related to how query properties are merged to envelope data. Ensures query, paramters and body are all available on envelope directly.
+
 ## 0.7.x
 
 ### 0.7.1
