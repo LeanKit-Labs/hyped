@@ -22,6 +22,23 @@ module.exports = function( host ) {
 					};
 				}
 			},
+			add: {
+				url: "/:id",
+				method: "post",
+				handle: function( envelope ) {
+					var resp = {
+						query: envelope.query,
+						params: envelope.params,
+						body: envelope.body,
+						merged: envelope.data,
+						version: 8
+					};
+					return {
+						status: 200,
+						data: resp
+					};
+				}
+			},
 			cards: {
 				method: "get",
 				url: "/:id/card",

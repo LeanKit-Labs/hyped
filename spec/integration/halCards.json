@@ -93,6 +93,10 @@
 			"href": "/test/api/board/100",
 			"method": "GET"
 		},
+		"add": {
+			"href": "/test/api/board/100",
+			"method": "POST"
+		},
 		"cards": {
 			"href": "/test/api/board/100/card",
 			"method": "GET"
