@@ -11,7 +11,6 @@ global.sinon = require( "sinon" );
 global.proxyquire = require( "proxyquire" ).noPreserveCache();
 var sinonChai = require( "sinon-chai" );
 chai.use( sinonChai );
-require( "sinon-as-promised" );
 
 var _log = console.log;
 console.log = function() {
