@@ -10,7 +10,7 @@
     "when": "^3.x"
   },
   "devDependencies": {
-    "autohost": "^2.0.0",
+    "autohost": "^3.0.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "mocha": "^8.2.1",
