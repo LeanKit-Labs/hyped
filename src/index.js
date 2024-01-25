@@ -198,6 +198,10 @@ function hyperMiddleware( state, req, res, next ) { // jshint ignore:line
 		contentType = state.defaultContentType;
 	}
 	var engine = getEngine( state, contentType );
+	if ( !engine && contentType.includes( "application/json" ) ) {
+		contentType = "application/json";
+		engine = jsonEngine;
+	}
 	var hyperModel = getHyperModel( state, req );
 	var envelope = getEnvelope( req, res );
 	var response = new HyperResponse( envelope, engine, hyperModel, contentType ).origin( req.originalUrl, req.method ); // jshint ignore:line
