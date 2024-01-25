@@ -490,6 +490,23 @@ describe( "Autohost Integration", function() {
 			} );
 		} );
 
+		describe( "when requesting a media type that includes json", function() {
+			var body, contentType, elapsedMs, status;
+
+			before( function( done ) {
+				request.get( "http://localhost:8800/test/api/board/100", { headers: { accept: "text/plain, application/json, application/*+json, */*" } }, function( err, res ) {
+					status = res.statusCode;
+					contentType = res.headers[ "content-type" ].split( ";" )[ 0 ];
+					done();
+				} );
+			} );
+
+			it( "should return 200", function() {
+				status.should.equal( 200 );
+				contentType.should.equal( "application/json" );
+			} );
+		} );
+
 		describe( "when requesting an unsupported media type", function() {
 			var body, contentType, elapsedMs, status;
 
