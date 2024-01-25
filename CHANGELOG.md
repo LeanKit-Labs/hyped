@@ -1,5 +1,9 @@
 ## 1.x
 
+### 1.0.2
+
+* Allowed falling back to json engine when accept header includes application/json
+
 ### 1.0.1
 
 * Updated dependencies
